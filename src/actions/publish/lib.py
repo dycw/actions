@@ -39,8 +39,8 @@ Running %r (version %s) with settings:
         native_tls,
     )
     with TemporaryDirectory() as temp:
-        log_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
-        log_run(
+        _ = log_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
+        _ = log_run(
             "uv",
             "publish",
             *([] if username is None else ["--username", username]),
