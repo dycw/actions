@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from contextlib import suppress
-from subprocess import CalledProcessError, check_output
+from subprocess import CalledProcessError
 
 from utilities.version import parse_version
 
 from actions import __version__
 from actions.logging import LOGGER
 from actions.settings import SETTINGS
+from actions.utilities import log_run
 
 
 def actions(
@@ -34,9 +35,9 @@ Running 'tag', version %s with settings:
         major,
         latest,
     )
-    _ = _log_run("git", "config", "--global", "user.name", user_name)
-    _ = _log_run("git", "config", "--global", "user.email", user_email)
-    version = parse_version(_log_run("bump-my-version", "show", "current_version"))
+    _ = log_run("git", "config", "--global", "user.name", user_name)
+    _ = log_run("git", "config", "--global", "user.email", user_email)
+    version = parse_version(log_run("bump-my-version", "show", "current_version"))
     _tag(str(version))
     if major_minor:
         _tag(f"{version.major}.{version.minor}")
@@ -48,16 +49,11 @@ Running 'tag', version %s with settings:
 
 def _tag(version: str, /) -> None:
     with suppress(CalledProcessError):
-        _ = _log_run("git", "tag", "--delete", version)
+        _ = log_run("git", "tag", "--delete", version)
     with suppress(CalledProcessError):
-        _ = _log_run("git", "push", "--delete", "origin", version)
-    _ = _log_run("git", "tag", "-a", version, "HEAD", "-m", version)
-    _ = _log_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
-
-
-def _log_run(*cmds: str) -> str:
-    LOGGER.info("Running '%s'...", " ".join(cmds))
-    return check_output(cmds, text=True)
+        _ = log_run("git", "push", "--delete", "origin", version)
+    _ = log_run("git", "tag", "-a", version, "HEAD", "-m", version)
+    _ = log_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
 
 
 __all__ = ["actions"]
