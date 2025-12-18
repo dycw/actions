@@ -13,31 +13,30 @@ from actions.utilities import ENV_LOADER
 
 
 @click_options(
-    CommonSettings, [ENV_LOADER], show_envvars_in_help=True, argname="common_settings"
+    CommonSettings, [ENV_LOADER], show_envvars_in_help=True, argname="common"
 )
-@click_options(
-    TagSettings, [ENV_LOADER], show_envvars_in_help=True, argname="tag_settings"
-)
-def tag_sub_cmd(*, common_settings: CommonSettings, tag_settings: TagSettings) -> None:
+@click_options(TagSettings, [ENV_LOADER], show_envvars_in_help=True, argname="tag")
+def tag_sub_cmd(*, common: CommonSettings, tag: TagSettings) -> None:
     basic_config(obj=LOGGER)
     LOGGER.info(
         """\
-Running version %s with settings:
+Running '%r' (version %s) with settings:
 %s
 %s""",
+        tag_commit.__name__,
         __version__,
-        pretty_repr(common_settings),
-        pretty_repr(tag_settings),
+        pretty_repr(common),
+        pretty_repr(tag),
     )
-    if common_settings.dry_run:
+    if common.dry_run:
         LOGGER.info("Dry run; exiting...")
         return
     tag_commit(
-        user_name=tag_settings.user_name,
-        user_email=tag_settings.user_email,
-        major_minor=tag_settings.major_minor,
-        major=tag_settings.major,
-        latest=tag_settings.latest,
+        user_name=tag.user_name,
+        user_email=tag.user_email,
+        major_minor=tag.major_minor,
+        major=tag.major,
+        latest=tag.latest,
     )
 
 

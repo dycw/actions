@@ -1,38 +1,45 @@
 from __future__ import annotations
 
-from click import command
 from rich.pretty import pretty_repr
-from typed_settings import EnvLoader, click_options
-from utilities.click import CONTEXT_SETTINGS
+from typed_settings import click_options
 from utilities.logging import basic_config
-from uv_publish import __version__
-from uv_publish.lib import uv_publish
-from uv_publish.logging import LOGGER
-from uv_publish.settings import Settings
+
+from actions import __version__
+from actions.logging import LOGGER
+from actions.publish.lib import publish_package
+from actions.publish.settings import PublishSettings
+from actions.settings import CommonSettings
+from actions.utilities import ENV_LOADER
 
 
-@command(**CONTEXT_SETTINGS)
-@click_options(Settings, [EnvLoader("")], show_envvars_in_help=True)
-def _main(settings: Settings, /) -> None:
+@click_options(
+    CommonSettings, [ENV_LOADER], show_envvars_in_help=True, argname="common"
+)
+@click_options(
+    PublishSettings, [ENV_LOADER], show_envvars_in_help=True, argname="publish"
+)
+def publish_sub_cmd(*, common: CommonSettings, publish: PublishSettings) -> None:
     basic_config(obj=LOGGER)
     LOGGER.info(
         """\
-Running version %s with settings:
+Running '%r' (version %s) with settings:
+%s
 %s""",
+        publish_package.__name__,
         __version__,
-        pretty_repr(settings),
+        pretty_repr(common),
+        pretty_repr(publish),
     )
-    if settings.dry_run:
+    if common.dry_run:
         LOGGER.info("Dry run; exiting...")
         return
-    uv_publish(
-        username=settings.username,
-        password=settings.password,
-        publish_url=settings.publish_url,
-        trusted_publishing=settings.trusted_publishing,
-        native_tls=settings.native_tls,
+    publish_package(
+        username=publish.username,
+        password=publish.password,
+        publish_url=publish.publish_url,
+        trusted_publishing=publish.trusted_publishing,
+        native_tls=publish.native_tls,
     )
 
 
-if __name__ == "__main__":
-    _main()
+__all__ = ["publish_sub_cmd"]
