@@ -7,4 +7,4 @@ from utilities.pathlib import get_repo_root
 
 class TestCLI:
     def test_main(self) -> None:
-        _ = check_call(["template-action", "--dry-run"], cwd=get_repo_root())
+        _ = check_call(["action", "--dry-run"], cwd=get_repo_root())
