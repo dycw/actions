@@ -7,7 +7,7 @@ from utilities.click import CONTEXT_SETTINGS
 from utilities.logging import basic_config
 
 from actions import __version__
-from actions.lib import action
+from actions.lib import run_action
 from actions.logging import LOGGER
 from actions.settings import Settings
 
@@ -26,7 +26,7 @@ Running version %s with settings:
     if settings.dry_run:
         LOGGER.info("Dry run; exiting...")
         return
-    action(flag=settings.flag)
+    run_action(flag=settings.flag)
 
 
 if __name__ == "__main__":
