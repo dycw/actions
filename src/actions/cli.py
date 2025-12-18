@@ -1,32 +1,16 @@
 from __future__ import annotations
 
-from click import command
-from rich.pretty import pretty_repr
-from typed_settings import EnvLoader, click_options
+from click import group
 from utilities.click import CONTEXT_SETTINGS
-from utilities.logging import basic_config
 
-from actions import __version__
-from actions.lib import run_action
-from actions.logging import LOGGER
-from actions.settings import Settings
+from actions.tag.cli import tag_sub_cmd
 
 
-@command(**CONTEXT_SETTINGS)
-@click_options(Settings, [EnvLoader("")], show_envvars_in_help=True)
-def _main(settings: Settings, /) -> None:
-    basic_config(obj=LOGGER)
-    LOGGER.info(
-        """\
-Running version %s with settings:
-%s""",
-        __version__,
-        pretty_repr(settings),
-    )
-    if settings.dry_run:
-        LOGGER.info("Dry run; exiting...")
-        return
-    run_action(flag=settings.flag)
+@group(**CONTEXT_SETTINGS)
+def _main() -> None: ...
+
+
+_ = _main.command(name="tag", **CONTEXT_SETTINGS)(tag_sub_cmd)
 
 
 if __name__ == "__main__":

@@ -1,31 +1,19 @@
 from __future__ import annotations
 
-from typed_settings import Secret, option, secret, settings
+from typed_settings import Secret, load_settings, option, secret, settings
 
-
-def _converter(text: str, /) -> str | None:
-    return None if text == "" else text
+from actions.utilities import ENV_LOADER, empty_str_to_none
 
 
 @settings
-class Settings:
+class CommonSettings:
     token: Secret[str] | None = secret(
-        default=None, converter=_converter, help="GitHub token"
+        default=None, converter=empty_str_to_none, help="GitHub token"
     )
     dry_run: bool = option(default=False, help="Dry run the CLI")
-    tag: _TagSettings = option(factory=lambda: _TagSettings(), help="'tag' settings")
 
 
-@settings
-class _TagSettings:
-    user_name: str = option(default="github-actions-bot", help="'git' user name")
-    user_email: str = option(default="noreply@github.com", help="'git' user email")
-    major_minor: bool = option(default=False, help="Add the 'major.minor' tag")
-    major: bool = option(default=False, help="Add the 'major' tag")
-    latest: bool = option(default=False, help="Add the 'latest' tag")
+COMMON_SETTINGS = load_settings(CommonSettings, [ENV_LOADER])
 
 
-SETTINGS = Settings()
-
-
-__all__ = ["SETTINGS", "Settings"]
+__all__ = ["COMMON_SETTINGS", "CommonSettings"]

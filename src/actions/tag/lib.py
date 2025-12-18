@@ -7,17 +7,17 @@ from utilities.version import parse_version
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.settings import SETTINGS
+from actions.tag.settings import TAG_SETTINGS
 from actions.utilities import log_run
 
 
-def actions(
+def tag_commit(
     *,
-    user_name: str = SETTINGS.tag.user_name,
-    user_email: str = SETTINGS.tag.user_email,
-    major_minor: bool = SETTINGS.tag.major_minor,
-    major: bool = SETTINGS.tag.major,
-    latest: bool = SETTINGS.tag.latest,
+    user_name: str = TAG_SETTINGS.user_name,
+    user_email: str = TAG_SETTINGS.user_email,
+    major_minor: bool = TAG_SETTINGS.major_minor,
+    major: bool = TAG_SETTINGS.major,
+    latest: bool = TAG_SETTINGS.latest,
 ) -> None:
     LOGGER.info(
         """\
@@ -56,4 +56,4 @@ def _tag(version: str, /) -> None:
     _ = log_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
 
 
-__all__ = ["actions"]
+__all__ = ["tag_commit"]
