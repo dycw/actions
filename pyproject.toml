@@ -19,7 +19,7 @@
   version = "0.1.1"
 
   [project.scripts]
-    template-action = "template_action.cli:_main"
+    action = "actions.cli:_main"
 
 [tool]
   [tool.uv]
