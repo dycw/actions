@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from template_action import __version__
-from template_action.logging import LOGGER
-from template_action.settings import SETTINGS
+from actions import __version__
+from actions.logging import LOGGER
+from actions.settings import SETTINGS
 
 
-def template_action(*, flag: bool = SETTINGS.flag) -> None:
+def run_action(*, flag: bool = SETTINGS.flag) -> None:
     LOGGER.info(
         """\
 Running version %s with settings:
@@ -16,4 +16,4 @@ Running version %s with settings:
     )
 
 
-__all__ = ["template_action"]
+__all__ = ["run_action"]
