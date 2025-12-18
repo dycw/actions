@@ -1,3 +1,3 @@
-# `template-action`
+# `actions`
 
-Template for Python actions
+GitHub actions
