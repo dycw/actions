@@ -1,0 +1,79 @@
+repos:
+  - hooks:
+      - args:
+          - --fix
+        id: ruff-check
+      - id: ruff-format
+    repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.10
+  - hooks:
+      - args:
+          - --upgrade
+        id: uv-lock
+    repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.18
+  - hooks:
+      - args:
+          - --option
+          - indent_tables=true
+          - --option
+          - indent_entries=true
+          - --option
+          - reorder_keys=true
+        id: taplo-format
+    repo: https://github.com/compwa/taplo-pre-commit
+    rev: v0.9.3
+  - hooks:
+      - args:
+          - --description=Template for Python actions
+          - --github--push--publish
+          - --github--push--publish--trusted-publishing
+          - --github--push--tag
+          - --github--push--tag--latest
+          - --github--push--tag--major
+          - --github--push--tag--major-minor
+          - --package-name=dycw-template-action
+          - --pre-commit--prettier
+          - --pre-commit--ruff
+          - --pre-commit--taplo
+          - --pre-commit--uv
+          - --pyproject
+          - --pyright
+          - --pyright
+          - --pyright--include=src
+          - --pytest
+          - --pytest--test-paths=src/tests
+          - --python-package-name=template_action
+          - --python-version=3.13
+          - --readme
+          - --repo-name=template-action
+          - --ruff
+        id: nitpick
+    repo: https://github.com/dycw/pre-commit-hook-nitpick
+    rev: 0.4.4
+  - hooks:
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - args:
+          - --fix=lf
+        id: mixed-line-ending
+      - id: no-commit-to-branch
+      - args:
+          - --autofix
+        id: pretty-format-json
+      - id: trailing-whitespace
+    repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+  - hooks:
+      - entry: npx prettier --write
+        id: prettier
+        language: system
+        name: prettier
+        types_or:
+          - markdown
+          - yaml
+    repo: local
