@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from subprocess import check_call
 
+from pytest import mark, param
 from utilities.pathlib import get_repo_root
 
 
 class TestCLI:
-    def test_main(self) -> None:
-        _ = check_call(["template-action", "--dry-run"], cwd=get_repo_root())
+    @mark.parametrize("cmd", [param("publish"), param("tag")])
+    def test_main(self, *, cmd: str) -> None:
+        _ = check_call(["action", cmd, "--dry-run"], cwd=get_repo_root())

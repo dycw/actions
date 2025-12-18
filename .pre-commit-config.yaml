@@ -25,14 +25,14 @@ repos:
     rev: v0.9.3
   - hooks:
       - args:
-          - --description=Template for Python actions
+          - --description=GitHub actions
           - --github--push--publish
           - --github--push--publish--trusted-publishing
           - --github--push--tag
           - --github--push--tag--latest
           - --github--push--tag--major
           - --github--push--tag--major-minor
-          - --package-name=dycw-template-action
+          - --package-name=dycw-actions
           - --pre-commit--prettier
           - --pre-commit--ruff
           - --pre-commit--taplo
@@ -43,10 +43,10 @@ repos:
           - --pyright--include=src
           - --pytest
           - --pytest--test-paths=src/tests
-          - --python-package-name=template_action
+          - --python-package-name=actions
           - --python-version=3.13
           - --readme
-          - --repo-name=template-action
+          - --repo-name=actions
           - --ruff
         id: nitpick
     repo: https://github.com/dycw/pre-commit-hook-nitpick
