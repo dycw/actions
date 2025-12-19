@@ -55,7 +55,10 @@ def _intermediate(
     remaining = TimeDelta(seconds=ceil((end - now).in_seconds()))
     this_sleep = min(remaining, TimeDelta(seconds=log_freq))
     LOGGER.info(
-        "Sleeping... (elapsed = %s, remaining = %s)", this_sleep, elapsed, remaining
+        "Sleeping for %s... (elapsed = %s, remaining = %s)",
+        this_sleep,
+        elapsed,
+        remaining,
     )
     sleep(round(this_sleep.in_seconds()))
 
