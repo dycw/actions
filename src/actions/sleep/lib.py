@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from math import ceil, floor
 from random import choice
 from time import sleep
 
@@ -36,7 +37,7 @@ Running %r (version %s) with settings:
     start = get_now()
     delta = TimeDelta(seconds=choice(range(min_, max_, step)))
     LOGGER.info("Sleeping for %s...", delta)
-    end = start + delta
+    end = (start + delta).round(mode="ceil")
     while (now := get_now()) < end:
         _intermediate(start, now, end, log_freq=log_freq)
     LOGGER.info("Finished sleeping for %s", delta)
@@ -50,14 +51,11 @@ def _intermediate(
     *,
     log_freq: int = SLEEP_SETTINGS.log_freq,
 ) -> None:
-    elapsed = now - start
-    remaining = end - now
+    elapsed = TimeDelta(seconds=floor((now - start).in_seconds()))
+    remaining = TimeDelta(seconds=ceil((end - now).in_seconds()))
     this_sleep = min(remaining, TimeDelta(seconds=log_freq))
     LOGGER.info(
-        "Sleeping for %s... (elapsed = %s, remaining = %s)",
-        this_sleep,
-        elapsed,
-        remaining,
+        "Sleeping... (elapsed = %s, remaining = %s)", this_sleep, elapsed, remaining
     )
     sleep(round(this_sleep.in_seconds()))
 
