@@ -4,6 +4,7 @@ from click import group
 from utilities.click import CONTEXT_SETTINGS
 
 from actions.publish.cli import publish_sub_cmd
+from actions.sleep.cli import sleep_sub_cmd
 from actions.tag.cli import tag_sub_cmd
 
 
@@ -11,8 +12,9 @@ from actions.tag.cli import tag_sub_cmd
 def _main() -> None: ...
 
 
-_ = _main.command(name="tag", **CONTEXT_SETTINGS)(tag_sub_cmd)
 _ = _main.command(name="publish", **CONTEXT_SETTINGS)(publish_sub_cmd)
+_ = _main.command(name="sleep", **CONTEXT_SETTINGS)(sleep_sub_cmd)
+_ = _main.command(name="tag", **CONTEXT_SETTINGS)(tag_sub_cmd)
 
 
 if __name__ == "__main__":
