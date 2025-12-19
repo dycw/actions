@@ -8,15 +8,15 @@ from whenever import TimeDelta, ZonedDateTime
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.random_sleep.settings import RANDOM_SLEEP_SETTINGS
+from actions.sleep.settings import SLEEP_SETTINGS
 
 
 def random_sleep(
     *,
-    min_: int = RANDOM_SLEEP_SETTINGS.min,
-    max_: int = RANDOM_SLEEP_SETTINGS.max,
-    step: int = RANDOM_SLEEP_SETTINGS.step,
-    log_freq: int = RANDOM_SLEEP_SETTINGS.log_freq,
+    min_: int = SLEEP_SETTINGS.min,
+    max_: int = SLEEP_SETTINGS.max,
+    step: int = SLEEP_SETTINGS.step,
+    log_freq: int = SLEEP_SETTINGS.log_freq,
 ) -> None:
     LOGGER.info(
         """\
@@ -48,7 +48,7 @@ def _intermediate(
     end: ZonedDateTime,
     /,
     *,
-    log_freq: int = RANDOM_SLEEP_SETTINGS.log_freq,
+    log_freq: int = SLEEP_SETTINGS.log_freq,
 ) -> None:
     elapsed = now - start
     remaining = end - now
