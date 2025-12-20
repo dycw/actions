@@ -7,8 +7,8 @@ from actions.utilities import ENV_LOADER
 
 @settings
 class SleepSettings:
-    max: int = option(default=3600, help="Maximum duration, in seconds")
     min: int = option(default=0, help="Minimum duration, in seconds")
+    max: int = option(default=3600, help="Maximum duration, in seconds")
     step: int = option(default=1, help="Step duration, in seconds")
     log_freq: int = option(default=60, help="Log frequency, in seconds")
 
