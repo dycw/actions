@@ -26,7 +26,6 @@ class PublishSettings:
         default=False,
         help="Whether to load TLS certificates from the platform's native certificate store",
     )
-    dry_run: bool = option(default=False, help="Dry run the CLI")
 
 
 PUBLISH_SETTINGS = load_settings(PublishSettings, [ENV_LOADER])
