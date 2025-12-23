@@ -18,7 +18,7 @@ def convert_secret_str(value: SecretLike, /) -> Secret[str] | None:
     match value:
         case Secret():
             return value
-        case str():
+        case str() | None:
             return None if value == "" else Secret(value)
         case None:
             return None
