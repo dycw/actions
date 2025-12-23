@@ -43,7 +43,6 @@ repos:
           - --pre-commit--uv
           - --pyproject
           - --pyright
-          - --pyright
           - --pytest
           - --python-package-name=actions
           - --python-version=3.13
