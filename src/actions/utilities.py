@@ -14,22 +14,23 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def convert_secret_str(value: SecretLike, /) -> Secret[str] | None:
-    match value:
+def convert_secret_str(x: SecretLike, /) -> Secret[str] | None:
+    empty = {None, ""}
+    match x:
         case Secret():
-            return value
+            return None if x.get_secret_value() in empty else x
         case str() | None:
-            return None if value == "" else Secret(value)
+            return None if x in empty else Secret(x)
         case None:
             return None
         case never:
             assert_never(never)
 
 
-def convert_str(value: str | None, /) -> str | None:
-    match value:
+def convert_str(x: str | None, /) -> str | None:
+    match x:
         case str():
-            return None if value == "" else value
+            return None if x == "" else x
         case None:
             return None
         case never:
