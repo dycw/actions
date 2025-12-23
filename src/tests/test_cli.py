@@ -9,4 +9,4 @@ from utilities.pathlib import get_repo_root
 class TestCLI:
     @mark.parametrize("cmd", [param("publish"), param("sleep"), param("tag")])
     def test_main(self, *, cmd: str) -> None:
-        _ = check_call(["action", cmd, "--dry-run"], cwd=get_repo_root())
+        _ = check_call(["action", cmd], cwd=get_repo_root())

@@ -2,14 +2,11 @@ from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
-from actions.utilities import ENV_LOADER, empty_str_to_none
+from actions.utilities import LOADER, empty_str_to_none
 
 
 @settings
 class PublishSettings:
-    token: Secret[str] | None = secret(
-        default=None, converter=empty_str_to_none, help="GitHub token"
-    )
     username: str | None = option(
         default=None, converter=empty_str_to_none, help="The username of the upload"
     )
@@ -26,10 +23,9 @@ class PublishSettings:
         default=False,
         help="Whether to load TLS certificates from the platform's native certificate store",
     )
-    dry_run: bool = option(default=False, help="Dry run the CLI")
 
 
-PUBLISH_SETTINGS = load_settings(PublishSettings, [ENV_LOADER])
+PUBLISH_SETTINGS = load_settings(PublishSettings, [LOADER])
 
 
 __all__ = ["PUBLISH_SETTINGS", "PublishSettings"]

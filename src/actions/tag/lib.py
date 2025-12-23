@@ -38,7 +38,9 @@ Running %r (version %s) with settings:
     )
     _ = log_run("git", "config", "--global", "user.name", user_name)
     _ = log_run("git", "config", "--global", "user.email", user_email)
-    version = parse_version(log_run("bump-my-version", "show", "current_version"))
+    version = parse_version(
+        log_run("bump-my-version", "show", "current_version", return_=True)
+    )
     _tag(str(version))
     if major_minor:
         _tag(f"{version.major}.{version.minor}")

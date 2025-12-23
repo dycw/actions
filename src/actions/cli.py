@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from click import group
 from utilities.click import CONTEXT_SETTINGS
+from utilities.logging import basic_config
 
+from actions.logging import LOGGER
 from actions.publish.cli import publish_sub_cmd
 from actions.sleep.cli import sleep_sub_cmd
 from actions.tag.cli import tag_sub_cmd
@@ -18,4 +20,5 @@ _ = _main.command(name="tag", **CONTEXT_SETTINGS)(tag_sub_cmd)
 
 
 if __name__ == "__main__":
+    basic_config(obj=LOGGER)
     _main()
