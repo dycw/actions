@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import suppress
 from subprocess import CalledProcessError
 
+from utilities.text import strip_and_dedent
 from utilities.version import parse_version
 
 from actions import __version__
@@ -20,14 +21,14 @@ def tag_commit(
     latest: bool = TAG_SETTINGS.latest,
 ) -> None:
     LOGGER.info(
-        """\
-Running '%s' (version %s) with settings:
- - user_name   = %s
- - user_email  = %s
- - major_minor = %s
- - major       = %s
- - latest      = %s
-""",
+        strip_and_dedent("""
+            Running '%s' (version %s) with settings:
+             - user_name   = %s
+             - user_email  = %s
+             - major_minor = %s
+             - major       = %s
+             - latest      = %s
+        """),
         tag_commit.__name__,
         __version__,
         user_name,

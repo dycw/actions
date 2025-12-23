@@ -4,6 +4,7 @@ from math import ceil, floor
 from random import choice
 from time import sleep
 
+from utilities.text import strip_and_dedent
 from utilities.whenever import get_now
 from whenever import TimeDelta, ZonedDateTime
 
@@ -20,13 +21,13 @@ def random_sleep(
     log_freq: int = SLEEP_SETTINGS.log_freq,
 ) -> None:
     LOGGER.info(
-        """\
-Running '%s' (version %s) with settings:
- - min_     = %s
- - max_     = %s
- - step     = %s
- - log_freq = %s
-""",
+        strip_and_dedent("""
+            Running '%s' (version %s) with settings:
+             - min_     = %s
+             - max_     = %s
+             - step     = %s
+             - log_freq = %s
+        """),
         random_sleep.__name__,
         __version__,
         min_,
