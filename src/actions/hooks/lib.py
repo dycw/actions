@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-def hooks_package(
+def run_hooks(
     *,
     repos: list[str] | None = HOOKS_SETTINGS.repos,
     hooks: list[str] | None = HOOKS_SETTINGS.hooks,
@@ -29,7 +29,7 @@ def hooks_package(
              - repos = %s
              - hooks = %s
         """),
-        hooks_package.__name__,
+        run_hooks.__name__,
         __version__,
         repos,
         hooks,
@@ -73,4 +73,4 @@ def _run_hook(hook: str, /) -> bool:
     return True
 
 
-__all__ = ["hooks_package"]
+__all__ = ["run_hooks"]
