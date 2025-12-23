@@ -6,13 +6,13 @@ from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any
 
 from utilities.functions import ensure_class, ensure_str
-from utilities.subprocess import run
 from utilities.text import strip_and_dedent
 from yaml import safe_load
 
 from actions import __version__
 from actions.hooks.settings import HOOKS_SETTINGS
 from actions.logging import LOGGER
+from actions.utilities import log_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -67,7 +67,7 @@ def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
 def _run_hook(hook: str, /) -> bool:
     LOGGER.info("Running '%s'...", hook)
     try:
-        run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
+        log_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
     except CalledProcessError:
         return False
     return True

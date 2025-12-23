@@ -79,7 +79,7 @@ def log_run(
     all_cmds = [cmd, *cmds]
     LOGGER.info("Running '%s'...", " ".join(map(str, all_cmds)))
     unwrapped = [c if isinstance(c, str) else c.get_secret_value() for c in all_cmds]
-    return run(*unwrapped, print=print, return_=return_)
+    return run(*unwrapped, print=print, return_=return_, logger=LOGGER)
 
 
 __all__ = [
