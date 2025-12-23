@@ -14,12 +14,22 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def empty_str_to_none(value: SecretLike, /) -> Secret[str] | None:
+def convert_secret_str(value: SecretLike, /) -> Secret[str] | None:
     match value:
         case Secret():
             return value
         case str():
             return None if value == "" else Secret(value)
+        case None:
+            return None
+        case never:
+            assert_never(never)
+
+
+def convert_str(value: str | None, /) -> str | None:
+    match value:
+        case str():
+            return None if value == "" else value
         case None:
             return None
         case never:
@@ -55,4 +65,4 @@ def log_run(
     return run(*unwrapped, print=print, return_=return_)
 
 
-__all__ = ["LOADER", "empty_str_to_none", "log_run"]
+__all__ = ["LOADER", "convert_secret_str", "convert_str", "log_run"]
