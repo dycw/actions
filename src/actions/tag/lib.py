@@ -37,12 +37,10 @@ def tag_commit(
         major,
         latest,
     )
-    log_run("git", "config", "--global", "user.name", user_name, logger=LOGGER)
-    log_run("git", "config", "--global", "user.email", user_email, logger=LOGGER)
+    log_run("git", "config", "--global", "user.name", user_name)
+    log_run("git", "config", "--global", "user.email", user_email)
     version = parse_version(
-        log_run(
-            "bump-my-version", "show", "current_version", return_=True, logger=LOGGER
-        )
+        log_run("bump-my-version", "show", "current_version", return_=True)
     )
     _tag(str(version))
     if major_minor:
