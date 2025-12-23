@@ -14,12 +14,28 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def convert_secret_str(x: SecretLike, /) -> Secret[str] | None:
+def convert_list_strs(
+    x: str | list[str] | tuple[str, ...] | None, /
+) -> list[str] | None:
+    match x:
+        case None:
+            return None
+        case list():
+            return x
+        case tuple():
+            return None if x == () else list(x)
+        case str():
+            return x.splitlines()
+        case never:
+            assert_never(never)
+
+
+def convert_secret_str(x: SecretLike | None, /) -> Secret[str] | None:
     empty = {None, ""}
     match x:
         case Secret():
             return None if x.get_secret_value() in empty else x
-        case str() | None:
+        case str():
             return None if x in empty else Secret(x)
         case None:
             return None
@@ -66,4 +82,10 @@ def log_run(
     return run(*unwrapped, print=print, return_=return_)
 
 
-__all__ = ["LOADER", "convert_secret_str", "convert_str", "log_run"]
+__all__ = [
+    "LOADER",
+    "convert_list_strs",
+    "convert_secret_str",
+    "convert_str",
+    "log_run",
+]

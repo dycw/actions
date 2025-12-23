@@ -8,10 +8,60 @@ from pytest import mark, param
 from typed_settings import Secret, click_options, option, settings
 
 from actions.publish.settings import convert_str
-from actions.utilities import LOADER, convert_secret_str
+from actions.utilities import LOADER, convert_list_strs, convert_secret_str
 
 if TYPE_CHECKING:
     from pytest import MonkeyPatch
+
+
+@settings
+class _SettingsWithList:
+    key: list[str] | None = option(default=None, converter=convert_list_strs)
+
+
+@command()
+@click_options(_SettingsWithList, [LOADER], show_envvars_in_help=True)
+def _cli_with_list(settings: _SettingsWithList, /) -> None:
+    echo(f"key = {settings.key}")
+
+
+class TestConvertListStr:
+    def test_missing(self) -> None:
+        result = CliRunner().invoke(_cli_with_list)
+        assert result.exit_code == 0
+        assert result.stdout == "key = None\n"
+
+    def test_cli(self) -> None:
+        result = CliRunner().invoke(_cli_with_list, args=["--key", "value"])
+        assert result.exit_code == 0
+        assert result.stdout == "key = ['value']\n"
+
+    def test_cli2(self) -> None:
+        result = CliRunner().invoke(
+            _cli_with_list, args=["--key", "value1", "--key", "value2"]
+        )
+        assert result.exit_code == 0
+        assert result.stdout == "key = ['value1', 'value2']\n"
+
+    @mark.parametrize(
+        ("value", "expected"),
+        [
+            param("value", "['value']"),
+            param("value1\nvalue2", "['value1', 'value2']"),
+            param("", "None"),
+        ],
+    )
+    def test_env(self, *, monkeypatch: MonkeyPatch, value: str, expected: str) -> None:
+        monkeypatch.setenv("KEY", value)
+
+        @command()
+        @click_options(_SettingsWithList, [LOADER], show_envvars_in_help=True)
+        def _cli_with_list(settings: _SettingsWithList, /) -> None:
+            echo(f"key = {settings.key}")
+
+        result = CliRunner().invoke(_cli_with_list)
+        assert result.exit_code == 0
+        assert result.stdout == f"key = {expected}\n"
 
 
 @settings
