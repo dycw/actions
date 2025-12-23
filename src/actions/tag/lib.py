@@ -21,7 +21,7 @@ def tag_commit(
 ) -> None:
     LOGGER.info(
         """\
-Running %r (version %s) with settings:
+Running '%s' (version %s) with settings:
  - user_name   = %s
  - user_email  = %s
  - major_minor = %s
