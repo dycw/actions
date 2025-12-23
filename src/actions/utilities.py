@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, overload
+from typing import TYPE_CHECKING, Literal, assert_never, overload
 
-from typed_settings import EnvLoader
+from typed_settings import EnvLoader, Secret
 from utilities.subprocess import run
 
 from actions.logging import LOGGER
@@ -14,8 +14,16 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def empty_str_to_none(text: str, /) -> str | None:
-    return None if text == "" else text
+def empty_str_to_none(value: SecretLike, /) -> Secret[str] | None:
+    match value:
+        case Secret():
+            return value
+        case str():
+            return None if value == "" else Secret(value)
+        case None:
+            return None
+        case never:
+            assert_never(never)
 
 
 @overload
