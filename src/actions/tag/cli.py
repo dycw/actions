@@ -10,13 +10,11 @@ from actions.logging import LOGGER
 from actions.settings import CommonSettings
 from actions.tag.lib import tag_commit
 from actions.tag.settings import TagSettings
-from actions.utilities import ENV_LOADER
+from actions.utilities import LOADER
 
 
-@click_options(
-    CommonSettings, [ENV_LOADER], show_envvars_in_help=True, argname="common"
-)
-@click_options(TagSettings, [ENV_LOADER], show_envvars_in_help=True, argname="tag")
+@click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
+@click_options(TagSettings, [LOADER], show_envvars_in_help=True, argname="tag")
 def tag_sub_cmd(*, common: CommonSettings, tag: TagSettings) -> None:
     if is_pytest():
         return

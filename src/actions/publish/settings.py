@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
-from actions.utilities import ENV_LOADER, empty_str_to_none
+from actions.utilities import LOADER, empty_str_to_none
 
 
 @settings
@@ -25,7 +25,7 @@ class PublishSettings:
     )
 
 
-PUBLISH_SETTINGS = load_settings(PublishSettings, [ENV_LOADER])
+PUBLISH_SETTINGS = load_settings(PublishSettings, [LOADER])
 
 
 __all__ = ["PUBLISH_SETTINGS", "PublishSettings"]

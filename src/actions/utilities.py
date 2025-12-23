@@ -10,7 +10,8 @@ from actions.logging import LOGGER
 if TYPE_CHECKING:
     from actions.types import SecretLike
 
-ENV_LOADER = EnvLoader("")
+
+LOADER = EnvLoader("")
 
 
 def empty_str_to_none(text: str, /) -> str | None:
@@ -46,4 +47,4 @@ def log_run(
     return run(*unwrapped, print=print, return_=return_)
 
 
-__all__ = ["ENV_LOADER", "empty_str_to_none", "log_run"]
+__all__ = ["LOADER", "empty_str_to_none", "log_run"]

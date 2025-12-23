@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typed_settings import load_settings, option, settings
 
-from actions.utilities import ENV_LOADER
+from actions.utilities import LOADER
 
 
 @settings
@@ -14,7 +14,7 @@ class TagSettings:
     latest: bool = option(default=False, help="Add the 'latest' tag")
 
 
-TAG_SETTINGS = load_settings(TagSettings, [ENV_LOADER])
+TAG_SETTINGS = load_settings(TagSettings, [LOADER])
 
 
 __all__ = ["TAG_SETTINGS", "TagSettings"]

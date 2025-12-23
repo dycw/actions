@@ -10,15 +10,11 @@ from actions.logging import LOGGER
 from actions.publish.lib import publish_package
 from actions.publish.settings import PublishSettings
 from actions.settings import CommonSettings
-from actions.utilities import ENV_LOADER
+from actions.utilities import LOADER
 
 
-@click_options(
-    CommonSettings, [ENV_LOADER], show_envvars_in_help=True, argname="common"
-)
-@click_options(
-    PublishSettings, [ENV_LOADER], show_envvars_in_help=True, argname="publish"
-)
+@click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
+@click_options(PublishSettings, [LOADER], show_envvars_in_help=True, argname="publish")
 def publish_sub_cmd(*, common: CommonSettings, publish: PublishSettings) -> None:
     if is_pytest():
         return

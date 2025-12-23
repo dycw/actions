@@ -10,13 +10,11 @@ from actions.logging import LOGGER
 from actions.settings import CommonSettings
 from actions.sleep.lib import random_sleep
 from actions.sleep.settings import SleepSettings
-from actions.utilities import ENV_LOADER
+from actions.utilities import LOADER
 
 
-@click_options(
-    CommonSettings, [ENV_LOADER], show_envvars_in_help=True, argname="common"
-)
-@click_options(SleepSettings, [ENV_LOADER], show_envvars_in_help=True, argname="sleep")
+@click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
+@click_options(SleepSettings, [LOADER], show_envvars_in_help=True, argname="sleep")
 def sleep_sub_cmd(*, common: CommonSettings, sleep: SleepSettings) -> None:
     if is_pytest():
         return
