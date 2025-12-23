@@ -19,9 +19,7 @@ class _Settings:
 
 
 @command()
-@click_options(
-    _Settings, [LOADER], show_envvars_in_help=True, reload_settings_on_invoke=True
-)
+@click_options(_Settings, [LOADER], show_envvars_in_help=True)
 def _cli(settings: _Settings, /) -> None:
     if (value := settings.key) is None:
         echo("key = None")
@@ -44,12 +42,7 @@ class TestEmptyStrToNone:
         monkeypatch.setenv("KEY", "value")
 
         @command()
-        @click_options(
-            _Settings,
-            [LOADER],
-            show_envvars_in_help=True,
-            reload_settings_on_invoke=True,
-        )
+        @click_options(_Settings, [LOADER], show_envvars_in_help=True)
         def _cli(settings: _Settings, /) -> None:
             if (value := settings.key) is None:
                 echo("key = None")
