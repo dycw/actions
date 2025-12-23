@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from rich.pretty import pretty_repr
 from typed_settings import click_options
+from utilities.logging import basic_config
 from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
 
@@ -18,6 +19,7 @@ from actions.utilities import LOADER
 def sleep_sub_cmd(*, common: CommonSettings, sleep: SleepSettings) -> None:
     if is_pytest():
         return
+    basic_config(obj=LOGGER)
     LOGGER.info(
         strip_and_dedent("""
             Running '%r' (version %s) with settings:
