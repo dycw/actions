@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from utilities.tempfile import TemporaryDirectory
+from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
@@ -22,14 +23,14 @@ def publish_package(
     native_tls: bool = PUBLISH_SETTINGS.native_tls,
 ) -> None:
     LOGGER.info(
-        """\
-Running '%s' (version %s) with settings:
- - username           = %s
- - password           = %s
- - publish_url        = %s
- - trusted_publishing = %s
- - native_tls         = %s
- """,
+        strip_and_dedent("""
+            Running '%s' (version %s) with settings:
+             - username           = %s
+             - password           = %s
+             - publish_url        = %s
+             - trusted_publishing = %s
+             - native_tls         = %s
+        """),
         publish_package.__name__,
         __version__,
         username,

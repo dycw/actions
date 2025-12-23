@@ -22,7 +22,7 @@ def tag_sub_cmd(*, common: CommonSettings, tag: TagSettings) -> None:
     basic_config(obj=LOGGER)
     LOGGER.info(
         strip_and_dedent("""
-            Running '%r' (version %s) with settings:
+            Running '%s' (version %s) with settings:
             %s
             %s
         """),

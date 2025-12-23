@@ -7,16 +7,16 @@ from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
 
 from actions import __version__
+from actions.hooks.lib import run_hooks
+from actions.hooks.settings import HooksSettings
 from actions.logging import LOGGER
 from actions.settings import CommonSettings
-from actions.sleep.lib import random_sleep
-from actions.sleep.settings import SleepSettings
 from actions.utilities import LOADER
 
 
 @click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
-@click_options(SleepSettings, [LOADER], show_envvars_in_help=True, argname="sleep")
-def sleep_sub_cmd(*, common: CommonSettings, sleep: SleepSettings) -> None:
+@click_options(HooksSettings, [LOADER], show_envvars_in_help=True, argname="hooks")
+def hooks_sub_cmd(*, common: CommonSettings, hooks: HooksSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -26,14 +26,12 @@ def sleep_sub_cmd(*, common: CommonSettings, sleep: SleepSettings) -> None:
             %s
             %s
         """),
-        random_sleep.__name__,
+        run_hooks.__name__,
         __version__,
         pretty_repr(common),
-        pretty_repr(sleep),
+        pretty_repr(hooks),
     )
-    random_sleep(
-        min_=sleep.min, max_=sleep.max, step=sleep.step, log_freq=sleep.log_freq
-    )
+    run_hooks(repos=hooks.repos, hooks=hooks.hooks)
 
 
-__all__ = ["sleep_sub_cmd"]
+__all__ = ["hooks_sub_cmd"]

@@ -26,6 +26,10 @@ repos:
   - hooks:
       - args:
           - --description=GitHub actions
+          - --github--pull-request--pytest--os--ubuntu
+          - --github--pull-request--pytest--python-version--3-13
+          - --github--pull-request--pytest--resolution--highest
+          - --github--pull-request--ruff
           - --github--push--publish
           - --github--push--publish--trusted-publishing
           - --github--push--tag
@@ -39,10 +43,7 @@ repos:
           - --pre-commit--uv
           - --pyproject
           - --pyright
-          - --pyright
-          - --pyright--include=src
           - --pytest
-          - --pytest--test-paths=src/tests
           - --python-package-name=actions
           - --python-version=3.13
           - --readme
@@ -50,7 +51,7 @@ repos:
           - --ruff
         id: nitpick
     repo: https://github.com/dycw/pre-commit-hook-nitpick
-    rev: 0.5.3
+    rev: 0.6.5
   - hooks:
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
