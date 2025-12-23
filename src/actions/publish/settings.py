@@ -7,9 +7,6 @@ from actions.utilities import ENV_LOADER, empty_str_to_none
 
 @settings
 class PublishSettings:
-    token: Secret[str] | None = secret(
-        default=None, converter=empty_str_to_none, help="GitHub token"
-    )
     username: str | None = option(
         default=None, converter=empty_str_to_none, help="The username of the upload"
     )
