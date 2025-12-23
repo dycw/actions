@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from click import command, echo
 from click.testing import CliRunner
+from pytest import mark, param
 from typed_settings import Secret, click_options, option, settings
 
 from actions.publish.settings import convert_str
@@ -38,8 +39,11 @@ class TestConvertSecretStr:
         assert result.exit_code == 0
         assert result.stdout == "key = value\n"
 
-    def test_env(self, *, monkeypatch: MonkeyPatch) -> None:
-        monkeypatch.setenv("KEY", "value")
+    @mark.parametrize(
+        ("value", "expected"), [param("value", "value"), param("", "None")]
+    )
+    def test_env(self, *, monkeypatch: MonkeyPatch, value: str, expected: str) -> None:
+        monkeypatch.setenv("KEY", value)
 
         @command()
         @click_options(_SettingsWithSecret, [LOADER], show_envvars_in_help=True)
@@ -51,7 +55,7 @@ class TestConvertSecretStr:
 
         result = CliRunner().invoke(_cli_with_secret)
         assert result.exit_code == 0
-        assert result.stdout == "key = value\n"
+        assert result.stdout == f"key = {expected}\n"
 
 
 @settings
@@ -76,8 +80,11 @@ class TestConvertStr:
         assert result.exit_code == 0
         assert result.stdout == "key = value\n"
 
-    def test_env(self, *, monkeypatch: MonkeyPatch) -> None:
-        monkeypatch.setenv("KEY", "value")
+    @mark.parametrize(
+        ("value", "expected"), [param("value", "value"), param("", "None")]
+    )
+    def test_env(self, *, monkeypatch: MonkeyPatch, value: str, expected: str) -> None:
+        monkeypatch.setenv("KEY", value)
 
         @command()
         @click_options(_SettingsWithStr, [LOADER], show_envvars_in_help=True)
@@ -86,4 +93,4 @@ class TestConvertStr:
 
         result = CliRunner().invoke(_cli_with_str)
         assert result.exit_code == 0
-        assert result.stdout == "key = value\n"
+        assert result.stdout == f"key = {expected}\n"
