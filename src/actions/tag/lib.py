@@ -36,8 +36,8 @@ Running %r (version %s) with settings:
         major,
         latest,
     )
-    _ = log_run("git", "config", "--global", "user.name", user_name)
-    _ = log_run("git", "config", "--global", "user.email", user_email)
+    log_run("git", "config", "--global", "user.name", user_name)
+    log_run("git", "config", "--global", "user.email", user_email)
     version = parse_version(
         log_run("bump-my-version", "show", "current_version", return_=True)
     )
@@ -52,11 +52,11 @@ Running %r (version %s) with settings:
 
 def _tag(version: str, /) -> None:
     with suppress(CalledProcessError):
-        _ = log_run("git", "tag", "--delete", version)
+        log_run("git", "tag", "--delete", version)
     with suppress(CalledProcessError):
-        _ = log_run("git", "push", "--delete", "origin", version)
-    _ = log_run("git", "tag", "-a", version, "HEAD", "-m", version)
-    _ = log_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
+        log_run("git", "push", "--delete", "origin", version)
+    log_run("git", "tag", "-a", version, "HEAD", "-m", version)
+    log_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
 
 
 __all__ = ["tag_commit"]
