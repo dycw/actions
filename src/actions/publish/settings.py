@@ -1,12 +1,8 @@
 from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
-from utilities.logging import basic_config
 
-from actions.logging import LOGGER
 from actions.utilities import LOADER, empty_str_to_none
-
-basic_config(obj=LOGGER)
 
 
 @settings

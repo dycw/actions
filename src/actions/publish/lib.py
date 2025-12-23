@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
+from typed_settings import Secret
 from utilities.tempfile import TemporaryDirectory
 
 from actions import __version__
 from actions.logging import LOGGER
 from actions.publish.settings import PUBLISH_SETTINGS
 from actions.utilities import log_run
-
-if TYPE_CHECKING:
-    from typed_settings import Secret
 
 
 def publish_package(
@@ -38,6 +34,8 @@ Running '%s' (version %s) with settings:
         trusted_publishing,
         native_tls,
     )
+    if isinstance(password, Secret):
+        LOGGER.info(f"password = {password.get_secret_value()}")
     with TemporaryDirectory() as temp:
         log_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
         log_run(
