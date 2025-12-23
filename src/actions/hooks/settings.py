@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typed_settings import Secret, load_settings, option, secret, settings
+from typed_settings import load_settings, option, settings
 
-from actions.utilities import LOADER, convert_secret_str, convert_str
+from actions.utilities import LOADER
 
 
 @settings
