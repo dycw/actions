@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
-from actions.utilities import LOADER, convert_str
+from actions.utilities import LOADER, convert_secret_str, convert_str
 
 
 @settings
@@ -11,7 +11,7 @@ class PublishSettings:
         default=None, converter=convert_str, help="The username of the upload"
     )
     password: Secret[str] | None = secret(
-        default=None, converter=convert_str, help="The password for the upload"
+        default=None, converter=convert_secret_str, help="The password for the upload"
     )
     publish_url: str | None = option(
         default=None, converter=convert_str, help="The URL of the upload endpoint"
