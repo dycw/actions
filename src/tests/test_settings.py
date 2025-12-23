@@ -74,6 +74,6 @@ class TestEmptyStrToNone:
             else:
                 echo(f"key = {value.get_secret_value()}")
 
-        result = CliRunner().invoke(cli, args=[])
+        result = CliRunner().invoke(cli)
         assert result.exit_code == 0
         assert result.stdout == "key = value\n"
