@@ -21,7 +21,7 @@ def random_sleep(
 ) -> None:
     LOGGER.info(
         """\
-Running %r (version %s) with settings:
+Running '%s' (version %s) with settings:
  - min_     = %s
  - max_     = %s
  - step     = %s

@@ -23,7 +23,7 @@ def publish_package(
 ) -> None:
     LOGGER.info(
         """\
-Running %r (version %s) with settings:
+Running '%s' (version %s) with settings:
  - username           = %s
  - password           = %s
  - publish_url        = %s
