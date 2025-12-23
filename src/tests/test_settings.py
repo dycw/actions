@@ -13,7 +13,7 @@ from typed_settings import (
 )
 from utilities.os import temp_environ
 
-from actions.publish.settings import empty_str_to_none2
+from actions.publish.settings import empty_str_to_none
 from actions.settings import CommonSettings
 from actions.utilities import LOADER
 
@@ -30,7 +30,7 @@ class TestEmptyStrToNone:
     def test_value_missing(self) -> None:
         @settings
         class Settings:
-            key: Secret[str] | None = option(default=None, converter=empty_str_to_none2)
+            key: Secret[str] | None = option(default=None, converter=empty_str_to_none)
 
         @command()
         @click_options(Settings, [LOADER], show_envvars_in_help=True)
@@ -47,7 +47,7 @@ class TestEmptyStrToNone:
     def test_value_via_cli(self) -> None:
         @settings
         class Settings:
-            key: Secret[str] | None = option(default=None, converter=empty_str_to_none2)
+            key: Secret[str] | None = option(default=None, converter=empty_str_to_none)
 
         @command()
         @click_options(Settings, [LOADER], show_envvars_in_help=True)
@@ -64,7 +64,7 @@ class TestEmptyStrToNone:
     def test_value_via_env(self) -> None:
         @settings
         class Settings:
-            key: Secret[str] | None = option(default=None, converter=empty_str_to_none2)
+            key: Secret[str] | None = option(default=None, converter=empty_str_to_none)
 
         @command()
         @click_options(Settings, [LOADER], show_envvars_in_help=True)
@@ -74,6 +74,6 @@ class TestEmptyStrToNone:
             else:
                 echo(f"key = {value.get_secret_value()}")
 
-        result = CliRunner().invoke(cli)
+        result = CliRunner().invoke(cli, env={"KEY": "value"})
         assert result.exit_code == 0
         assert result.stdout == "key = value\n"
