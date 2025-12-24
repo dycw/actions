@@ -91,7 +91,7 @@ def log_run(
     return_: bool = False,
 ) -> str | None:
     all_cmds = [cmd, *cmds]
-    LOGGER.info("Running '%s' with env = %s...", " ".join(map(str, all_cmds)), env)
+    LOGGER.info("Running '%s'...", " ".join(map(str, all_cmds)))
     unwrapped = [c if isinstance(c, str) else c.get_secret_value() for c in all_cmds]
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
