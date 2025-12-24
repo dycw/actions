@@ -48,14 +48,16 @@ def _yield_hooks(
 ) -> Iterator[str]:
     dict_ = safe_load(Path(".pre-commit-config.yaml").read_text())
     repos_list = ensure_class(dict_["repos"], list)
+    results: set[str] = set()
     for repo in (ensure_class(r, dict) for r in repos_list):
         url = repo["repo"]
         if (repos is not None) and any(search(repo_i, url) for repo_i in repos):
-            yield from _yield_repo_hooks(repo)
+            results.update(*_yield_repo_hooks(repo))
         elif hooks is not None:
             for hook in _yield_repo_hooks(repo):
                 if any(search(hook_i, hook) for hook_i in hooks):
-                    yield hook
+                    results.add(hook)
+    yield from results
 
 
 def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
