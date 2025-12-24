@@ -35,9 +35,6 @@ repos:
           - --github--push--publish
           - --github--push--publish--trusted-publishing
           - --github--push--tag
-          - --github--push--tag--latest
-          - --github--push--tag--major
-          - --github--push--tag--major-minor
           - --package-name=dycw-actions
           - --pre-commit--prettier
           - --pre-commit--ruff
