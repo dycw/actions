@@ -15,7 +15,7 @@ class HooksSettings:
     hooks: list[str] | None = option(
         default=None, converter=convert_list_strs, help="The hooks to be run"
     )
-    sleep: int = option(default=2, help="Sleep in between runs")
+    sleep: int = option(default=1, help="Sleep in between runs")
 
 
 HOOKS_SETTINGS = load_settings(HooksSettings, [LOADER])
