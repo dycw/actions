@@ -4,12 +4,12 @@ from pathlib import Path
 
 from tomlkit import dumps
 
-from actions.requirements.lib import _format_path
+from actions.requirements.lib import _get_formatted
 
 
-class TestFormatRequirements:
-    def test_basic(self) -> None:
+class TestGetFormatted:
+    def test_main(self) -> None:
         root = Path(__file__).parent
-        result = dumps(_format_path(root.joinpath("in.toml")))
+        result = dumps(_get_formatted(root.joinpath("in.toml")))
         expected = root.joinpath("out.toml").read_text()
         assert result == expected
