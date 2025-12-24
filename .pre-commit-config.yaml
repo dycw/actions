@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/pre-commit-hook-nitpick
-    rev: 0.7.3
+    rev: 0.7.5
     hooks:
       - args:
           - --description=GitHub actions
@@ -72,6 +72,7 @@ repos:
           - indent_entries=true
           - --option
           - reorder_keys=true
+        exclude: src/tests/.*/.*\.toml$
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.9.18
     hooks:

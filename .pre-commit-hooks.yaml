@@ -1,0 +1,7 @@
+- id: format-requirements
+  name: format-requirements
+  entry: format-requirements
+  language: python
+  types: [toml]
+  files: pyproject\.toml
+  description: Format requirements
