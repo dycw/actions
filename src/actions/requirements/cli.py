@@ -11,7 +11,6 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.requirements.lib import format_requirements
-from actions.sleep.lib import random_sleep
 
 
 @argument(
@@ -28,7 +27,7 @@ def requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
             Running '%s' (version %s) with settings:
              - paths = %s
         """),
-        random_sleep.__name__,
+        format_requirements.__name__,
         __version__,
         paths,
     )
