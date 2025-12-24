@@ -50,7 +50,7 @@ repos:
           - --ruff
         id: nitpick
     repo: https://github.com/dycw/pre-commit-hook-nitpick
-    rev: 0.6.16
+    rev: 0.6.17
   - hooks:
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
