@@ -1,6 +1,6 @@
 - id: format-requirements
   name: format-requirements
-  entry: format-requirements
+  entry: action requirements
   language: python
   types: [toml]
   files: pyproject\.toml

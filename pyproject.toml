@@ -9,6 +9,7 @@
   dependencies = [
     "click >=8.3.1, <8.4",
     "dycw-utilities >=0.173.0, < 0.174",
+    "libcst>=1.8.6",
     "packaging >=25.0, <25.1",
     "pyyaml >=6.0.3, <6.1",
     "rich >=14.2.0, <14.3",
@@ -19,7 +20,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.3.22"
+  version = "0.3.23"
 
   [project.scripts]
     action = "actions.cli:_main"

@@ -17,7 +17,6 @@ from actions.logging import LOGGER
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from tomlkit.toml_document import TOMLDocument
     from utilities.types import PathLike
 
 
@@ -46,14 +45,14 @@ def format_requirements(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
-    current = loads(path.read_text())
+    current = path.read_text()
     expected = _get_formatted(path)
     if current != expected:
-        _ = path.write_text(dumps(expected))
+        _ = path.write_text(expected)
         _MODIFICATIONS.add(path)
 
 
-def _get_formatted(path: PathLike, /) -> TOMLDocument:
+def _get_formatted(path: PathLike, /) -> str:
     path = Path(path)
     doc = loads(path.read_text())
     if isinstance(dep_grps := doc.get("dependency-groups"), Table):
@@ -67,7 +66,7 @@ def _get_formatted(path: PathLike, /) -> TOMLDocument:
             for key, value in optional.items():
                 if isinstance(value, Array):
                     optional[key] = _format_array(value)
-    return doc
+    return dumps(doc).rstrip("\n") + "\n"
 
 
 def _format_array(dependencies: Array, /) -> Array:
