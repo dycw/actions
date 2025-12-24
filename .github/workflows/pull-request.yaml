@@ -27,9 +27,9 @@ jobs:
   pytest:
     env:
       CI: "1"
-    name: pytest (${{ matrix.os }}, ${{ matrix.python-version }}, ${{
-      matrix.resolution }})
-    runs-on: ${{ matrix.os }}
+    name: pytest (${{matrix.os}}, ${{matrix.python-version}},
+      ${{matrix.resolution}})
+    runs-on: ${{matrix.os}}
     steps:
       - name: Run 'pytest'
         uses: dycw/action-pytest@latest
@@ -54,3 +54,7 @@ jobs:
         uses: dycw/action-ruff@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run 'ruff'
+        uses: dycw/action-ruff@latest
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
