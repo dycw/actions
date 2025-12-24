@@ -72,6 +72,7 @@ repos:
           - indent_entries=true
           - --option
           - reorder_keys=true
+        exclude: src/tests/.*/.*\.toml$
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.9.18
     hooks:
