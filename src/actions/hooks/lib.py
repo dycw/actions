@@ -52,12 +52,12 @@ def _yield_hooks(
     for repo in (ensure_class(r, dict) for r in repos_list):
         url = repo["repo"]
         if (repos is not None) and any(search(repo_i, url) for repo_i in repos):
-            results.update(*_yield_repo_hooks(repo))
+            results.update(_yield_repo_hooks(repo))
         elif hooks is not None:
             for hook in _yield_repo_hooks(repo):
                 if any(search(hook_i, hook) for hook_i in hooks):
                     results.add(hook)
-    yield from results
+    yield from sorted(results)
 
 
 def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
