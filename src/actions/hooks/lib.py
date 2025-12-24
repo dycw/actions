@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from re import search
 from subprocess import CalledProcessError
@@ -7,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from utilities.functions import ensure_class, ensure_str
 from utilities.text import strip_and_dedent
+from whenever import TimeDelta
 from yaml import safe_load
 
 from actions import __version__
@@ -22,19 +24,25 @@ def run_hooks(
     *,
     repos: list[str] | None = HOOKS_SETTINGS.repos,
     hooks: list[str] | None = HOOKS_SETTINGS.hooks,
+    sleep: int = HOOKS_SETTINGS.sleep,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
              - repos = %s
              - hooks = %s
+             - sleep = %d
         """),
         run_hooks.__name__,
         __version__,
         repos,
         hooks,
+        sleep,
     )
-    results = {hook: _run_hook(hook) for hook in _yield_hooks(repos=repos, hooks=hooks)}
+    results = {
+        hook: _run_hook(hook, sleep=sleep)
+        for hook in _yield_hooks(repos=repos, hooks=hooks)
+    }
     failed = {hook: result for hook, result in results.items() if not result}
     if len(failed) >= 1:
         msg = f"Failed hook(s): {', '.join(failed)}"
@@ -66,13 +74,24 @@ def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
         yield ensure_str(hook["id"])
 
 
-def _run_hook(hook: str, /) -> bool:
+def _run_hook(hook: str, /, *, sleep: int = HOOKS_SETTINGS.sleep) -> bool:
     LOGGER.info("Running '%s'...", hook)
     try:
         log_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
     except CalledProcessError:
-        return False
-    return True
+        is_success = False
+    else:
+        is_success = True
+    delta = TimeDelta(seconds=sleep)
+    LOGGER.info(
+        "Hook '%s' %s; sleeping for %s...",
+        hook,
+        "succeeded" if is_success else "failed",
+        delta,
+    )
+    time.sleep(sleep)
+    LOGGER.info("Finished sleeping for %s", delta)
+    return is_success
 
 
 __all__ = ["run_hooks"]

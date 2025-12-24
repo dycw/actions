@@ -31,7 +31,7 @@ def hooks_sub_cmd(*, common: CommonSettings, hooks: HooksSettings) -> None:
         pretty_repr(common),
         pretty_repr(hooks),
     )
-    run_hooks(repos=hooks.repos, hooks=hooks.hooks)
+    run_hooks(repos=hooks.repos, hooks=hooks.hooks, sleep=hooks.sleep)
 
 
 __all__ = ["hooks_sub_cmd"]
