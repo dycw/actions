@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/pre-commit-hook-nitpick
-    rev: 0.7.5
+    rev: 0.7.8
     hooks:
       - args:
           - --description=GitHub actions
@@ -23,7 +23,7 @@ repos:
           - --pyright
           - --pytest
           - --python-package-name=actions
-          - --python-version=3.13
+          - --python-version=3.12
           - --readme
           - --repo-name=actions
           - --ruff
