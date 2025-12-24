@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import click
-from click import argument, command
+from click import argument
 from utilities.logging import basic_config
 from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
@@ -14,7 +14,6 @@ from actions.requirements.lib import format_requirements
 from actions.sleep.lib import random_sleep
 
 
-@command()
 @argument(
     "paths",
     nargs=-1,
