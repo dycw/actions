@@ -76,8 +76,11 @@ def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
 
 def _run_hook(hook: str, /, *, sleep: int = HOOKS_SETTINGS.sleep) -> bool:
     LOGGER.info("Running '%s'...", hook)
+    env = {"SKIP_VERSION_BUMP": "True"} if hook == "nitpick" else {}
     try:
-        log_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
+        log_run(
+            "pre-commit", "run", "--verbose", "--all-files", hook, env=env, print=True
+        )
     except CalledProcessError:
         is_success = False
     else:
