@@ -3,21 +3,21 @@
   requires = ["uv_build"]
 
 [dependency-groups]
-  dev = ["dycw-utilities[test]", "rich"]
+  dev = ["dycw-utilities[test]", "pyright", "rich"]
 
 [project]
   dependencies = [
     "click >=8.3.1, <8.4",
     "dycw-utilities >=0.172.6, < 0.173",
     "pyyaml >=6.0.3, <6.1",
-    "rich>=14.2.0, <14.3",
+    "rich >=14.2.0, <14.3",
     "typed-settings[attrs, click] >=25.3.0, <25.4",
   ]
   description = "GitHub actions"
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.13"
-  version = "0.3.10"
+  version = "0.3.11"
 
   [project.scripts]
     action = "actions.cli:_main"
