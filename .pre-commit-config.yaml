@@ -23,7 +23,7 @@ repos:
           - --pyright
           - --pytest
           - --python-package-name=actions
-          - --python-version=3.13
+          - --python-version=3.12
           - --readme
           - --repo-name=actions
           - --ruff
