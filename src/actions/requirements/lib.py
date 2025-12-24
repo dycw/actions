@@ -39,7 +39,7 @@ def format_requirements(*paths: PathLike) -> None:
     if len(_MODIFICATIONS) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr, sorted(_MODIFICATIONS))),
+            ", ".join(map(repr, map(str, sorted(_MODIFICATIONS)))),
         )
         sys.exit(1)
 
