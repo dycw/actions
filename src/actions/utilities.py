@@ -8,6 +8,8 @@ from utilities.subprocess import run
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
+    from utilities.types import StrStrMapping
+
     from actions.types import SecretLike
 
 
@@ -55,31 +57,43 @@ def convert_str(x: str | None, /) -> str | None:
 
 @overload
 def log_run(
-    cmd: SecretLike, /, *cmds: SecretLike, print: bool = False, return_: Literal[True]
+    cmd: SecretLike,
+    /,
+    *cmds: SecretLike,
+    env: StrStrMapping | None = None,
+    print: bool = False,
+    return_: Literal[True],
 ) -> str: ...
 @overload
 def log_run(
     cmd: SecretLike,
     /,
     *cmds: SecretLike,
+    env: StrStrMapping | None = None,
     print: bool = False,
     return_: Literal[False] = False,
 ) -> None: ...
 @overload
 def log_run(
-    cmd: SecretLike, /, *cmds: SecretLike, print: bool = False, return_: bool = False
+    cmd: SecretLike,
+    /,
+    *cmds: SecretLike,
+    env: StrStrMapping | None = None,
+    print: bool = False,
+    return_: bool = False,
 ) -> str | None: ...
 def log_run(
     cmd: SecretLike,
     /,
     *cmds: SecretLike,
+    env: StrStrMapping | None = None,
     print: bool = False,  # noqa: A002
     return_: bool = False,
 ) -> str | None:
     all_cmds = [cmd, *cmds]
     LOGGER.info("Running '%s'...", " ".join(map(str, all_cmds)))
     unwrapped = [c if isinstance(c, str) else c.get_secret_value() for c in all_cmds]
-    return run(*unwrapped, print=print, return_=return_, logger=LOGGER)
+    return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
 
 __all__ = [
