@@ -10,7 +10,7 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.requirements.lib import format_requirements
+from actions.sequence_strs.lib import replace_sequence_strs
 
 
 @argument(
@@ -18,7 +18,7 @@ from actions.requirements.lib import format_requirements
     nargs=-1,
     type=click.Path(exists=True, file_okay=True, dir_okay=False, path_type=Path),
 )
-def requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
+def sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -27,11 +27,11 @@ def requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
             Running '%s' (version %s) with settings:
              - paths = %s
         """),
-        format_requirements.__name__,
+        replace_sequence_strs.__name__,
         __version__,
         paths,
     )
-    format_requirements(*paths)
+    replace_sequence_strs(*paths)
 
 
-__all__ = ["requirements_sub_cmd"]
+__all__ = ["sequence_strs_sub_cmd"]

@@ -13,6 +13,7 @@ class TestCLI:
             param("hooks"),
             param("publish"),
             param("requirements"),
+            param("sequence-strs"),
             param("sleep"),
             param("tag"),
         ],
