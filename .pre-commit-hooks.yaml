@@ -7,7 +7,7 @@
   description: Format requirements
 - id: replace-sequence-strs
   name: replace-sequence-strs
-  entry: action sequence-str
+  entry: action sequence-strs
   language: python
   types: [toml]
   files: pyproject\.toml
