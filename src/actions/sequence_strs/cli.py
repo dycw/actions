@@ -18,7 +18,7 @@ from actions.sequence_strs.lib import replace_sequence_strs
     nargs=-1,
     type=click.Path(exists=True, file_okay=True, dir_okay=False, path_type=Path),
 )
-def sequences_sub_cmd(*, paths: tuple[Path, ...]) -> None:
+def sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -34,4 +34,4 @@ def sequences_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     replace_sequence_strs(*paths)
 
 
-__all__ = ["sequences_sub_cmd"]
+__all__ = ["sequence_strs_sub_cmd"]
