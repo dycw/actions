@@ -5,3 +5,10 @@
   types: [toml]
   files: pyproject\.toml
   description: Format requirements
+- id: replace-sequence-strs
+  name: replace-sequence-strs
+  entry: action sequence-str
+  language: python
+  types: [toml]
+  files: pyproject\.toml
+  description: Format requirements
