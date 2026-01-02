@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/pre-commit-hook-nitpick
-    rev: 0.7.8
+    rev: 0.8.3
     hooks:
       - args:
           - --description=GitHub actions
@@ -74,8 +74,12 @@ repos:
           - reorder_keys=true
         exclude: src/tests/.*/.*\.toml$
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.18
+    rev: 0.9.21
     hooks:
       - id: uv-lock
         args:
           - --upgrade
+          - --resolution
+          - highest
+          - --prerelease
+          - disallow

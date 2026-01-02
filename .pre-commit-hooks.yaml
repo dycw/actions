@@ -11,4 +11,4 @@
   language: python
   types: [toml]
   files: pyproject\.toml
-  description: Format requirements
+  description: Replace `Sequence[str]`
