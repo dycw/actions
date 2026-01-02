@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from subprocess import check_call
-
 from pytest import mark, param
 from utilities.pathlib import get_repo_root
+from utilities.subprocess import run
 
 
 class TestCLI:
@@ -19,4 +18,4 @@ class TestCLI:
         ],
     )
     def test_main(self, *, cmd: str) -> None:
-        _ = check_call(["action", cmd], cwd=get_repo_root())
+        run("action", cmd, cwd=get_repo_root())
