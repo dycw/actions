@@ -57,7 +57,7 @@ def _get_formatted(path: PathLike, /) -> str:
     existing = path.read_text()
     wrapper = MetadataWrapper(parse_module(existing))
     transformed = wrapper.module.visit(SequenceToListTransformer())
-    return transformed.code
+    return transformed.code.rstrip("\n") + "\n"
 
 
 class SequenceToListTransformer(CSTTransformer):
