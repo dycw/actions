@@ -9,7 +9,7 @@ from packaging.requirements import InvalidRequirement, Requirement, _parse_requi
 from packaging.specifiers import Specifier, SpecifierSet
 from tomlkit import TOMLDocument, array, dumps, loads, string
 from tomlkit.items import Array, Table
-from utilities.text import strip_and_dedent
+from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
@@ -38,7 +38,7 @@ def format_requirements(*paths: PathLike) -> None:
     if len(_MODIFICATIONS) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr, map(str, sorted(_MODIFICATIONS)))),
+            ", ".join(map(repr_str, sorted(_MODIFICATIONS))),
         )
         sys.exit(1)
 
