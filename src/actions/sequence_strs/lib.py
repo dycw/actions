@@ -11,7 +11,6 @@ from libcst.matchers import Subscript as MSubscript
 from libcst.matchers import SubscriptElement as MSubscriptElement
 from libcst.matchers import matches
 from libcst.metadata import MetadataWrapper
-from tomlkit import loads
 from utilities.text import strip_and_dedent
 
 from actions import __version__
@@ -46,7 +45,7 @@ def replace_sequence_strs(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
-    current = loads(path.read_text())
+    current = path.read_text()
     expected = _get_formatted(path)
     if current != expected:
         _ = path.write_text(expected)

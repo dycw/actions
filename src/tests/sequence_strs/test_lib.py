@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from pytest import fixture
 
-from actions.requirements.lib import _format_path, _get_formatted
+from actions.sequence_strs.lib import _format_path, _get_formatted
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -12,21 +12,21 @@ if TYPE_CHECKING:
 
 @fixture
 def path_tests_i(*, path_tests: Path) -> Path:
-    return path_tests / "requirements"
+    return path_tests / "sequence_strs"
 
 
 class TestFormatPath:
     def test_main(self, *, path_tests_i: Path, tmp_path: Path) -> None:
-        path = tmp_path / "file.toml"
-        _ = path.write_text((path_tests_i / "in.toml").read_text())
+        path = tmp_path / "file.py"
+        _ = path.write_text((path_tests_i / "in_.py").read_text())
         _format_path(path)
         result = path.read_text()
-        expected = path_tests_i.joinpath("out.toml").read_text()
+        expected = path_tests_i.joinpath("out.py").read_text()
         assert result == expected
 
 
 class TestGetFormatted:
     def test_main(self, *, path_tests_i: Path) -> None:
-        result = _get_formatted(path_tests_i.joinpath("in.toml"))
-        expected = path_tests_i.joinpath("out.toml").read_text()
+        result = _get_formatted(path_tests_i.joinpath("in_.py"))
+        expected = path_tests_i.joinpath("out.py").read_text()
         assert result == expected
