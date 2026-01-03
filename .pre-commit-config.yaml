@@ -1,9 +1,11 @@
 repos:
-  - repo: https://github.com/dycw/pre-commit-hook-nitpick
-    rev: 0.8.3
+  - repo: https://github.com/dycw/conformalize
+    rev: 0.10.8
     hooks:
       - args:
           - --description=GitHub actions
+          - --envrc
+          - --envrc--uv
           - --github--pull-request--pre-commit
           - --github--pull-request--pyright
           - --github--pull-request--pytest--os--macos
@@ -27,7 +29,7 @@ repos:
           - --readme
           - --repo-name=actions
           - --ruff
-        id: nitpick
+        id: conformalize
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
