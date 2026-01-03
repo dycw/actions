@@ -11,7 +11,7 @@ from libcst.matchers import Subscript as MSubscript
 from libcst.matchers import SubscriptElement as MSubscriptElement
 from libcst.matchers import matches
 from libcst.metadata import MetadataWrapper
-from utilities.text import strip_and_dedent
+from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
@@ -38,7 +38,7 @@ def replace_sequence_strs(*paths: PathLike) -> None:
     if len(_MODIFICATIONS) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr, map(str, sorted(_MODIFICATIONS)))),
+            ", ".join(map(repr_str, sorted(_MODIFICATIONS))),
         )
         sys.exit(1)
 
