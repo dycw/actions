@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from pytest import fixture
+from tomlkit import loads
 
 from actions.requirements.lib import _format_path, _get_formatted
 
@@ -28,5 +29,5 @@ class TestFormatPath:
 class TestGetFormatted:
     def test_main(self, *, path_tests_i: Path) -> None:
         result = _get_formatted(path_tests_i.joinpath("in.toml"))
-        expected = path_tests_i.joinpath("out.toml").read_text()
+        expected = loads(path_tests_i.joinpath("out.toml").read_text())
         assert result == expected
