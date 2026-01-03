@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, override
 
-from libcst import CSTTransformer, Name, Subscript, parse_module
+from libcst import CSTTransformer, Module, Name, Subscript, parse_module
 from libcst.matchers import Index as MIndex
 from libcst.matchers import Name as MName
 from libcst.matchers import Subscript as MSubscript
@@ -45,19 +45,18 @@ def replace_sequence_strs(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
-    current = path.read_text()
+    current = parse_module(path.read_text())
     expected = _get_formatted(path)
-    if current != expected:
-        _ = path.write_text(expected)
+    if current.code != expected.code:
+        _ = path.write_text(expected.code.rstrip("\n") + "\n")
         _MODIFICATIONS.add(path)
 
 
-def _get_formatted(path: PathLike, /) -> str:
+def _get_formatted(path: PathLike, /) -> Module:
     path = Path(path)
     existing = path.read_text()
     wrapper = MetadataWrapper(parse_module(existing))
-    transformed = wrapper.module.visit(SequenceToListTransformer())
-    return transformed.code.rstrip("\n") + "\n"
+    return wrapper.module.visit(SequenceToListTransformer())
 
 
 class SequenceToListTransformer(CSTTransformer):

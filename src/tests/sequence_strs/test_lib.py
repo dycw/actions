@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from libcst import parse_module
 from pytest import fixture
 
 from actions.sequence_strs.lib import _format_path, _get_formatted
@@ -28,5 +29,5 @@ class TestFormatPath:
 class TestGetFormatted:
     def test_main(self, *, path_tests_i: Path) -> None:
         result = _get_formatted(path_tests_i.joinpath("in_.py"))
-        expected = path_tests_i.joinpath("out.py").read_text()
-        assert result == expected
+        expected = parse_module(path_tests_i.joinpath("out.py").read_text())
+        assert result.code == expected.code
