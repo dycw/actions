@@ -9,6 +9,5 @@
   name: replace-sequence-strs
   entry: action sequence-strs
   language: python
-  types: [toml]
-  files: pyproject\.toml
+  types: [python]
   description: Replace `Sequence[str]`
