@@ -202,8 +202,8 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3.1,<8.4" },
-    { name = "dycw-utilities", specifier = ">=0.175.36,<0.176" },
-    { name = "libcst", specifier = ">=1.8.6" },
+    { name = "dycw-utilities", specifier = ">=0.175.38,<0.176" },
+    { name = "libcst", specifier = ">=1.8.6,<2" },
     { name = "packaging", specifier = ">=25.0,<25.1" },
     { name = "pyyaml", specifier = ">=6.0.3,<6.1" },
     { name = "rich", specifier = ">=14.2.0,<14.3" },
