@@ -3,4 +3,4 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 _ = Sequence
-OBJ: Sequence[str] = []
+OBJ: list[str] = []
