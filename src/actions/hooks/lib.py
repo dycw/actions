@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from os import environ
 from pathlib import Path
 from re import search
 from subprocess import CalledProcessError
@@ -77,11 +76,8 @@ def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
 
 def _run_hook(hook: str, /, *, sleep: int = HOOKS_SETTINGS.sleep) -> bool:
     LOGGER.info("Running '%s'...", hook)
-    env = (environ | {"SKIP_VERSION_BUMP": "True"}) if hook == "nitpick" else None
     try:
-        log_run(
-            "pre-commit", "run", "--verbose", "--all-files", hook, env=env, print=True
-        )
+        log_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
     except CalledProcessError:
         is_success = False
     else:
