@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/conformalize
-    rev: 0.10.10
+    rev: 0.12.1
     hooks:
       - args:
           - --description=GitHub actions
@@ -8,9 +8,9 @@ repos:
           - --envrc--uv
           - --github--pull-request--pre-commit
           - --github--pull-request--pyright
+          - --github--pull-request--pytest--all-versions
           - --github--pull-request--pytest--os--macos
           - --github--pull-request--pytest--os--ubuntu
-          - --github--pull-request--pytest--python-version--default
           - --github--pull-request--pytest--resolution--highest
           - --github--pull-request--ruff
           - --github--push--publish
@@ -49,7 +49,7 @@ repos:
           - --autofix
       - id: trailing-whitespace
   - repo: https://github.com/dycw/actions
-    rev: 0.3.30
+    rev: 0.3.31
     hooks:
       - id: format-requirements
         exclude: src/tests/.*/\.py$
