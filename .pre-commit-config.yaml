@@ -17,6 +17,7 @@ repos:
           - --github--push--publish--trusted-publishing
           - --github--push--tag
           - --package-name=dycw-actions
+          - --pre-commit--dycw
           - --pre-commit--prettier
           - --pre-commit--ruff
           - --pre-commit--taplo
@@ -85,3 +86,9 @@ repos:
           - highest
           - --prerelease
           - disallow
+  - repo: https://github.com/dycw/actions
+    rev: 0.3.29
+    hooks:
+      - id: format-requirements
+        exclude: src/tests/.*/\.py$
+      - id: replace-sequence-strs
