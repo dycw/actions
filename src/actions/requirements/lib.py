@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, override
 from packaging._tokenizer import ParserSyntaxError
 from packaging.requirements import InvalidRequirement, Requirement, _parse_requirement
 from packaging.specifiers import Specifier, SpecifierSet
-from tomlkit import array, dumps, loads, string
+from tomlkit import TOMLDocument, array, dumps, loads, string
 from tomlkit.items import Array, Table
 from utilities.text import strip_and_dedent
 
@@ -45,14 +45,15 @@ def format_requirements(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
-    current = path.read_text()
+    current = loads(path.read_text())
     expected = _get_formatted(path)
-    if current != expected:
-        _ = path.write_text(expected)
+    is_equal = current == expected  # tomlkit cannot handle !=
+    if not is_equal:
+        _ = path.write_text(dumps(expected).rstrip("\n") + "\n")
         _MODIFICATIONS.add(path)
 
 
-def _get_formatted(path: PathLike, /) -> str:
+def _get_formatted(path: PathLike, /) -> TOMLDocument:
     path = Path(path)
     doc = loads(path.read_text())
     if isinstance(dep_grps := doc.get("dependency-groups"), Table):
@@ -66,7 +67,7 @@ def _get_formatted(path: PathLike, /) -> str:
             for key, value in optional.items():
                 if isinstance(value, Array):
                     optional[key] = _format_array(value)
-    return dumps(doc).rstrip("\n") + "\n"
+    return doc
 
 
 def _format_array(dependencies: Array, /) -> Array:
