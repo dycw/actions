@@ -48,6 +48,12 @@ repos:
         args:
           - --autofix
       - id: trailing-whitespace
+  - repo: https://github.com/dycw/actions
+    rev: 0.3.29
+    hooks:
+      - id: format-requirements
+        exclude: src/tests/.*/\.py$
+      - id: replace-sequence-strs
   - repo: local
     hooks:
       - id: prettier
@@ -86,9 +92,3 @@ repos:
           - highest
           - --prerelease
           - disallow
-  - repo: https://github.com/dycw/actions
-    rev: 0.3.29
-    hooks:
-      - id: format-requirements
-        exclude: src/tests/.*/\.py$
-      - id: replace-sequence-strs
