@@ -8,7 +8,7 @@ from actions.hooks.lib import _yield_hooks
 class TestYieldHooks:
     @mark.parametrize(
         ("repos", "expected"),
-        [param([], []), param(["dycw/pre-commit-hook-nitpick"], ["nitpick"])],
+        [param([], []), param(["dycw/conformalize"], ["conformalize"])],
     )
     def test_repos(self, *, repos: list[str], expected: list[str]) -> None:
         result = list(_yield_hooks(repos=repos))
@@ -19,9 +19,10 @@ class TestYieldHooks:
         [
             param([], []),
             param(["invalid"], []),
-            param(["nitpick"], ["nitpick"]),
+            param(["conformalize"], ["conformalize"]),
             param(
-                ["nitpick", "no-commit-to-branch"], ["nitpick", "no-commit-to-branch"]
+                ["conformalize", "no-commit-to-branch"],
+                ["conformalize", "no-commit-to-branch"],
             ),
         ],
     )
