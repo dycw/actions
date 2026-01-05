@@ -24,8 +24,8 @@ jobs:
       - name: Run 'pyright'
         uses: dycw/action-pyright@latest
         with:
-          token-checkout: ${{github.token}}
-          token-uv: ${{github.token}}
+          token-checkout: ${{secrets.GITHUB_TOKEN}}
+          token-uv: ${{secrets.GITHUB_TOKEN}}
           python-version: "3.12"
           resolution: highest
           prerelease: disallow
