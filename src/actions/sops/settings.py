@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from platform import platform, system
 
 from typed_settings import Secret, load_settings, option, secret, settings
@@ -14,6 +15,9 @@ class SopsSettings:
     )
     system: str = option(default=system(), help="System name")
     platform: str = option(default=platform(), help="Platform name")
+    path: Path = option(default=Path("/usr/bin/local/sops"), help="Download path")
+    timeout: int = option(default=60, help="Download timeout")
+    chunk_size: int = option(default=8192, help="Streaming chunk size")
 
 
 SOPS_SETTINGS = load_settings(SopsSettings, [LOADER])

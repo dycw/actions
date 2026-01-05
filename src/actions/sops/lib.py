@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from re import IGNORECASE, search
 from typing import TYPE_CHECKING
 
@@ -15,6 +14,8 @@ from actions.logging import LOGGER
 from actions.sops.settings import SOPS_SETTINGS
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from typed_settings import Secret
 
 
@@ -23,19 +24,26 @@ def setup_sops(
     token: Secret[str] | None = SOPS_SETTINGS.token,
     system: str = SOPS_SETTINGS.system,
     platform: str = SOPS_SETTINGS.platform,
+    path: Path = SOPS_SETTINGS.path,
+    timeout: int = SOPS_SETTINGS.timeout,
+    chunk_size: int = SOPS_SETTINGS.chunk_size,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
-             - token    = %s
-             - system   = %s
-             - platform = %s
+             - token      = %s
+             - system     = %s
+             - platform   = %s
+             - path       = %s
+             - timeout    = %d
+             - chunk_size = %d
         """),
         setup_sops.__name__,
         __version__,
         token,
         system,
         platform,
+        chunk_size,
     )
     if token is None:
         msg = "'token' must be given"
@@ -52,17 +60,16 @@ def setup_sops(
         if search(system, a.name, flags=IGNORECASE)
         and search(platform, a.name, flags=IGNORECASE)
     )
-    path = Path("/usr/local/bin")
     with get(
         asset.browser_download_url,
         headers={"Authorization": f"Bearer {token.get_secret_value()}"},
-        timeout=60,
+        timeout=timeout,
         stream=True,
     ) as resp:
         resp.raise_for_status()
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open(mode="wb") as fh:
-            fh.writelines(resp.iter_content(chunk_size=8192))
+            fh.writelines(resp.iter_content(chunk_size=chunk_size))
     path.chmod(0o755)
 
 
