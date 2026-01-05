@@ -12,7 +12,6 @@ repos:
           - --github--pull-request--pytest--ubuntu
           - --github--pull-request--ruff
           - --github--push--publish
-          - --github--push--publish--trusted-publishing
           - --github--push--tag
           - --package-name=dycw-actions
           - --pre-commit--dycw
