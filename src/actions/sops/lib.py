@@ -25,7 +25,7 @@ def setup_sops(
     *,
     token: Secret[str] | None = SOPS_SETTINGS.token,
     system: str = SOPS_SETTINGS.system,
-    platform: str = SOPS_SETTINGS.platform,
+    machine: str = SOPS_SETTINGS.machine,
     path_binary: Path = SOPS_SETTINGS.path_binary,
     timeout: int = SOPS_SETTINGS.timeout,
     chunk_size: int = SOPS_SETTINGS.chunk_size,
@@ -35,7 +35,7 @@ def setup_sops(
             Running '%s' (version %s) with settings:
              - token       = %s
              - system      = %s
-             - platform    = %s
+             - machine     = %s
              - path_binary = %s
              - timeout     = %d
              - chunk_size  = %d
@@ -44,7 +44,9 @@ def setup_sops(
         __version__,
         token,
         system,
-        platform,
+        machine,
+        path_binary,
+        timeout,
         chunk_size,
     )
     gh = Github(auth=None if token is None else Token(token.get_secret_value()))
@@ -57,7 +59,8 @@ def setup_sops(
         a
         for a in release.get_assets()
         if search(system, a.name, flags=IGNORECASE)
-        and search(platform, a.name, flags=IGNORECASE)
+        and search(machine, a.name, flags=IGNORECASE)
+        and not a.name.endswith("json")
     )
     headers: StrDict = {}
     if token is not None:

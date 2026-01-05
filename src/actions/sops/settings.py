@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from platform import platform, system
+from platform import machine, system
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
@@ -14,7 +14,7 @@ class SopsSettings:
         default=None, converter=convert_secret_str, help="The GitHub token"
     )
     system: str = option(default=system(), help="System name")
-    platform: str = option(default=platform(), help="Platform name")
+    machine: str = option(default=machine(), help="Machine type")
     path_binary: Path = option(
         default=Path("/usr/bin/local/sops"), help="Download path"
     )

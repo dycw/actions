@@ -30,7 +30,7 @@ def sops_sub_cmd(settings: SopsSettings, /) -> None:
     setup_sops(
         token=settings.token,
         system=settings.system,
-        platform=settings.platform,
+        machine=settings.machine,
         path_binary=settings.path_binary,
         timeout=settings.timeout,
         chunk_size=settings.chunk_size,
