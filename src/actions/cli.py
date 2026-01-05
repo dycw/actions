@@ -8,6 +8,7 @@ from actions.publish.cli import publish_sub_cmd
 from actions.requirements.cli import requirements_sub_cmd
 from actions.sequence_strs.cli import sequence_strs_sub_cmd
 from actions.sleep.cli import sleep_sub_cmd
+from actions.sops.cli import sops_sub_cmd
 from actions.tag.cli import tag_sub_cmd
 
 
@@ -20,6 +21,7 @@ _ = _main.command(name="publish", **CONTEXT_SETTINGS)(publish_sub_cmd)
 _ = _main.command(name="requirements", **CONTEXT_SETTINGS)(requirements_sub_cmd)
 _ = _main.command(name="sequence-strs", **CONTEXT_SETTINGS)(sequence_strs_sub_cmd)
 _ = _main.command(name="sleep", **CONTEXT_SETTINGS)(sleep_sub_cmd)
+_ = _main.command(name="sops", **CONTEXT_SETTINGS)(sops_sub_cmd)
 _ = _main.command(name="tag", **CONTEXT_SETTINGS)(tag_sub_cmd)
 
 
