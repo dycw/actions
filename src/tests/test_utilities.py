@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from click import command, echo
 from click.testing import CliRunner
 from pytest import mark, param
-from typed_settings import Secret, click_options, option, settings
+from typed_settings import Secret, click_options, option, secret, settings
 
 from actions.publish.settings import convert_str
 from actions.utilities import LOADER, convert_list_strs, convert_secret_str
@@ -66,7 +66,7 @@ class TestConvertListStr:
 
 @settings
 class _SettingsWithSecret:
-    key: Secret[str] | None = option(default=None, converter=convert_secret_str)
+    key: Secret[str] | None = secret(default=None, converter=convert_secret_str)
 
 
 @command()

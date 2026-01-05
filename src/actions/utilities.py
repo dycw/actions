@@ -33,12 +33,17 @@ def convert_list_strs(
 
 
 def convert_secret_str(x: SecretLike | None, /) -> Secret[str] | None:
-    empty = {None, ""}
     match x:
         case Secret():
-            return None if x.get_secret_value() in empty else x
+            match x.get_secret_value():
+                case None:
+                    return None
+                case str() as inner:
+                    return None if inner == "" else Secret(inner)
+                case never:
+                    assert_never(never)
         case str():
-            return None if x in empty else Secret(x)
+            return None if x == "" else Secret(x)
         case None:
             return None
         case never:
