@@ -117,9 +117,9 @@ def run_action_random_sleep_dict(
 
 
 def run_action_ruff_dict(
-    *, token_checkout: str = GITHUB_TOKEN, token_uv: str = GITHUB_TOKEN
+    *, token_checkout: str = GITHUB_TOKEN, token_ruff: str = GITHUB_TOKEN
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    dict_: StrDict = {"token-checkout": token_checkout, "token-ruff": token_ruff}
     return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
 
 
