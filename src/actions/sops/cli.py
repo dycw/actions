@@ -31,7 +31,7 @@ def sops_sub_cmd(settings: SopsSettings, /) -> None:
         token=settings.token,
         system=settings.system,
         platform=settings.platform,
-        path=settings.path_binary,
+        path_binary=settings.path_binary,
         timeout=settings.timeout,
         chunk_size=settings.chunk_size,
     )

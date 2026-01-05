@@ -26,19 +26,19 @@ def setup_sops(
     token: Secret[str] | None = SOPS_SETTINGS.token,
     system: str = SOPS_SETTINGS.system,
     platform: str = SOPS_SETTINGS.platform,
-    path: Path = SOPS_SETTINGS.path_binary,
+    path_binary: Path = SOPS_SETTINGS.path_binary,
     timeout: int = SOPS_SETTINGS.timeout,
     chunk_size: int = SOPS_SETTINGS.chunk_size,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
-             - token      = %s
-             - system     = %s
-             - platform   = %s
-             - path       = %s
-             - timeout    = %d
-             - chunk_size = %d
+             - token       = %s
+             - system      = %s
+             - platform    = %s
+             - path_binary = %s
+             - timeout     = %d
+             - chunk_size  = %d
         """),
         setup_sops.__name__,
         __version__,
@@ -66,10 +66,10 @@ def setup_sops(
         asset.browser_download_url, headers=headers, timeout=timeout, stream=True
     ) as resp:
         resp.raise_for_status()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open(mode="wb") as fh:
+        path_binary.parent.mkdir(parents=True, exist_ok=True)
+        with path_binary.open(mode="wb") as fh:
             fh.writelines(resp.iter_content(chunk_size=chunk_size))
-    path.chmod(0o755)
+    path_binary.chmod(0o755)
 
 
 __all__ = ["setup_sops"]
