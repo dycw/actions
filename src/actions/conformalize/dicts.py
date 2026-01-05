@@ -75,8 +75,8 @@ def run_action_pyright_dict(
 
 def run_action_pytest_dict(
     *,
-    token_checkout: bool | str = False,
-    token_uv: bool | str = False,
+    token_checkout: str = GITHUB_TOKEN,
+    token_uv: str = GITHUB_TOKEN,
     python_version: str | None = None,
     resolution: str = RESOLUTION,
     prerelease: str = PRERELEASE,
