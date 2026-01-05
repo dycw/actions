@@ -92,14 +92,35 @@ def run_action_pytest_dict(
     return {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest", "with": dict_}
 
 
+def run_action_random_sleep_dict(
+    *,
+    token_checkout: str = GITHUB_TOKEN,
+    token_uv: str = GITHUB_TOKEN,
+    min: int = 0,  # noqa: A002
+    max: int = 3600,  # noqa: A002
+    step: int = 1,
+    log_freq: int = 1,
+) -> StrDict:
+    dict_: StrDict = {
+        "token-checkout": token_checkout,
+        "token-uv": token_uv,
+        "min": min,
+        "max": max,
+        "step": step,
+        "log-freq": log_freq,
+    }
+    return {
+        "name": "Tag latest commit",
+        "uses": "dycw/action-tag@latest",
+        "with": dict_,
+    }
+
+
 def run_action_ruff_dict(
     *, token_checkout: str = GITHUB_TOKEN, token_uv: str = GITHUB_TOKEN
 ) -> StrDict:
-    return {
-        "name": "Run 'ruff'",
-        "uses": "dycw/action-ruff@latest",
-        "with": {"token-checkout": token_checkout, "token-uv": token_uv},
-    }
+    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
 
 
 def run_action_tag_dict(
@@ -159,6 +180,7 @@ __all__ = [
     "run_action_publish_dict",
     "run_action_pyright_dict",
     "run_action_pytest_dict",
+    "run_action_random_sleep_dict",
     "run_action_ruff_dict",
     "run_action_tag_dict",
 ]
