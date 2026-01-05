@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 
     from typed_settings import Secret
 
+    from actions.types import StrDict
+
 
 def setup_sops(
     *,
@@ -45,10 +47,7 @@ def setup_sops(
         platform,
         chunk_size,
     )
-    if token is None:
-        msg = "'token' must be given"
-        raise ValueError(msg)
-    gh = Github(auth=Token(token.get_secret_value()))
+    gh = Github(auth=None if token is None else Token(token.get_secret_value()))
     repo = gh.get_repo("getsops/sops")
     release = repo.get_latest_release()
     if system not in {"Darwin", "Linux"}:
@@ -60,11 +59,11 @@ def setup_sops(
         if search(system, a.name, flags=IGNORECASE)
         and search(platform, a.name, flags=IGNORECASE)
     )
+    headers: StrDict = {}
+    if token is not None:
+        headers["Authorization"] = f"Bearer {token.get_secret_value()}"
     with get(
-        asset.browser_download_url,
-        headers={"Authorization": f"Bearer {token.get_secret_value()}"},
-        timeout=timeout,
-        stream=True,
+        asset.browser_download_url, headers=headers, timeout=timeout, stream=True
     ) as resp:
         resp.raise_for_status()
         path.parent.mkdir(parents=True, exist_ok=True)
