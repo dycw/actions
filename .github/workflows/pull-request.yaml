@@ -52,6 +52,7 @@ jobs:
           - "3.14"
         resolution:
           - highest
+          - lowest-direct
   ruff:
     runs-on: ubuntu-latest
     steps:
