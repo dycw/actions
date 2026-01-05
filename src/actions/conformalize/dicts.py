@@ -92,6 +92,16 @@ def run_action_pytest_dict(
     return {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest", "with": dict_}
 
 
+def run_action_ruff_dict(
+    *, token_checkout: str = GITHUB_TOKEN, token_uv: str = GITHUB_TOKEN
+) -> StrDict:
+    return {
+        "name": "Run 'ruff'",
+        "uses": "dycw/action-ruff@latest",
+        "with": {"token-checkout": token_checkout, "token-uv": token_uv},
+    }
+
+
 def _add_boolean(dict_: StrDict, key: str, /, *, value: bool = False) -> None:
     if value:
         dict_[key] = value
@@ -123,4 +133,5 @@ __all__ = [
     "run_action_publish_dict",
     "run_action_pyright_dict",
     "run_action_pytest_dict",
+    "run_action_ruff_dict",
 ]
