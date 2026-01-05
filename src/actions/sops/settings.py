@@ -15,7 +15,9 @@ class SopsSettings:
     )
     system: str = option(default=system(), help="System name")
     platform: str = option(default=platform(), help="Platform name")
-    path: Path = option(default=Path("/usr/bin/local/sops"), help="Download path")
+    path_binary: Path = option(
+        default=Path("/usr/bin/local/sops"), help="Download path"
+    )
     timeout: int = option(default=60, help="Download timeout")
     chunk_size: int = option(default=8192, help="Streaming chunk size")
 

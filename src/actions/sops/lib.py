@@ -26,7 +26,7 @@ def setup_sops(
     token: Secret[str] | None = SOPS_SETTINGS.token,
     system: str = SOPS_SETTINGS.system,
     platform: str = SOPS_SETTINGS.platform,
-    path: Path = SOPS_SETTINGS.path,
+    path: Path = SOPS_SETTINGS.path_binary,
     timeout: int = SOPS_SETTINGS.timeout,
     chunk_size: int = SOPS_SETTINGS.chunk_size,
 ) -> None:
