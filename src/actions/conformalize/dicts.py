@@ -102,6 +102,32 @@ def run_action_ruff_dict(
     }
 
 
+def run_action_tag_dict(
+    *,
+    token_checkout: str = GITHUB_TOKEN,
+    token_uv: str = GITHUB_TOKEN,
+    user_name: str = "github-actions-bot",
+    user_email: str = "noreply@github.com",
+    major_minor: bool = False,
+    major: bool = False,
+    latest: bool = False,
+) -> StrDict:
+    dict_: StrDict = {
+        "token-checkout": token_checkout,
+        "token-uv": token_uv,
+        "user-name": user_name,
+        "user-email": user_email,
+    }
+    _add_boolean(dict_, "major-minor", value=major_minor)
+    _add_boolean(dict_, "major", value=major)
+    _add_boolean(dict_, "latest", value=latest)
+    return {
+        "name": "Tag latest commit",
+        "uses": "dycw/action-tag@latest",
+        "with": dict_,
+    }
+
+
 def _add_boolean(dict_: StrDict, key: str, /, *, value: bool = False) -> None:
     if value:
         dict_[key] = value
@@ -134,4 +160,5 @@ __all__ = [
     "run_action_pyright_dict",
     "run_action_pytest_dict",
     "run_action_ruff_dict",
+    "run_action_tag_dict",
 ]
