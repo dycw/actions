@@ -47,7 +47,7 @@ repos:
           - --autofix
       - id: trailing-whitespace
   - repo: https://github.com/dycw/actions
-    rev: 0.3.33
+    rev: 0.3.34
     hooks:
       - id: format-requirements
         exclude: src/tests/.*/\.py$

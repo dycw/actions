@@ -7,20 +7,20 @@
 
 [project]
   dependencies = [
-    "click >=8.3.1, <8.4",
-    "dycw-utilities >=0.175.38, <0.176",
+    "click >=8.3.1, <9",
+    "dycw-utilities >=0.176.1, <1",
     "libcst >=1.8.6, <2",
-    "packaging >=25.0, <25.1",
-    "pyyaml >=6.0.3, <6.1",
-    "rich >=14.2.0, <14.3",
-    "tomlkit >=0.13.3, <0.14",
-    "typed-settings[attrs,click] >=25.3.0, <25.4",
+    "packaging >=25.0, <26",
+    "pyyaml >=6.0.3, <7",
+    "rich >=14.2.0, <15",
+    "tomlkit >=0.13.3, <1",
+    "typed-settings[attrs,click] >=25.3.0, <26",
   ]
   description = "GitHub actions"
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.3.34"
+  version = "0.3.35"
 
   [project.scripts]
     action = "actions.cli:_main"
