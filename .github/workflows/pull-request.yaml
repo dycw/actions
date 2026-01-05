@@ -64,9 +64,4 @@ jobs:
         uses: dycw/action-ruff@latest
         with:
           token-checkout: ${{github.token}}
-          token-uv: ${{github.token}}
-      - name: Run 'ruff'
-        uses: dycw/action-ruff@latest
-        with:
-          token-checkout: ${{github.token}}
           token-ruff: ${{github.token}}
