@@ -10,9 +10,9 @@
     "click >=8.3.1, <9",
     "dycw-utilities >=0.175.38, <1",
     "libcst >=1.8.6, <2",
-    "packaging >=25.0, <25.1",
-    "pyyaml >=6.0.3, <6.1",
-    "rich >=14.2.0, <14.3",
+    "packaging >=25.0, <26",
+    "pyyaml >=6.0.3, <7",
+    "rich >=14.2.0, <15",
     "tomlkit >=0.13.3, <0.14",
     "typed-settings[attrs,click] >=25.3.0, <25.4",
   ]
