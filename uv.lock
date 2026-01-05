@@ -207,8 +207,8 @@ requires-dist = [
     { name = "packaging", specifier = ">=25.0,<26" },
     { name = "pyyaml", specifier = ">=6.0.3,<7" },
     { name = "rich", specifier = ">=14.2.0,<15" },
-    { name = "tomlkit", specifier = ">=0.13.3,<0.14" },
-    { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0,<25.4" },
+    { name = "tomlkit", specifier = ">=0.13.3,<1" },
+    { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0,<26" },
 ]
 
 [package.metadata.requires-dev]
