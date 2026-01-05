@@ -27,7 +27,7 @@ def sops_sub_cmd(settings: SopsSettings, /) -> None:
         __version__,
         pretty_repr(settings),
     )
-    setup_sops(token=settings.token)
+    setup_sops(token=settings.token, system=settings.system, platform=settings.platform)
 
 
 __all__ = ["sops_sub_cmd"]
