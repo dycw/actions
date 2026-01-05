@@ -11,12 +11,15 @@ if TYPE_CHECKING:
 def run_action_pre_commit_dict(
     *,
     token_checkout: str = GITHUB_TOKEN,
+    submodules: str | None = None,
     token_uv: str = GITHUB_TOKEN,
     repos: Any | None = None,
     hooks: Any | None = None,
     sleep: int = 1,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    dict_: StrDict = {"token-checkout": token_checkout}
+    _add_item(dict_, "submodules", value=submodules)
+    dict_["token-uv"] = token_uv
     _add_item(dict_, "repos", value=repos)
     _add_item(dict_, "hooks", value=hooks)
     dict_["sleep"] = sleep
