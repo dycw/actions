@@ -20,7 +20,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.3.35"
+  version = "0.3.36"
 
   [project.scripts]
     action = "actions.cli:_main"
