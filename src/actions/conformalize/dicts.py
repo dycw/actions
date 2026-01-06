@@ -81,6 +81,9 @@ def run_action_pytest_dict(
     token_checkout: str = GITHUB_TOKEN,
     token_uv: str = GITHUB_TOKEN,
     python_version: str | None = None,
+    sops_age_key: str | None = None,
+    token_sops: str = GITHUB_TOKEN,
+    token_age: str = GITHUB_TOKEN,
     resolution: str = RESOLUTION,
     prerelease: str = PRERELEASE,
     native_tls: bool = False,
@@ -88,6 +91,9 @@ def run_action_pytest_dict(
 ) -> StrDict:
     dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
     _add_python_version(dict_, python_version=python_version)
+    _add_item(dict_, "sops-age-key", value=sops_age_key)
+    dict_["token-sops"] = token_sops
+    dict_["token-age"] = token_age
     dict_["resolution"] = resolution
     dict_["prerelease"] = prerelease
     _add_native_tls(dict_, native_tls=native_tls)
