@@ -507,6 +507,9 @@ def add_github_pull_request_yaml(
         jobs = get_dict(dict_, "jobs")
         if pre_commit:
             pre_commit_dict = get_dict(jobs, "pre-commit")
+            pre_commit_dict["if"] = (
+                f"{runner(gitea=pre_commit__gitea)}.event_name == 'pull_request'"
+            )
             pre_commit_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(pre_commit_dict, "steps")
             ensure_contains(
@@ -517,8 +520,7 @@ def add_github_pull_request_yaml(
                             dycw/actions
                             pre-commit/pre-commit-hooks
                         """)
-                    ),
-                    gitea=pre_commit__gitea,
+                    )
                 ),
             )
         if pyright:
@@ -1261,6 +1263,13 @@ def run_ripgrep_and_replace(
 ##
 
 
+def runner(*, gitea: bool = False) -> str:
+    return "gitea" if gitea else "github"
+
+
+##
+
+
 def set_version(version: Version, /) -> None:
     run(
         "bump-my-version",
@@ -1507,6 +1516,7 @@ __all__ = [
     "run_bump_my_version",
     "run_pre_commit_update",
     "run_ripgrep_and_replace",
+    "runner",
     "set_version",
     "update_action_file_extensions",
     "update_action_versions",
