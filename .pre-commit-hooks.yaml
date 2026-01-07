@@ -17,4 +17,4 @@
   entry: action replace-sequence-strs
   language: python
   types: [python]
-  description: Replace `Sequence[str]`
+  description: Replace 'Sequence[str]' with 'list[str]'

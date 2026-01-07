@@ -35,7 +35,9 @@ _ = _main.command(
     **CONTEXT_SETTINGS,
 )(publish_package_sub_cmd)
 _ = _main.command(
-    name="replace-sequence-strs", help="Replace `Sequence[str]`", **CONTEXT_SETTINGS
+    name="replace-sequence-strs",
+    help="Replace 'Sequence[str]' with 'list[str]'",
+    **CONTEXT_SETTINGS,
 )(sequence_strs_sub_cmd)
 _ = _main.command(
     name="run-hooks", help=actions.run_hooks.doc.DOCSTRING, **CONTEXT_SETTINGS
