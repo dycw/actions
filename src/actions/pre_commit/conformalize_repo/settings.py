@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typed_settings import load_settings, option, settings
 
-from actions.conformalize_repo.constants import RUN_VERSION_BUMP
+from actions.pre_commit.conformalize_repo.constants import RUN_VERSION_BUMP
 from actions.utilities import LOADER
 
 

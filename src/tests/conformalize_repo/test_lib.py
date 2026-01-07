@@ -6,7 +6,7 @@ from pytest import mark, param, raises
 from utilities.iterables import one
 from utilities.text import strip_and_dedent
 
-from actions.conformalize_repo.lib import (
+from actions.pre_commit.conformalize_repo.lib import (
     _add_envrc_uv_text,
     get_partial_dict,
     is_partial_dict,

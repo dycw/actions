@@ -6,7 +6,7 @@ from re import search
 from utilities.pathlib import get_repo_root
 from utilities.pytest import IS_CI
 
-from actions.constants import PATH_ACTIONS
+from actions.pre_commit.constants import PATH_PRE_COMMIT
 
 ACTIONS_URL = "https://github.com/dycw/actions"
 DOCKERFMT_URL = "https://github.com/reteps/dockerfmt"
@@ -40,7 +40,7 @@ RUN_VERSION_BUMP = (search("template", str(REPO_ROOT)) is None) and not IS_CI
 GITHUB_WORKFLOWS = Path(".github/workflows")
 GITHUB_PULL_REQUEST_YAML = GITHUB_WORKFLOWS / "pull-request.yaml"
 GITHUB_PUSH_YAML = GITHUB_WORKFLOWS / "push.yaml"
-PATH_CONFIGS = PATH_ACTIONS / "conformalize_repo/configs"
+PATH_CONFIGS = PATH_PRE_COMMIT / "conformalize_repo/configs"
 
 
 __all__ = [

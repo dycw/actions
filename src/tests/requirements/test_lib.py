@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pytest import fixture
 from tomlkit import loads
 
-from actions.format_requirements.lib import _format_path, _get_formatted
+from actions.pre_commit.format_requirements.lib import _format_path, _get_formatted
 
 if TYPE_CHECKING:
     from pathlib import Path

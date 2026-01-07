@@ -7,9 +7,9 @@ from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
 
 from actions import __version__
-from actions.conformalize_repo.lib import conformalize_repo
-from actions.conformalize_repo.settings import Settings
 from actions.logging import LOGGER
+from actions.pre_commit.conformalize_repo.lib import conformalize_repo
+from actions.pre_commit.conformalize_repo.settings import Settings
 from actions.utilities import LOADER
 
 
