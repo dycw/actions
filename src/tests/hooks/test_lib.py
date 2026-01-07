@@ -2,6 +2,11 @@ from __future__ import annotations
 
 from pytest import mark, param
 
+from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
+from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.constants import (
+    REPLACE_SEQUENCE_STRS_SUB_CMD,
+)
 from actions.run_hooks.lib import _yield_hooks
 
 
@@ -12,7 +17,11 @@ class TestYieldHooks:
             param([], []),
             param(
                 ["dycw/actions"],
-                ["conformalize-repo", "format-requirements", "replace-sequence-strs"],
+                [
+                    CONFORMALIZE_REPO_SUB_CMD,
+                    FORMAT_REQUIREMENTS_SUB_CMD,
+                    REPLACE_SEQUENCE_STRS_SUB_CMD,
+                ],
             ),
         ],
     )
@@ -25,10 +34,10 @@ class TestYieldHooks:
         [
             param([], []),
             param(["invalid"], []),
-            param(["conformalize-repo"], ["conformalize-repo"]),
+            param([CONFORMALIZE_REPO_SUB_CMD], [CONFORMALIZE_REPO_SUB_CMD]),
             param(
-                ["conformalize-repo", "no-commit-to-branch"],
-                ["conformalize-repo", "no-commit-to-branch"],
+                [CONFORMALIZE_REPO_SUB_CMD, "no-commit-to-branch"],
+                [CONFORMALIZE_REPO_SUB_CMD, "no-commit-to-branch"],
             ),
         ],
     )

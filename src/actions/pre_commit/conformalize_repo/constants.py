@@ -31,6 +31,9 @@ REPO_ROOT = get_repo_root()
 RUFF_TOML = Path("ruff.toml")
 
 
+CONFORMALIZE_REPO_SUB_CMD = "conformalize-repo"
+
+
 MAX_PYTHON_VERSION = "3.14"
 
 
@@ -46,6 +49,7 @@ PATH_CONFIGS = PATH_PRE_COMMIT / "conformalize_repo/configs"
 __all__ = [
     "ACTIONS_URL",
     "BUMPVERSION_TOML",
+    "CONFORMALIZE_REPO_SUB_CMD",
     "COVERAGERC_TOML",
     "DOCKERFMT_URL",
     "ENVRC",

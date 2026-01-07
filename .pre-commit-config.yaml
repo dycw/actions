@@ -1,6 +1,8 @@
+exclude: src/tests/pre_commit/touch_empty_py/out\.py
+
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.6.6
+    rev: 0.6.7
     hooks:
       - id: conformalize-repo
         args:

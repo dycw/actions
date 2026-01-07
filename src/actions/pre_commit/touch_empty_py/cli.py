@@ -9,14 +9,14 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.click import path_argument
-from actions.pre_commit.replace_sequence_strs.lib import replace_sequence_strs
+from actions.pre_commit.touch_empty_py.lib import touch_empty_py
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 
 @path_argument
-def replace_sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
+def touch_empty_py_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -25,11 +25,11 @@ def replace_sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
             Running '%s' (version %s) with settings:
              - paths = %s
         """),
-        replace_sequence_strs.__name__,
+        touch_empty_py.__name__,
         __version__,
         paths,
     )
-    replace_sequence_strs(*paths)
+    touch_empty_py(*paths)
 
 
-__all__ = ["replace_sequence_strs_sub_cmd"]
+__all__ = ["touch_empty_py_sub_cmd"]

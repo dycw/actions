@@ -18,3 +18,9 @@
   language: python
   types: [python]
   description: Replace 'Sequence[str]' with 'list[str]'
+- id: touch-empty-py
+  name: touch-empty-py
+  entry: action pre-commit touch-empty-py
+  language: python
+  types: [python]
+  description: Touch empty '.py' files
