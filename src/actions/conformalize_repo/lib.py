@@ -13,20 +13,15 @@ from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any, Literal, assert_never
 
 import tomlkit
-from click import command
 from rich.pretty import pretty_repr
 from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, aot, array, document, table
 from tomlkit.exceptions import NonExistentKey
 from tomlkit.items import AoT, Array, Table
-from typed_settings import click_options
 from utilities.atomicwrites import writer
-from utilities.click import CONTEXT_SETTINGS
 from utilities.functions import ensure_class
 from utilities.inflect import counted_noun
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
-from utilities.logging import basic_config
-from utilities.os import is_pytest
 from utilities.pathlib import get_repo_root
 from utilities.re import extract_groups
 from utilities.subprocess import append_text, ripgrep, run
@@ -62,7 +57,7 @@ from actions.conformalize_repo.constants import (
     README_MD,
     RUFF_TOML,
 )
-from actions.conformalize_repo.settings import SETTINGS, Settings
+from actions.conformalize_repo.settings import SETTINGS
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
@@ -213,7 +208,8 @@ def conformalize_repo(
     add_bumpversion_toml(
         modifications=modifications,
         pyproject=pyproject,
-        python_package_name_use=python_package_name_use,
+        package_name=package_name,
+        python_package_name=python_package_name,
     )
     check_versions()
     run_pre_commit_update(modifications=modifications)
@@ -291,7 +287,6 @@ def conformalize_repo(
             readme=readme,
             optional_dependencies__scripts=pyproject__project__optional_dependencies__scripts,
             python_package_name=python_package_name,
-            python_package_name_use=python_package_name_use,
             tool__uv__indexes=pyproject__tool__uv__indexes,
         )
     if pyright:
@@ -310,7 +305,8 @@ def conformalize_repo(
             ignore_warnings=pytest__ignore_warnings,
             timeout=pytest__timeout,
             coverage=coverage,
-            python_package_name=python_package_name_use,
+            package_name=package_name,
+            python_package_name=python_package_name,
             script=script,
         )
     if readme:
@@ -337,7 +333,8 @@ def add_bumpversion_toml(
     *,
     modifications: MutableSet[Path] | None = None,
     pyproject: bool = SETTINGS.pyproject,
-    python_package_name_use: str | None = SETTINGS.python_package_name_use,
+    package_name: str | None = SETTINGS.package_name,
+    python_package_name: str | None = SETTINGS.python_package_name,
 ) -> None:
     with yield_bumpversion_toml(modifications=modifications) as doc:
         tool = get_table(doc, "tool")
@@ -348,15 +345,19 @@ def add_bumpversion_toml(
                 files,
                 _add_bumpversion_toml_file(PYPROJECT_TOML, 'version = "${version}"'),
             )
-        if python_package_name_use is not None:
-            files = get_aot(bumpversion, "files")
-            ensure_aot_contains(
-                files,
-                _add_bumpversion_toml_file(
-                    f"src/{python_package_name_use}/__init__.py",
-                    '__version__ = "${version}"',
-                ),
-            )
+    if (
+        python_package_name_use := get_python_package_name(
+            package_name=package_name, python_package_name=python_package_name
+        )
+    ) is not None:
+        files = get_aot(bumpversion, "files")
+        ensure_aot_contains(
+            files,
+            _add_bumpversion_toml_file(
+                f"src/{python_package_name_use}/__init__.py",
+                '__version__ = "${version}"',
+            ),
+        )
 
 
 def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
@@ -758,7 +759,6 @@ def add_pyproject_toml(
     readme: bool = SETTINGS.readme,
     optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
     python_package_name: str | None = SETTINGS.python_package_name,
-    python_package_name_use: str | None = SETTINGS.python_package_name_use,
     tool__uv__indexes: list[tuple[str, str]] = SETTINGS.pyproject__tool__uv__indexes,
 ) -> None:
     with yield_toml_doc(PYPROJECT_TOML, modifications=modifications) as doc:
@@ -786,7 +786,9 @@ def add_pyproject_toml(
             tool = get_table(doc, "tool")
             uv = get_table(tool, "uv")
             build_backend = get_table(uv, "build-backend")
-            build_backend["module-name"] = python_package_name_use
+            build_backend["module-name"] = get_python_package_name(
+                package_name=package_name, python_package_name=python_package_name
+            )
             build_backend["module-root"] = "src"
         if len(tool__uv__indexes) >= 1:
             tool = get_table(doc, "tool")
@@ -848,7 +850,8 @@ def add_pytest_toml(
     ignore_warnings: bool = SETTINGS.pytest__ignore_warnings,
     timeout: int | None = SETTINGS.pytest__timeout,
     coverage: bool = SETTINGS.coverage,
-    python_package_name: str | None = SETTINGS.python_package_name_use,
+    package_name: str | None = SETTINGS.package_name,
+    python_package_name: str | None = SETTINGS.python_package_name,
     script: str | None = SETTINGS.script,
 ) -> None:
     with yield_toml_doc(PYTEST_TOML, modifications=modifications) as doc:
@@ -862,10 +865,17 @@ def add_pytest_toml(
             "--durations=10",
             "--durations-min=10",
         )
-        if coverage and (python_package_name is not None):
+        if coverage and (
+            (
+                python_package_name_use := get_python_package_name(
+                    package_name=package_name, python_package_name=python_package_name
+                )
+            )
+            is not None
+        ):
             ensure_contains(
                 addopts,
-                f"--cov={python_package_name}",
+                f"--cov={python_package_name_use}",
                 f"--cov-config={COVERAGERC_TOML}",
                 "--cov-report=html",
             )
