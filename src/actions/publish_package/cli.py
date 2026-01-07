@@ -14,7 +14,7 @@ from actions.utilities import LOADER
 
 
 @click_options(PublishSettings, [LOADER], show_envvars_in_help=True, argname="publish")
-def publish_sub_cmd(*, publish: PublishSettings) -> None:
+def publish_package_sub_cmd(*, publish: PublishSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -36,4 +36,4 @@ def publish_sub_cmd(*, publish: PublishSettings) -> None:
     )
 
 
-__all__ = ["publish_sub_cmd"]
+__all__ = ["publish_package_sub_cmd"]
