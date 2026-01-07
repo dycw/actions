@@ -10,13 +10,11 @@ from actions import __version__
 from actions.logging import LOGGER
 from actions.random_sleep.lib import random_sleep
 from actions.random_sleep.settings import SleepSettings
-from actions.settings import CommonSettings
 from actions.utilities import LOADER
 
 
-@click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
 @click_options(SleepSettings, [LOADER], show_envvars_in_help=True, argname="sleep")
-def sleep_sub_cmd(*, common: CommonSettings, sleep: SleepSettings) -> None:
+def sleep_sub_cmd(*, sleep: SleepSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -24,11 +22,9 @@ def sleep_sub_cmd(*, common: CommonSettings, sleep: SleepSettings) -> None:
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
             %s
-            %s
         """),
         random_sleep.__name__,
         __version__,
-        pretty_repr(common),
         pretty_repr(sleep),
     )
     random_sleep(

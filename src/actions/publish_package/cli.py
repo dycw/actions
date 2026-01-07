@@ -10,13 +10,11 @@ from actions import __version__
 from actions.logging import LOGGER
 from actions.publish_package.lib import publish_package
 from actions.publish_package.settings import PublishSettings
-from actions.settings import CommonSettings
 from actions.utilities import LOADER
 
 
-@click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
 @click_options(PublishSettings, [LOADER], show_envvars_in_help=True, argname="publish")
-def publish_sub_cmd(*, common: CommonSettings, publish: PublishSettings) -> None:
+def publish_sub_cmd(*, publish: PublishSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -24,11 +22,9 @@ def publish_sub_cmd(*, common: CommonSettings, publish: PublishSettings) -> None
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
             %s
-            %s
         """),
         publish_package.__name__,
         __version__,
-        pretty_repr(common),
         pretty_repr(publish),
     )
     publish_package(
