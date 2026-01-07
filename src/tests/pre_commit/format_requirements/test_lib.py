@@ -6,7 +6,7 @@ from pytest import fixture
 from tomlkit import loads
 from utilities.text import strip_and_dedent
 
-from actions.pre_commit.format_requirements.lib import _format_path, _get_formatted
+from actions.pre_commit.format_requirements.lib import _format_path
 
 if TYPE_CHECKING:
     from pathlib import Path

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from io import StringIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, assert_never, overload
+from typing import TYPE_CHECKING, Any, Literal, assert_never, overload
 
 from typed_settings import EnvLoader, Secret
 from utilities.atomicwrites import writer
 from utilities.subprocess import run
 
+from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
@@ -149,6 +151,15 @@ def write_text(
         modifications.add(Path(path))
 
 
+def yaml_dump(obj: Any, /) -> str:
+    stream = StringIO()
+    YAML_INSTANCE.dump(obj, stream)
+    return stream.getvalue()
+
+
+##
+
+
 __all__ = [
     "LOADER",
     "are_docs_unequal",
@@ -161,4 +172,5 @@ __all__ = [
     "ensure_new_line",
     "logged_run",
     "write_text",
+    "yaml_dump",
 ]

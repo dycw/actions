@@ -1,27 +1,24 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, override
 
 from packaging._tokenizer import ParserSyntaxError
 from packaging.requirements import InvalidRequirement, Requirement, _parse_requirement
 from packaging.specifiers import Specifier, SpecifierSet
-from tomlkit import TOMLDocument, array, dumps, loads, string
+from tomlkit import array, string
 from tomlkit.items import Array, Table
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.utilities import are_docs_unequal, write_text
+from actions.pre_commit.utilities import yield_toml_doc
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterator, MutableSet
+    from pathlib import Path
 
     from utilities.types import PathLike
-
-
-_MODIFICATIONS: set[Path] = set()
 
 
 def format_requirements(*paths: PathLike) -> None:
@@ -34,45 +31,34 @@ def format_requirements(*paths: PathLike) -> None:
         __version__,
         paths,
     )
+    modifications: set[Path] = set()
     for path in paths:
-        _format_path(path)
-    if len(_MODIFICATIONS) >= 1:
+        _format_path(path, modifications=modifications)
+    if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr_str, sorted(_MODIFICATIONS))),
+            ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
 
 
-def _format_path(path: PathLike, /) -> None:
-    path = Path(path)
-    if not path.is_file():
-        msg = f"Expected a file; {str(path)!r} is not"
-        raise FileNotFoundError(msg)
-    if path.suffix != ".toml":
-        msg = f"Expected a TOML file; got {str(path)!r}"
-        raise TypeError(msg)
-    current = loads(path.read_text())
-    expected = _get_formatted(path)
-    if are_docs_unequal(current, expected):
-        write_text(path, dumps(expected), modifications=_MODIFICATIONS)
-
-
-def _get_formatted(path: PathLike, /) -> TOMLDocument:
-    path = Path(path)
-    doc = loads(path.read_text())
-    if isinstance(dep_grps := doc.get("dependency-groups"), Table):
-        for key, value in dep_grps.items():
-            if isinstance(value, Array):
-                dep_grps[key] = _format_array(value)
-    if isinstance(project := doc["project"], Table):
-        if isinstance(deps := project["dependencies"], Array):
-            project["dependencies"] = _format_array(deps)
-        if isinstance(optional := project.get("optional-dependencies"), Table):
-            for key, value in optional.items():
+def _format_path(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> None:
+    with yield_toml_doc(path, modifications=modifications) as doc:
+        dep_grps = get_table
+        doc.clear()
+        if isinstance(dep_grps := doc.get("dependency-groups"), Table):
+            for key, value in dep_grps.items():
                 if isinstance(value, Array):
-                    optional[key] = _format_array(value)
-    return doc
+                    dep_grps[key] = _format_array(value)
+        if isinstance(project := doc["project"], Table):
+            if isinstance(deps := project["dependencies"], Array):
+                project["dependencies"] = _format_array(deps)
+            if isinstance(optional := project.get("optional-dependencies"), Table):
+                for key, value in optional.items():
+                    if isinstance(value, Array):
+                        optional[key] = _format_array(value)
 
 
 def _format_array(dependencies: Array, /) -> Array:
