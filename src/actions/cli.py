@@ -48,13 +48,13 @@ _ = _main.command(
 def pre_commit_sub_cmd() -> None: ...
 
 
-_ = pre_commit_sub_cmd().command(
+_ = pre_commit_sub_cmd.command(
     name="conformalize-repo", help="Conformalize a repo", **CONTEXT_SETTINGS
 )(conformalize_repo_sub_cmd)
-_ = pre_commit_sub_cmd().command(
+_ = pre_commit_sub_cmd.command(
     name="format-requirements", help="Format a set of requirements", **CONTEXT_SETTINGS
 )(format_requirements_sub_cmd)
-_ = pre_commit_sub_cmd().command(
+_ = pre_commit_sub_cmd.command(
     name="replace-sequence-strs",
     help="Replace 'Sequence[str]' with 'list[str]'",
     **CONTEXT_SETTINGS,

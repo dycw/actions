@@ -9,19 +9,19 @@ from utilities.whenever import MINUTE
 
 class TestCLI:
     @mark.parametrize(
-        "cmd",
+        "args",
         [
-            param("clean-dir"),
-            param("conformalize-repo"),
-            param("format-requirements"),
-            param("publish-package"),
-            param("random-sleep"),
-            param("replace-sequence-strs"),
-            param("run-hooks"),
-            param("setup-cronjob"),
-            param("tag-commit"),
+            param(["clean-dir"]),
+            param(["pre-commit", "conformalize-repo"]),
+            param(["pre-commit", "format-requirements"]),
+            param(["pre-commit", "replace-sequence-strs"]),
+            param(["publish-package"]),
+            param(["random-sleep"]),
+            param(["run-hooks"]),
+            param(["setup-cronjob"]),
+            param(["tag-commit"]),
         ],
     )
     @throttle(delta=MINUTE)
-    def test_main(self, *, cmd: str) -> None:
-        run("action", cmd, cwd=get_repo_root())
+    def test_main(self, *, args: list[str]) -> None:
+        run("action", *args, cwd=get_repo_root())
