@@ -41,7 +41,7 @@ def run_action_publish_dict(
     trusted_publishing: bool = False,
     native_tls: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token, "token-uv": token_uv}
+    dict_: StrDict = {"token": token}
     _add_item(dict_, "username", value=username)
     _add_item(dict_, "password", value=password)
     _add_item(dict_, "publish-url", value=publish_url)
