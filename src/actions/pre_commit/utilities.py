@@ -19,7 +19,12 @@ from utilities.types import PathLike
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.types import StrDict
-from actions.utilities import ensure_new_line, write_text, yaml_dump
+from actions.utilities import (
+    are_equal_modulo_new_line,
+    ensure_new_line,
+    write_text,
+    yaml_dump,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
@@ -240,11 +245,16 @@ def yield_immutable_write_context[T](
         write_text(path, dumps(context.output), modifications=modifications)
     else:
         match context.output, loads(current):
+            case Module() as output_module, Module() as current_module:
+                if not are_equal_modulo_new_line(
+                    output_module.code, current_module.code
+                ):
+                    write_text(path, dumps(output_module), modifications=modifications)
             case TOMLDocument() as output_doc, TOMLDocument() as current_doc:
                 if not (output_doc == current_doc):  # noqa: SIM201
                     write_text(path, dumps(output_doc), modifications=modifications)
             case str() as output_text, str() as current_text:
-                if ensure_new_line(output_text) != ensure_new_line(current_text):
+                if not are_equal_modulo_new_line(output_text, current_text):
                     write_text(path, dumps(output_text), modifications=modifications)
             case output_obj, current_obj:
                 if output_obj != current_obj:

@@ -90,6 +90,9 @@ class TestFormatPath:
     def test_main(self, *, tmp_path: Path, input_: str, output: str) -> None:
         path = tmp_path / "file.toml"
         _ = path.write_text(input_)
-        _format_path(path)
-        result = path.read_text()
-        assert result == output
+        for i in range(2):
+            modifications: set[Path] = set()
+            _format_path(path, modifications=modifications)
+            result = path.read_text()
+            assert result == output
+            assert len(modifications) == (1 if i == 0 else 0)

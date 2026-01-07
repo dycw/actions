@@ -18,5 +18,8 @@ class TestFormatPath:
         package.mkdir()
         tests = src / "tests"
         tests.mkdir()
-        _format_path(pyproject)
-        assert (package / "py.typed").is_file()
+        for i in range(2):
+            modifications: set[Path] = set()
+            _format_path(pyproject, modifications=modifications)
+            assert (package / "py.typed").is_file()
+            assert len(modifications) == (1 if i == 0 else 0)
