@@ -678,6 +678,7 @@ def add_pre_commit_config_yaml(
         if python:
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, "format-requirements")
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, "replace-sequence-strs")
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, "touch-empty-py")
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
