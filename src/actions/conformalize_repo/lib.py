@@ -30,6 +30,7 @@ from utilities.whenever import HOUR, get_now
 from whenever import ZonedDateTime
 from xdg_base_dirs import xdg_cache_home
 
+from actions import __version__
 from actions.action_dicts.lib import (
     run_action_pre_commit_dict,
     run_action_publish_dict,
@@ -54,17 +55,152 @@ from actions.conformalize_repo.constants import (
     README_MD,
     RUFF_TOML,
 )
-from actions.conformalize_repo.settings import SETTINGS
+from actions.conformalize_repo.settings import SETTINGS, Settings
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
 
-    from conformalize.types import HasAppend, HasSetDefault, StrDict
     from utilities.types import PathLike
 
+    from actions.types import HasAppend, HasSetDefault, StrDict
 
-def conformalize_repo(settings: Settings, /) -> None:
+
+def conformalize_repo(
+    *,
+    coverage: bool = SETTINGS.coverage,
+    description: str | None = SETTINGS.description,
+    envrc: bool = SETTINGS.envrc,
+    envrc__uv: bool = SETTINGS.envrc__uv,
+    envrc__uv__native_tls: bool = SETTINGS.envrc__uv__native_tls,
+    github__pull_request__pre_commit: bool = SETTINGS.github__pull_request__pre_commit,
+    github__pull_request__pyright: bool = SETTINGS.github__pull_request__pyright,
+    github__pull_request__pytest__macos: bool = SETTINGS.github__pull_request__pytest__macos,
+    github__pull_request__pytest__ubuntu: bool = SETTINGS.github__pull_request__pytest__ubuntu,
+    github__pull_request__pytest__windows: bool = SETTINGS.github__pull_request__pytest__windows,
+    github__pull_request__ruff: bool = SETTINGS.github__pull_request__ruff,
+    github__push__publish: bool = SETTINGS.github__push__publish,
+    github__push__tag: bool = SETTINGS.github__push__tag,
+    github__push__tag__major: bool = SETTINGS.github__push__tag__major,
+    github__push__tag__major_minor: bool = SETTINGS.github__push__tag__major_minor,
+    github__push__tag__latest: bool = SETTINGS.github__push__tag__latest,
+    gitignore: bool = SETTINGS.gitignore,
+    package_name: str | None = SETTINGS.package_name,
+    pre_commit__dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
+    pre_commit__dycw: bool = SETTINGS.pre_commit__dycw,
+    pre_commit__prettier: bool = SETTINGS.pre_commit__prettier,
+    pre_commit__ruff: bool = SETTINGS.pre_commit__ruff,
+    pre_commit__shell: bool = SETTINGS.pre_commit__shell,
+    pre_commit__taplo: bool = SETTINGS.pre_commit__taplo,
+    pre_commit__uv: bool = SETTINGS.pre_commit__uv,
+    pre_commit__uv__script: str | None = SETTINGS.pre_commit__uv__script,
+    pyproject: bool = SETTINGS.pyproject,
+    pyproject__project__optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
+    pyproject__tool__uv__indexes: list[
+        tuple[str, str]
+    ] = SETTINGS.pyproject__tool__uv__indexes,
+    pyright: bool = SETTINGS.pyright,
+    pytest: bool = SETTINGS.pytest,
+    pytest__asyncio: bool = SETTINGS.pytest__asyncio,
+    pytest__ignore_warnings: bool = SETTINGS.pytest__ignore_warnings,
+    pytest__timeout: int | None = SETTINGS.pytest__timeout,
+    python_package_name: str | None = SETTINGS.python_package_name,
+    python_version: str = SETTINGS.python_version,
+    readme: bool = SETTINGS.readme,
+    repo_name: str | None = SETTINGS.repo_name,
+    ruff: bool = SETTINGS.ruff,
+    run_version_bump: bool = SETTINGS.run_version_bump,
+    script: str | None = SETTINGS.script,
+) -> None:
+    LOGGER.info(
+        strip_and_dedent("""
+            Running '%s' (version %s) with settings:
+             - coverage = %s
+             - description = %s
+             - envrc = %s
+             - envrc__uv = %s
+             - envrc__uv__native_tls = %s
+             - github__pull_request__pre_commit = %s
+             - github__pull_request__pyright = %s
+             - github__pull_request__pytest__macos = %s
+             - github__pull_request__pytest__ubuntu = %s
+             - github__pull_request__pytest__windows = %s
+             - github__pull_request__ruff = %s
+             - github__push__publish = %s
+             - github__push__tag = %s
+             - github__push__tag__major = %s
+             - github__push__tag__major_minor = %s
+             - github__push__tag__latest = %s
+             - gitignore = %s
+             - package_name = %s
+             - pre_commit__dockerfmt = %s
+             - pre_commit__dycw = %s
+             - pre_commit__prettier = %s
+             - pre_commit__ruff = %s
+             - pre_commit__shell = %s
+             - pre_commit__taplo = %s
+             - pre_commit__uv = %s
+             - pre_commit__uv__script = %s
+             - pyproject = %s
+             - pyproject__project__optional_dependencies__scripts = %s
+             - pyproject__tool__uv__indexes = %s
+             - pyright = %s
+             - pytest = %s
+             - pytest__asyncio = %s
+             - pytest__ignore_warnings = %s
+             - pytest__timeout = %s
+             - python_package_name = %s
+             - python_version = %s
+             - readme = %s
+             - repo_name = %s
+             - ruff = %s
+             - run_version_bump = %s
+             - script = %s
+        """),
+        conformalize_repo.__name__,
+        __version__,
+        coverage,
+        description,
+        envrc,
+        envrc__uv,
+        envrc__uv__native_tls,
+        github__pull_request__pre_commit,
+        github__pull_request__pyright,
+        github__pull_request__pytest__macos,
+        github__pull_request__pytest__ubuntu,
+        github__pull_request__pytest__windows,
+        github__pull_request__ruff,
+        github__push__publish,
+        github__push__tag,
+        github__push__tag__major,
+        github__push__tag__major_minor,
+        github__push__tag__latest,
+        gitignore,
+        package_name,
+        pre_commit__dockerfmt,
+        pre_commit__dycw,
+        pre_commit__prettier,
+        pre_commit__ruff,
+        pre_commit__shell,
+        pre_commit__taplo,
+        pre_commit__uv,
+        pre_commit__uv__script,
+        pyproject,
+        pyproject__project__optional_dependencies__scripts,
+        pyproject__tool__uv__indexes,
+        pyright,
+        pytest,
+        pytest__asyncio,
+        pytest__ignore_warnings,
+        pytest__timeout,
+        python_package_name,
+        python_version,
+        readme,
+        repo_name,
+        ruff,
+        run_version_bump,
+        script,
+    )
     if is_pytest():
         return
     basic_config(obj=LOGGER)
