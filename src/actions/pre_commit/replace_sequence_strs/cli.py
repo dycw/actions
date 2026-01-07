@@ -15,6 +15,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+REPLACE_SEQUENCE_STRS_SUB_CMD = "replace-sequence-strs"
+
+
 @path_argument
 def replace_sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
@@ -32,4 +35,4 @@ def replace_sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     replace_sequence_strs(*paths)
 
 
-__all__ = ["replace_sequence_strs_sub_cmd"]
+__all__ = ["REPLACE_SEQUENCE_STRS_SUB_CMD", "replace_sequence_strs_sub_cmd"]

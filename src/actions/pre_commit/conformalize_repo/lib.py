@@ -68,6 +68,9 @@ from actions.pre_commit.conformalize_repo.constants import (
     UV_URL,
 )
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
+from actions.pre_commit.format_requirements.cli import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.cli import REPLACE_SEQUENCE_STRS_SUB_CMD
+from actions.pre_commit.touch_empty_py.cli import TOUCH_EMPTY_PY_SUB_CMD
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
@@ -676,9 +679,11 @@ def add_pre_commit_config_yaml(
                 types_or=["markdown", "yaml"],
             )
         if python:
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, "format-requirements")
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, "replace-sequence-strs")
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, "touch-empty-py")
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, FORMAT_REQUIREMENTS_SUB_CMD)
+            _add_pre_commit_config_repo(
+                dict_, ACTIONS_URL, REPLACE_SEQUENCE_STRS_SUB_CMD
+            )
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])

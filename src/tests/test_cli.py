@@ -6,6 +6,9 @@ from utilities.pytest import throttle
 from utilities.subprocess import run
 from utilities.whenever import MINUTE
 
+from actions.pre_commit.format_requirements.cli import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.cli import REPLACE_SEQUENCE_STRS_SUB_CMD
+
 
 class TestCLI:
     @mark.parametrize(
@@ -13,8 +16,8 @@ class TestCLI:
         [
             param(["clean-dir"]),
             param(["pre-commit", "conformalize-repo"]),
-            param(["pre-commit", "format-requirements"]),
-            param(["pre-commit", "replace-sequence-strs"]),
+            param(["pre-commit", FORMAT_REQUIREMENTS_SUB_CMD]),
+            param(["pre-commit", REPLACE_SEQUENCE_STRS_SUB_CMD]),
             param(["pre-commit", "touch-empty-py"]),
             param(["publish-package"]),
             param(["random-sleep"]),

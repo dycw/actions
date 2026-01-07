@@ -15,6 +15,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+TOUCH_EMPTY_PY_SUB_CMD = "touch-empty-py"
+
+
 @path_argument
 def touch_empty_py_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
@@ -32,4 +35,4 @@ def touch_empty_py_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     touch_empty_py(*paths)
 
 
-__all__ = ["touch_empty_py_sub_cmd"]
+__all__ = ["TOUCH_EMPTY_PY_SUB_CMD", "touch_empty_py_sub_cmd"]

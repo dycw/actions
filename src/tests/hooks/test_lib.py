@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pytest import mark, param
 
+from actions.pre_commit.format_requirements.cli import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.cli import REPLACE_SEQUENCE_STRS_SUB_CMD
 from actions.run_hooks.lib import _yield_hooks
 
 
@@ -12,7 +14,11 @@ class TestYieldHooks:
             param([], []),
             param(
                 ["dycw/actions"],
-                ["conformalize-repo", "format-requirements", "replace-sequence-strs"],
+                [
+                    "conformalize-repo",
+                    FORMAT_REQUIREMENTS_SUB_CMD,
+                    REPLACE_SEQUENCE_STRS_SUB_CMD,
+                ],
             ),
         ],
     )
