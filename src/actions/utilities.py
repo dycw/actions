@@ -22,6 +22,10 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
+def are_equal_modulo_new_line(x: str, y: str, /) -> bool:
+    return ensure_new_line(x) == ensure_new_line(y)
+
+
 def convert_list_strs(
     x: str | list[str] | tuple[str, ...] | None, /
 ) -> list[str] | None:
@@ -75,7 +79,7 @@ def copy_text(
 
 
 def ensure_new_line(text: str, /) -> str:
-    return text.rstrip("\n") + "\n"
+    return text.strip("\n") + "\n"
 
 
 @overload
@@ -148,6 +152,7 @@ def yaml_dump(obj: Any, /) -> str:
 
 __all__ = [
     "LOADER",
+    "are_equal_modulo_new_line",
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",

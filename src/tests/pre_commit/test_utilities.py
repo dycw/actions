@@ -57,7 +57,7 @@ class TestIsPartialDict:
         assert is_partial_dict(obj, dict_) is expected
 
 
-class TestYieldWriteContext:
+class TestYieldImmutableWriteContext:
     @mark.parametrize("init", [param("init"), param("init\n"), param("init\n\n")])
     def test_modified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.txt"
@@ -100,9 +100,8 @@ class TestYieldPythonFile:
         ("init", "expected"),
         [
             param("", "import abc\n"),
-            param("\n", "\nimport abc\n"),
-            param("\n\n", "\n\nimport abc\n"),
-            param("\n\n\n", "\n\n\nimport abc\n"),
+            param("\n", "import abc\n"),
+            param("\n\n", "import abc\n"),
         ],
     )
     def test_modified(self, *, tmp_path: Path, init: str, expected: str) -> None:
@@ -113,21 +112,13 @@ class TestYieldPythonFile:
             context.output = context.input.with_changes(body=body)
         assert path.read_text() == expected
 
-    @mark.parametrize(
-        ("init", "expected"),
-        [
-            param("", "\n"),
-            param("\n", "\n"),
-            param("\n\n", "\n"),
-            param("\n\n\n", "\n"),
-        ],
-    )
-    def test_unmodified(self, *, tmp_path: Path, init: str, expected: str) -> None:
+    @mark.parametrize("init", [param(""), param("\n"), param("\n\n")])
+    def test_unmodified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.py"
         _ = path.write_text(init)
         with yield_python_file(path):
             ...
-        assert path.read_text() == expected
+        assert path.read_text() == init
 
 
 class TestYieldTextFile:
