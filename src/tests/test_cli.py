@@ -10,6 +10,7 @@ class TestCLI:
         "cmd",
         [
             param("clean-dir"),
+            param("conformalize-repo"),
             param("format-requirements"),
             param("publish-package"),
             param("random-sleep"),

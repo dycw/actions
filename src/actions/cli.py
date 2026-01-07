@@ -24,6 +24,9 @@ _ = _main.command(name="clean-dir", help="Clean a directory", **CONTEXT_SETTINGS
     clean_dir_sub_cmd
 )
 _ = _main.command(
+    name="conformalize-repo", help="Conformalize a repo", **CONTEXT_SETTINGS
+)(clean_dir_sub_cmd)
+_ = _main.command(
     name="format-requirements", help="Format a set of requirements", **CONTEXT_SETTINGS
 )(format_requirements_sub_cmd)
 _ = _main.command(
