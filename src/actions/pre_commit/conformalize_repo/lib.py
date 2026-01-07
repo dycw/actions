@@ -4,7 +4,7 @@ import sys
 from contextlib import contextmanager, suppress
 from itertools import product
 from pathlib import Path
-from re import MULTILINE, escape, sub
+from re import MULTILINE, escape, search, sub
 from shlex import join
 from string import Template
 from subprocess import CalledProcessError
@@ -17,7 +17,7 @@ from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
 from utilities.pathlib import get_repo_root
 from utilities.re import extract_groups
-from utilities.subprocess import append_text, ripgrep
+from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
 from utilities.version import ParseVersionError, Version, parse_version
 from utilities.whenever import HOUR, get_now
@@ -427,31 +427,27 @@ def add_envrc(
     python_version: str = SETTINGS.python_version,
     script: str | None = SETTINGS.script,
 ) -> None:
-    with yield_text_file(ENVRC, modifications=modifications) as temp:
+    with yield_text_file(ENVRC, modifications=modifications) as context:
         shebang = strip_and_dedent("""
             #!/usr/bin/env sh
             # shellcheck source=/dev/null
         """)
-        append_text(temp, shebang, skip_if_present=True, flags=MULTILINE, blank_lines=2)
+        if search(escape(shebang), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{shebang}"
 
         echo = strip_and_dedent("""
             # echo
             echo_date() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" >&2; }
         """)
-        append_text(temp, echo, skip_if_present=True, flags=MULTILINE, blank_lines=2)
+        if search(escape(echo), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{echo}"
 
         if uv:
-            append_text(
-                temp,
-                _add_envrc_uv_text(
-                    native_tls=uv__native_tls,
-                    python_version=python_version,
-                    script=script,
-                ),
-                skip_if_present=True,
-                flags=MULTILINE,
-                blank_lines=2,
+            uv_text = _add_envrc_uv_text(
+                native_tls=uv__native_tls, python_version=python_version, script=script
             )
+            if search(escape(uv_text), context.output, flags=MULTILINE) is None:
+                context.output += f"\n\n{echo}"
 
 
 def _add_envrc_uv_text(
@@ -631,9 +627,10 @@ def add_github_push_yaml(
 
 
 def add_gitignore(*, modifications: MutableSet[Path] | None = None) -> None:
-    with yield_text_file(GITIGNORE, modifications=modifications) as temp:
+    with yield_text_file(GITIGNORE, modifications=modifications) as context:
         text = (PATH_CONFIGS / "gitignore").read_text()
-        append_text(temp, text, skip_if_present=True, flags=MULTILINE)
+        if search(escape(text), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{text}"
 
 
 ##
@@ -941,13 +938,15 @@ def add_readme_md(
     name: str | None = SETTINGS.package_name,
     description: str | None = SETTINGS.description,
 ) -> None:
-    with yield_text_file(README_MD, modifications=modifications) as temp:
+    with yield_text_file(README_MD, modifications=modifications) as context:
         lines: list[str] = []
         if name is not None:
             lines.append(f"# `{name}`")
         if description is not None:
             lines.append(description)
-        write_text(temp, "\n\n".join(lines))
+        text = "\n".join(lines)
+        if search(escape(text), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{text}"
 
 
 ##
@@ -1155,15 +1154,14 @@ def run_ripgrep_and_replace(
     )
     if result is None:
         return
-    for path in map(Path, result.splitlines()):
-        with yield_text_file(path, modifications=modifications) as temp:
-            text = sub(
+    for path in result.splitlines():
+        with yield_text_file(path, modifications=modifications) as context:
+            context.output = sub(
                 r'# requires-python = ">=\d+\.\d+"',
                 rf'# requires-python = ">={version}"',
-                path.read_text(),
+                context.input,
                 flags=MULTILINE,
             )
-            write_text(temp, text)
 
 
 ##
