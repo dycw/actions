@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def are_docs_unequal_equal(left: TOMLDocument, right: TOMLDocument, /) -> bool:
+def are_docs_unequal(left: TOMLDocument, right: TOMLDocument, /) -> bool:
     return not (left == right)  # noqa: SIM201
 
 
@@ -151,7 +151,7 @@ def write_text(
 
 __all__ = [
     "LOADER",
-    "are_docs_unequal_equal",
+    "are_docs_unequal",
     "are_modules_equal",
     "are_texts_equal",
     "convert_list_strs",
