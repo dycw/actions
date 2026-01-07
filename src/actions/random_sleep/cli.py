@@ -8,9 +8,9 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.random_sleep.lib import random_sleep
+from actions.random_sleep.settings import SleepSettings
 from actions.settings import CommonSettings
-from actions.sleep.lib import random_sleep
-from actions.sleep.settings import SleepSettings
 from actions.utilities import LOADER
 
 

@@ -3,11 +3,11 @@ from __future__ import annotations
 from click import group
 from utilities.click import CONTEXT_SETTINGS
 
-from actions.hooks.cli import hooks_sub_cmd
 from actions.publish.cli import publish_sub_cmd
+from actions.random_sleep.cli import sleep_sub_cmd
 from actions.replace_sequence_strs.cli import sequence_strs_sub_cmd
 from actions.requirements.cli import requirements_sub_cmd
-from actions.sleep.cli import sleep_sub_cmd
+from actions.run_hooks.cli import hooks_sub_cmd
 from actions.tag.cli import tag_sub_cmd
 
 

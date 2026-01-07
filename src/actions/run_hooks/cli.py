@@ -7,9 +7,9 @@ from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
 
 from actions import __version__
-from actions.hooks.lib import run_hooks
-from actions.hooks.settings import HooksSettings
 from actions.logging import LOGGER
+from actions.run_hooks.lib import run_hooks
+from actions.run_hooks.settings import HooksSettings
 from actions.settings import CommonSettings
 from actions.utilities import LOADER
 
