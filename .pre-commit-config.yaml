@@ -1,4 +1,4 @@
-exclude: src/tests/pre_commit/.*/out\.*
+exclude: src/tests/pre_commit/.*/(in.*|out.*)\.*
 
 repos:
   - repo: https://github.com/dycw/actions
