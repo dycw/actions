@@ -1,8 +1,9 @@
 repos:
-  - repo: https://github.com/dycw/conformalize
-    rev: 0.13.7
+  - repo: https://github.com/dycw/actions
+    rev: 0.6.0
     hooks:
-      - args:
+      - id: conformalize-repo
+        args:
           - --description=Library of actions
           - --envrc
           - --envrc--uv
@@ -15,8 +16,8 @@ repos:
           - --github--push--tag
           - --gitignore
           - --package-name=dycw-actions
-          - --pre-commit--dycw
           - --pre-commit--prettier
+          - --pre-commit--python
           - --pre-commit--ruff
           - --pre-commit--taplo
           - --pre-commit--uv
@@ -28,7 +29,8 @@ repos:
           - --readme
           - --repo-name=actions
           - --ruff
-        id: conformalize
+      - id: format-requirements
+      - id: replace-sequence-strs
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -46,11 +48,6 @@ repos:
         args:
           - --autofix
       - id: trailing-whitespace
-  - repo: https://github.com/dycw/actions
-    rev: 0.4.5
-    hooks:
-      - id: format-requirements
-      - id: replace-sequence-strs
   - repo: local
     hooks:
       - id: prettier
@@ -78,7 +75,6 @@ repos:
           - indent_entries=true
           - --option
           - reorder_keys=true
-        exclude: src/tests/.*/.*\.toml$
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.9.22
     hooks:
