@@ -22,10 +22,6 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def are_texts_equal(left: str, right: str, /) -> bool:
-    return ensure_new_line(left) == ensure_new_line(right)
-
-
 def convert_list_strs(
     x: str | list[str] | tuple[str, ...] | None, /
 ) -> list[str] | None:
@@ -152,7 +148,6 @@ def yaml_dump(obj: Any, /) -> str:
 
 __all__ = [
     "LOADER",
-    "are_texts_equal",
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
