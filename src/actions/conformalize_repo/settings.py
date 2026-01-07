@@ -18,6 +18,9 @@ class Settings:
     github__pull_request__pre_commit: bool = option(
         default=False, help="Set up 'pull-request.yaml' pre-commit"
     )
+    github__pull_request__pre_commit__gitea: bool = option(
+        default=False, help="Set up 'pull-request.yaml' for Gitea"
+    )
     github__pull_request__pyright: bool = option(
         default=False, help="Set up 'pull-request.yaml' pyright"
     )

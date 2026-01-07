@@ -85,6 +85,7 @@ def conformalize_repo(
     envrc__uv: bool = SETTINGS.envrc__uv,
     envrc__uv__native_tls: bool = SETTINGS.envrc__uv__native_tls,
     github__pull_request__pre_commit: bool = SETTINGS.github__pull_request__pre_commit,
+    github__pull_request__pre_commit__gitea: bool = SETTINGS.github__pull_request__pre_commit__gitea,
     github__pull_request__pyright: bool = SETTINGS.github__pull_request__pyright,
     github__pull_request__pytest__macos: bool = SETTINGS.github__pull_request__pytest__macos,
     github__pull_request__pytest__ubuntu: bool = SETTINGS.github__pull_request__pytest__ubuntu,
@@ -132,6 +133,7 @@ def conformalize_repo(
              - envrc__uv                                          = %s
              - envrc__uv__native_tls                              = %s
              - github__pull_request__pre_commit                   = %s
+             - github__pull_request__pre_commit__gitea            = %s
              - github__pull_request__pyright                      = %s
              - github__pull_request__pytest__macos                = %s
              - github__pull_request__pytest__ubuntu               = %s
@@ -176,6 +178,7 @@ def conformalize_repo(
         envrc__uv,
         envrc__uv__native_tls,
         github__pull_request__pre_commit,
+        github__pull_request__pre_commit__gitea,
         github__pull_request__pyright,
         github__pull_request__pytest__macos,
         github__pull_request__pytest__ubuntu,
@@ -247,6 +250,7 @@ def conformalize_repo(
         )
     if (
         github__pull_request__pre_commit
+        or github__pull_request__pre_commit__gitea
         or github__pull_request__pyright
         or github__pull_request__pytest__windows
         or github__pull_request__pytest__macos
@@ -256,6 +260,7 @@ def conformalize_repo(
         add_github_pull_request_yaml(
             modifications=modifications,
             pre_commit=github__pull_request__pre_commit,
+            pre_commit__gitea=github__pull_request__pre_commit__gitea,
             pyright=github__pull_request__pyright,
             pytest__windows=github__pull_request__pytest__windows,
             pytest__macos=github__pull_request__pytest__macos,
@@ -479,6 +484,7 @@ def add_github_pull_request_yaml(
     *,
     modifications: MutableSet[Path] | None = None,
     pre_commit: bool = SETTINGS.github__pull_request__pre_commit,
+    pre_commit__gitea: bool = SETTINGS.github__pull_request__pre_commit__gitea,
     pyright: bool = SETTINGS.github__pull_request__pyright,
     pytest__macos: bool = SETTINGS.github__pull_request__pytest__macos,
     pytest__ubuntu: bool = SETTINGS.github__pull_request__pytest__ubuntu,
@@ -511,7 +517,8 @@ def add_github_pull_request_yaml(
                             dycw/actions
                             pre-commit/pre-commit-hooks
                         """)
-                    )
+                    ),
+                    gitea=pre_commit__gitea,
                 ),
             )
         if pyright:
