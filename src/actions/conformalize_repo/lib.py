@@ -652,10 +652,6 @@ def add_pre_commit_config_yaml(
                 "dockerfmt",
                 args=("add", ["--newline", "--write"]),
             )
-        if python:
-            dycw_url = "https://github.com/dycw/actions"
-            _add_pre_commit_config_repo(dict_, dycw_url, "format-requirements")
-            _add_pre_commit_config_repo(dict_, dycw_url, "replace-sequence-strs")
         if prettier:
             _add_pre_commit_config_repo(
                 dict_,
@@ -666,6 +662,9 @@ def add_pre_commit_config_yaml(
                 language="system",
                 types_or=["markdown", "yaml"],
             )
+        if python:
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, "format-requirements")
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, "replace-sequence-strs")
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
