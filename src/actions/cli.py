@@ -25,6 +25,7 @@ from actions.pre_commit.touch_empty_py.constants import (
     TOUCH_EMPTY_PY_DOCSTRING,
     TOUCH_EMPTY_PY_SUB_CMD,
 )
+from actions.pre_commit.touch_py_typed.cli import touch_py_typed_sub_cmd
 from actions.pre_commit.touch_py_typed.constants import (
     TOUCH_PY_TYPED_DOCSTRING,
     TOUCH_PY_TYPED_SUB_CMD,
@@ -93,7 +94,7 @@ _ = pre_commit_sub_cmd.command(
 )(touch_empty_py_sub_cmd)
 _ = pre_commit_sub_cmd.command(
     name=TOUCH_PY_TYPED_SUB_CMD, help=TOUCH_PY_TYPED_DOCSTRING, **CONTEXT_SETTINGS
-)(touch_empty_py_sub_cmd)
+)(touch_py_typed_sub_cmd)
 
 
 if __name__ == "__main__":
