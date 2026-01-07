@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import actions.publish_package.doc
+import actions.tag_commit.doc
 from actions.conformalize.defaults import GITHUB_TOKEN, PRERELEASE, RESOLUTION
 
 if TYPE_CHECKING:
@@ -47,7 +49,7 @@ def run_action_publish_dict(
     _add_boolean(dict_, "trusted-publishing", value=trusted_publishing)
     _add_native_tls(dict_, native_tls=native_tls)
     return {
-        "name": "Build and publish package",
+        "name": actions.publish_package.doc.DOCSTRING,
         "uses": "dycw/action-publish@latest",
         "with": dict_,
     }
@@ -119,7 +121,7 @@ def run_action_random_sleep_dict(
         "log-freq": log_freq,
     }
     return {
-        "name": "Tag latest commit",
+        "name": actions.tag_commit.doc.DOCSTRING,
         "uses": "dycw/action-tag@latest",
         "with": dict_,
     }
