@@ -8,11 +8,11 @@ from actions.utilities import LOADER
 
 
 @settings
-class CleanDirSettings:
+class Settings:
     dir: Path = option(default=Path.cwd(), help="The directory to clean")
 
 
-CLEAN_DIR_SETTINGS = load_settings(CleanDirSettings, [LOADER])
+SETTINGS = load_settings(Settings, [LOADER])
 
 
-__all__ = ["CLEAN_DIR_SETTINGS", "CleanDirSettings"]
+__all__ = ["SETTINGS", "Settings"]

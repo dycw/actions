@@ -9,12 +9,12 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.tag_commit.lib import tag_commit
-from actions.tag_commit.settings import TagSettings
+from actions.tag_commit.settings import Settings
 from actions.utilities import LOADER
 
 
-@click_options(TagSettings, [LOADER], show_envvars_in_help=True, argname="tag")
-def tag_commit_sub_cmd(*, tag: TagSettings) -> None:
+@click_options(Settings, [LOADER], show_envvars_in_help=True, argname="tag")
+def tag_commit_sub_cmd(*, tag: Settings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)

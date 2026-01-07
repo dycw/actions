@@ -13,7 +13,7 @@ from yaml import safe_load
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.run_hooks.settings import HOOKS_SETTINGS
+from actions.run_hooks.settings import SETTINGS
 from actions.utilities import log_run
 
 if TYPE_CHECKING:
@@ -22,9 +22,9 @@ if TYPE_CHECKING:
 
 def run_hooks(
     *,
-    repos: list[str] | None = HOOKS_SETTINGS.repos,
-    hooks: list[str] | None = HOOKS_SETTINGS.hooks,
-    sleep: int = HOOKS_SETTINGS.sleep,
+    repos: list[str] | None = SETTINGS.repos,
+    hooks: list[str] | None = SETTINGS.hooks,
+    sleep: int = SETTINGS.sleep,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""
@@ -51,8 +51,8 @@ def run_hooks(
 
 def _yield_hooks(
     *,
-    repos: list[str] | None = HOOKS_SETTINGS.repos,
-    hooks: list[str] | None = HOOKS_SETTINGS.hooks,
+    repos: list[str] | None = SETTINGS.repos,
+    hooks: list[str] | None = SETTINGS.hooks,
 ) -> Iterator[str]:
     dict_ = safe_load(Path(".pre-commit-config.yaml").read_text())
     repos_list = ensure_class(dict_["repos"], list)
@@ -74,7 +74,7 @@ def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
         yield ensure_str(hook["id"])
 
 
-def _run_hook(hook: str, /, *, sleep: int = HOOKS_SETTINGS.sleep) -> bool:
+def _run_hook(hook: str, /, *, sleep: int = SETTINGS.sleep) -> bool:
     LOGGER.info("Running '%s'...", hook)
     try:
         log_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)

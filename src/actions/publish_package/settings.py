@@ -6,7 +6,7 @@ from actions.utilities import LOADER, convert_secret_str, convert_str
 
 
 @settings
-class PublishSettings:
+class Settings:
     username: str | None = option(
         default=None, converter=convert_str, help="The username of the upload"
     )
@@ -25,7 +25,7 @@ class PublishSettings:
     )
 
 
-PUBLISH_SETTINGS = load_settings(PublishSettings, [LOADER])
+SETTINGS = load_settings(Settings, [LOADER])
 
 
-__all__ = ["PUBLISH_SETTINGS", "PublishSettings"]
+__all__ = ["SETTINGS", "Settings"]

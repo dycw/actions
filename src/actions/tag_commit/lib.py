@@ -8,17 +8,17 @@ from utilities.version import parse_version
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.tag_commit.settings import TAG_SETTINGS
+from actions.tag_commit.settings import SETTINGS
 from actions.utilities import log_run
 
 
 def tag_commit(
     *,
-    user_name: str = TAG_SETTINGS.user_name,
-    user_email: str = TAG_SETTINGS.user_email,
-    major_minor: bool = TAG_SETTINGS.major_minor,
-    major: bool = TAG_SETTINGS.major,
-    latest: bool = TAG_SETTINGS.latest,
+    user_name: str = SETTINGS.user_name,
+    user_email: str = SETTINGS.user_email,
+    major_minor: bool = SETTINGS.major_minor,
+    major: bool = SETTINGS.major,
+    latest: bool = SETTINGS.latest,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""

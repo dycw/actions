@@ -9,12 +9,12 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.publish_package.lib import publish_package
-from actions.publish_package.settings import PublishSettings
+from actions.publish_package.settings import Settings
 from actions.utilities import LOADER
 
 
-@click_options(PublishSettings, [LOADER], show_envvars_in_help=True, argname="publish")
-def publish_package_sub_cmd(*, publish: PublishSettings) -> None:
+@click_options(Settings, [LOADER], show_envvars_in_help=True, argname="publish")
+def publish_package_sub_cmd(*, publish: Settings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
