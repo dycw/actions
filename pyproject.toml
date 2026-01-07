@@ -3,7 +3,7 @@
   requires = ["uv_build"]
 
 [dependency-groups]
-  dev = ["dycw-utilities[test]", "orjson >=3.11.5", "pyright", "rich"]
+  dev = ["dycw-utilities[test]", "orjson", "pyright", "rich"]
 
 [project]
   dependencies = [

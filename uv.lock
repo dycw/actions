@@ -221,7 +221,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "dycw-utilities", extras = ["test"] },
-    { name = "orjson", specifier = ">=3.11.5" },
+    { name = "orjson" },
     { name = "pyright" },
     { name = "rich" },
 ]
