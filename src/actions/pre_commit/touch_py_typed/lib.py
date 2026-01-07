@@ -47,6 +47,9 @@ def touch_empty_py(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
+    if path.name != "pyproject.toml":
+        msg = f"Expected 'pyproject.toml'; got {str(path)!r}"
+        raise TypeError(msg)
     current = parse_module(path.read_text())
     expected = _get_formatted(path)
     if not are_modules_equal(current, expected):

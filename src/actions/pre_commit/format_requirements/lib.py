@@ -13,6 +13,7 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.utilities import are_docs_equal, write_text
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -45,11 +46,13 @@ def format_requirements(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
+    if path.suffix != ".toml":
+        msg = f"Expected a TOML file; got {str(path)!r}"
+        raise TypeError(msg)
     current = loads(path.read_text())
     expected = _get_formatted(path)
-    is_equal = current == expected  # tomlkit cannot handle !=
-    if not is_equal:
-        _ = path.write_text(dumps(expected).rstrip("\n") + "\n")
+    if not are_docs_equal(current, expected):
+        write_text(path, dumps(expected))
         _MODIFICATIONS.add(path)
 
 

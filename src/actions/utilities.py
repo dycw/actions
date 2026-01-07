@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, assert_never, overload
 
+from tomlkit import dumps
 from typed_settings import EnvLoader, Secret
+from utilities.atomicwrites import writer
 from utilities.subprocess import run
 
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
     from libcst import Module
-    from utilities.types import StrStrMapping
+    from tomlkit import TOMLDocument
+    from utilities.types import PathLike, StrStrMapping
 
     from actions.types import SecretLike
 
@@ -17,8 +20,16 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
+def are_docs_equal(left: TOMLDocument, right: TOMLDocument, /) -> bool:
+    return are_texts_equal(dumps(left), dumps(right))
+
+
 def are_modules_equal(left: Module, right: Module, /) -> bool:
-    return left.code.rstrip("\n") == right.code.rstrip("\n")
+    return are_texts_equal(left.code, right.code)
+
+
+def are_texts_equal(left: str, right: str, /) -> bool:
+    return ensure_new_line(left) == ensure_new_line(right)
 
 
 def convert_list_strs(
@@ -63,6 +74,10 @@ def convert_str(x: str | None, /) -> str | None:
             return None
         case never:
             assert_never(never)
+
+
+def ensure_new_line(text: str, /) -> str:
+    return text.rstrip("\n") + "\n"
 
 
 @overload
@@ -114,11 +129,20 @@ def logged_run(
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
 
+def write_text(path: PathLike, text: str, /) -> None:
+    with writer(path, overwrite=True) as temp:
+        _ = temp.write_text(ensure_new_line(text))
+
+
 __all__ = [
     "LOADER",
+    "are_docs_equal",
     "are_modules_equal",
+    "are_texts_equal",
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
+    "ensure_new_line",
     "logged_run",
+    "write_text",
 ]

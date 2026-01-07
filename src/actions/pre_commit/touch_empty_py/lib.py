@@ -47,6 +47,8 @@ def touch_empty_py(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
+    if path.suffix != ".py":
+        return
     current = parse_module(path.read_text())
     expected = _get_formatted(path)
     if not are_modules_equal(current, expected):
