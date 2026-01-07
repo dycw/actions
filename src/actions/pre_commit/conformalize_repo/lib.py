@@ -944,7 +944,7 @@ def add_readme_md(
             lines.append(f"# `{name}`")
         if description is not None:
             lines.append(description)
-        text = "\n".join(lines)
+        text = "\n\n".join(lines)
         if search(escape(text), context.output, flags=MULTILINE) is None:
             context.output += f"\n\n{text}"
 
