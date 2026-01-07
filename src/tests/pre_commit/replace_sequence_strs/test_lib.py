@@ -12,22 +12,22 @@ if TYPE_CHECKING:
 
 
 @fixture
-def path_tests_i(*, path_tests: Path) -> Path:
-    return path_tests / "sequence_strs"
+def root(*, tests_pre_commit: Path) -> Path:
+    return tests_pre_commit / "replace_sequence_strs"
 
 
 class TestFormatPath:
-    def test_main(self, *, path_tests_i: Path, tmp_path: Path) -> None:
+    def test_main(self, *, root: Path, tmp_path: Path) -> None:
         path = tmp_path / "file.py"
-        _ = path.write_text((path_tests_i / "in_.py").read_text())
+        _ = path.write_text((root / "in_.py").read_text())
         _format_path(path)
         result = path.read_text()
-        expected = path_tests_i.joinpath("out.py").read_text()
+        expected = root.joinpath("out.py").read_text()
         assert result == expected
 
 
 class TestGetFormatted:
-    def test_main(self, *, path_tests_i: Path) -> None:
-        result = _get_formatted(path_tests_i.joinpath("in_.py"))
-        expected = parse_module(path_tests_i.joinpath("out.py").read_text())
+    def test_main(self, *, root: Path) -> None:
+        result = _get_formatted(root.joinpath("in_.py"))
+        expected = parse_module(root.joinpath("out.py").read_text())
         assert result.code == expected.code

@@ -54,8 +54,7 @@ def _format_path(path: PathLike, /) -> None:
 
 def _get_formatted(path: PathLike, /) -> Module:
     path = Path(path)
-    existing = path.read_text()
-    wrapper = MetadataWrapper(parse_module(existing))
+    wrapper = MetadataWrapper(parse_module(path.read_text()))
     return wrapper.module.visit(SequenceToListTransformer())
 
 

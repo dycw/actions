@@ -13,8 +13,8 @@ setup_hypothesis_profiles()
 
 
 @fixture
-def path_tests() -> Path:
-    path = files(anchor="tests")
+def tests_pre_commit() -> Path:
+    path = files(anchor="tests") / "pre_commit"
     if not path.is_dir():
         raise NotADirectoryError(path)
     return path

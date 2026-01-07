@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 @path_argument
-def replace_sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
+def touch_empty_py_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -32,4 +32,4 @@ def replace_sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     replace_sequence_strs(*paths)
 
 
-__all__ = ["replace_sequence_strs_sub_cmd"]
+__all__ = ["touch_empty_py_sub_cmd"]
