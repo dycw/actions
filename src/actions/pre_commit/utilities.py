@@ -19,12 +19,7 @@ from utilities.types import PathLike
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.types import StrDict
-from actions.utilities import (
-    are_equal_modulo_new_line,
-    ensure_new_line,
-    write_text,
-    yaml_dump,
-)
+from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
