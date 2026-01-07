@@ -41,7 +41,9 @@ from actions.action_dicts.lib import (
     run_action_ruff_dict,
     run_action_tag_dict,
 )
-from actions.conformalize_repo.constants import (
+from actions.constants import YAML_INSTANCE
+from actions.logging import LOGGER
+from actions.pre_commit.conformalize_repo.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
     COVERAGERC_TOML,
@@ -65,9 +67,7 @@ from actions.conformalize_repo.constants import (
     TAPLO_URL,
     UV_URL,
 )
-from actions.conformalize_repo.settings import SETTINGS
-from actions.constants import YAML_INSTANCE
-from actions.logging import LOGGER
+from actions.pre_commit.conformalize_repo.settings import SETTINGS
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet

@@ -8,11 +8,11 @@ import actions.random_sleep.doc
 import actions.run_hooks.doc
 import actions.tag_commit.doc
 from actions.clean_dir.cli import clean_dir_sub_cmd
-from actions.conformalize_repo.cli import conformalize_repo_sub_cmd
-from actions.format_requirements.cli import format_requirements_sub_cmd
+from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
+from actions.pre_commit.format_requirements.cli import format_requirements_sub_cmd
+from actions.pre_commit.replace_sequence_strs.cli import sequence_strs_sub_cmd
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.random_sleep.cli import random_sleep_sub_cmd
-from actions.replace_sequence_strs.cli import sequence_strs_sub_cmd
 from actions.run_hooks.cli import run_hooks_sub_cmd
 from actions.setup_cronjob.cli import setup_cronjob_sub_cmd
 from actions.tag_commit.cli import tag_commit_sub_cmd
