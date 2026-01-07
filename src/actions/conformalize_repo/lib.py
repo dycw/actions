@@ -30,7 +30,7 @@ from utilities.whenever import HOUR, get_now
 from whenever import ZonedDateTime
 from xdg_base_dirs import xdg_cache_home
 
-from actions.conformalize.dicts import (
+from actions.action_dicts.lib import (
     run_action_pre_commit_dict,
     run_action_publish_dict,
     run_action_pyright_dict,
