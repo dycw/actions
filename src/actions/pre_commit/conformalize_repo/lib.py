@@ -24,7 +24,7 @@ from utilities.inflect import counted_noun
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.pathlib import get_repo_root
 from utilities.re import extract_groups
-from utilities.subprocess import append_text, ripgrep, run
+from utilities.subprocess import append_text, ripgrep
 from utilities.tempfile import TemporaryFile
 from utilities.text import repr_str, strip_and_dedent
 from utilities.version import ParseVersionError, Version, parse_version
@@ -68,6 +68,7 @@ from actions.pre_commit.conformalize_repo.constants import (
     UV_URL,
 )
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
@@ -1168,12 +1169,12 @@ def get_version_from_bumpversion_toml(
 
 
 def get_version_from_git_show() -> Version:
-    text = run("git", "show", f"origin/master:{BUMPVERSION_TOML}", return_=True)
+    text = logged_run("git", "show", f"origin/master:{BUMPVERSION_TOML}", return_=True)
     return get_version_from_bumpversion_toml(obj=text.rstrip("\n"))
 
 
 def get_version_from_git_tag() -> Version:
-    text = run("git", "tag", "--points-at", "origin/master", return_=True)
+    text = logged_run("git", "tag", "--points-at", "origin/master", return_=True)
     for line in text.splitlines():
         with suppress(ParseVersionError):
             return parse_version(line)
@@ -1213,7 +1214,7 @@ def run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> N
 
     def run_autoupdate() -> None:
         current = PRE_COMMIT_CONFIG_YAML.read_text()
-        run("pre-commit", "autoupdate", print=True)
+        logged_run("pre-commit", "autoupdate", print=True)
         with writer(cache, overwrite=True) as temp:
             _ = temp.write_text(get_now().format_iso())
         if (modifications is not None) and (
@@ -1262,7 +1263,7 @@ def run_ripgrep_and_replace(
 
 
 def set_version(version: Version, /) -> None:
-    run(
+    logged_run(
         "bump-my-version",
         "replace",
         "--new-version",
