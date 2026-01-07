@@ -4,6 +4,7 @@ from click import group
 from utilities.click import CONTEXT_SETTINGS
 
 from actions.clean_dir.cli import clean_dir_sub_cmd
+from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
 from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
 from actions.pre_commit.conformalize_repo.constants import (
     CONFORMALIZE_REPO_DOCSTRING,
@@ -50,7 +51,7 @@ from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CM
 def _main() -> None: ...
 
 
-_ = _main.command(name="clean-dir", help="Clean a directory", **CONTEXT_SETTINGS)(
+_ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_SUB_CMD, **CONTEXT_SETTINGS)(
     clean_dir_sub_cmd
 )
 _ = _main.command(
