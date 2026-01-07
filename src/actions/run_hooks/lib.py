@@ -12,8 +12,8 @@ from whenever import TimeDelta
 from yaml import safe_load
 
 from actions import __version__
-from actions.hooks.settings import HOOKS_SETTINGS
 from actions.logging import LOGGER
+from actions.run_hooks.settings import HOOKS_SETTINGS
 from actions.utilities import log_run
 
 if TYPE_CHECKING:

@@ -8,15 +8,13 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.settings import CommonSettings
-from actions.tag.lib import tag_commit
-from actions.tag.settings import TagSettings
+from actions.tag_commit.lib import tag_commit
+from actions.tag_commit.settings import TagSettings
 from actions.utilities import LOADER
 
 
-@click_options(CommonSettings, [LOADER], show_envvars_in_help=True, argname="common")
 @click_options(TagSettings, [LOADER], show_envvars_in_help=True, argname="tag")
-def tag_sub_cmd(*, common: CommonSettings, tag: TagSettings) -> None:
+def tag_sub_cmd(*, tag: TagSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -24,11 +22,9 @@ def tag_sub_cmd(*, common: CommonSettings, tag: TagSettings) -> None:
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
             %s
-            %s
         """),
         tag_commit.__name__,
         __version__,
-        pretty_repr(common),
         pretty_repr(tag),
     )
     tag_commit(

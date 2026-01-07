@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from libcst import parse_module
 from pytest import fixture
 
-from actions.sequence_strs.lib import _format_path, _get_formatted
+from actions.replace_sequence_strs.lib import _format_path, _get_formatted
 
 if TYPE_CHECKING:
     from pathlib import Path

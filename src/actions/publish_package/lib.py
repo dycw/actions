@@ -7,7 +7,7 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.publish.settings import PUBLISH_SETTINGS
+from actions.publish_package.settings import PUBLISH_SETTINGS
 from actions.utilities import log_run
 
 if TYPE_CHECKING:

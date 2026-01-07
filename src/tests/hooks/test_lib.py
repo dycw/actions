@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pytest import mark, param
 
-from actions.hooks.lib import _yield_hooks
+from actions.run_hooks.lib import _yield_hooks
 
 
 class TestYieldHooks:

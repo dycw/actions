@@ -8,7 +8,7 @@ from utilities.version import parse_version
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.tag.settings import TAG_SETTINGS
+from actions.tag_commit.settings import TAG_SETTINGS
 from actions.utilities import log_run
 
 

@@ -10,7 +10,7 @@ from whenever import TimeDelta, ZonedDateTime
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.sleep.settings import SLEEP_SETTINGS
+from actions.random_sleep.settings import SLEEP_SETTINGS
 
 
 def random_sleep(
