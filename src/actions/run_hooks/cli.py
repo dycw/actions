@@ -14,7 +14,7 @@ from actions.utilities import LOADER
 
 
 @click_options(HooksSettings, [LOADER], show_envvars_in_help=True, argname="hooks")
-def hooks_sub_cmd(*, hooks: HooksSettings) -> None:
+def run_hooks_sub_cmd(*, hooks: HooksSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -30,4 +30,4 @@ def hooks_sub_cmd(*, hooks: HooksSettings) -> None:
     run_hooks(repos=hooks.repos, hooks=hooks.hooks, sleep=hooks.sleep)
 
 
-__all__ = ["hooks_sub_cmd"]
+__all__ = ["run_hooks_sub_cmd"]

@@ -14,7 +14,7 @@ from actions.utilities import LOADER
 
 
 @click_options(TagSettings, [LOADER], show_envvars_in_help=True, argname="tag")
-def tag_sub_cmd(*, tag: TagSettings) -> None:
+def tag_commit_sub_cmd(*, tag: TagSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -36,4 +36,4 @@ def tag_sub_cmd(*, tag: TagSettings) -> None:
     )
 
 
-__all__ = ["tag_sub_cmd"]
+__all__ = ["tag_commit_sub_cmd"]

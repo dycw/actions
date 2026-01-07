@@ -18,7 +18,7 @@ from actions.logging import LOGGER
     nargs=-1,
     type=click.Path(exists=True, file_okay=True, dir_okay=False, path_type=Path),
 )
-def requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
+def format_requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -34,4 +34,4 @@ def requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     format_requirements(*paths)
 
 
-__all__ = ["requirements_sub_cmd"]
+__all__ = ["format_requirements_sub_cmd"]

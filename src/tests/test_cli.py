@@ -10,12 +10,12 @@ class TestCLI:
         "cmd",
         [
             param("clean-dir"),
-            param("hooks"),
-            param("publish"),
-            param("requirements"),
-            param("sequence-strs"),
-            param("sleep"),
-            param("tag"),
+            param("format-requirements"),
+            param("publish-package"),
+            param("random-sleep"),
+            param("replace-sequence-strs"),
+            param("run-hooks"),
+            param("tag-commit"),
         ],
     )
     def test_main(self, *, cmd: str) -> None:

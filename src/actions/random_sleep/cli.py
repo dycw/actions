@@ -14,7 +14,7 @@ from actions.utilities import LOADER
 
 
 @click_options(SleepSettings, [LOADER], show_envvars_in_help=True, argname="sleep")
-def sleep_sub_cmd(*, sleep: SleepSettings) -> None:
+def random_sleep_sub_cmd(*, sleep: SleepSettings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
@@ -32,4 +32,4 @@ def sleep_sub_cmd(*, sleep: SleepSettings) -> None:
     )
 
 
-__all__ = ["sleep_sub_cmd"]
+__all__ = ["random_sleep_sub_cmd"]
