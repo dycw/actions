@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from pytest import mark, param
 from utilities.pathlib import get_repo_root
+from utilities.pytest import throttle
 from utilities.subprocess import run
+from utilities.whenever import MINUTE
 
 
 class TestCLI:
@@ -16,8 +18,10 @@ class TestCLI:
             param("random-sleep"),
             param("replace-sequence-strs"),
             param("run-hooks"),
+            param("setup-cronjob"),
             param("tag-commit"),
         ],
     )
+    @throttle(delta=MINUTE)
     def test_main(self, *, cmd: str) -> None:
         run("action", cmd, cwd=get_repo_root())

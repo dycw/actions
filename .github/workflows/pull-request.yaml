@@ -9,7 +9,8 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Run 'pre-commit' hooks
+      - if: github.event_name == 'pull_request'
+        name: Run 'pre-commit' hooks
         uses: dycw/action-run-hooks@latest
         with:
           token: ${{github.token}}
