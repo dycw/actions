@@ -9,7 +9,6 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.pre_commit.utilities import yield_toml_doc
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
