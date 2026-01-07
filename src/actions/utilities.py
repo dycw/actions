@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, assert_never, overload
 
-from tomlkit import dumps
 from typed_settings import EnvLoader, Secret
 from utilities.atomicwrites import writer
 from utilities.subprocess import run
@@ -23,8 +22,8 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def are_docs_equal(left: TOMLDocument, right: TOMLDocument, /) -> bool:
-    return are_texts_equal(dumps(left), dumps(right))
+def are_docs_unequal_equal(left: TOMLDocument, right: TOMLDocument, /) -> bool:
+    return not (left == right)  # noqa: SIM201
 
 
 def are_modules_equal(left: Module, right: Module, /) -> bool:
@@ -152,7 +151,7 @@ def write_text(
 
 __all__ = [
     "LOADER",
-    "are_docs_equal",
+    "are_docs_unequal_equal",
     "are_modules_equal",
     "are_texts_equal",
     "convert_list_strs",

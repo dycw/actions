@@ -13,7 +13,7 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.utilities import are_docs_equal, write_text
+from actions.utilities import are_docs_unequal_equal, write_text
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -54,7 +54,7 @@ def _format_path(path: PathLike, /) -> None:
         raise TypeError(msg)
     current = loads(path.read_text())
     expected = _get_formatted(path)
-    if not are_docs_equal(current, expected):
+    if are_docs_unequal_equal(current, expected):
         write_text(path, dumps(expected), modifications=_MODIFICATIONS)
 
 
