@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 from typing import TYPE_CHECKING, override
 
-from libcst import CSTTransformer, Module, Name, Subscript, parse_module
+from libcst import CSTTransformer, Name, Subscript
 from libcst.matchers import Index as MIndex
 from libcst.matchers import Name as MName
 from libcst.matchers import Subscript as MSubscript
@@ -15,11 +14,11 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.pre_commit.utilities import yield_python_file, yield_text_file
-from actions.utilities import are_modules_equal, write_text
+from actions.pre_commit.utilities import yield_python_file
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
+    from pathlib import Path
 
     from utilities.types import PathLike
 
@@ -48,20 +47,10 @@ def replace_sequence_strs(*paths: PathLike) -> None:
 def _format_path(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> None:
-    with yield_python_file(path, modifications=modifications) as temp:
-        wrapper = MetadataWrapper(parse_module(path.read_text()))
-        return wrapper.module.visit(SequenceToListTransformer())
-        temp.write_text()
-    expected = _get_formatted(path)
-    if not are_modules_equal(current, expected):
-        write_text(path, expected.code, modifications=_MODIFICATIONS)
-    return None
-
-
-def _get_formatted(path: PathLike, /) -> Module:
-    path = Path(path)
-    wrapper = MetadataWrapper(parse_module(path.read_text()))
-    return wrapper.module.visit(SequenceToListTransformer())
+    with yield_python_file(path, modifications=modifications) as context:
+        context.output = MetadataWrapper(context.input).module.visit(
+            SequenceToListTransformer()
+        )
 
 
 class SequenceToListTransformer(CSTTransformer):
