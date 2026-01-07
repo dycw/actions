@@ -17,6 +17,15 @@ jobs:
             dycw/actions
             pre-commit/pre-commit-hooks
           sleep: 1
+      - if: github.event_name == 'pull_request'
+        name: Run 'pre-commit' hooks
+        uses: dycw/action-run-hooks@latest
+        with:
+          token: ${{github.token}}
+          repos: |-
+            dycw/actions
+            pre-commit/pre-commit-hooks
+          sleep: 1
   pyright:
     runs-on: ubuntu-latest
     steps:
