@@ -30,7 +30,6 @@ repos:
           - --repo-name=actions
           - --ruff
       - id: format-requirements
-        exclude: src/tests/.*/\.py$
       - id: replace-sequence-strs
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
