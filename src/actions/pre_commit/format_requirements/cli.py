@@ -15,9 +15,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-FORMAT_REQUIREMENTS_SUB_CMD = "format-requirements"
-
-
 @path_argument
 def format_requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
@@ -35,4 +32,4 @@ def format_requirements_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     format_requirements(*paths)
 
 
-__all__ = ["FORMAT_REQUIREMENTS_SUB_CMD", "format_requirements_sub_cmd"]
+__all__ = ["format_requirements_sub_cmd"]

@@ -46,6 +46,7 @@ from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
+    CONFORMALIZE_REPO_SUB_CMD,
     COVERAGERC_TOML,
     DOCKERFMT_URL,
     ENVRC,
@@ -68,9 +69,11 @@ from actions.pre_commit.conformalize_repo.constants import (
     UV_URL,
 )
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
-from actions.pre_commit.format_requirements.cli import FORMAT_REQUIREMENTS_SUB_CMD
-from actions.pre_commit.replace_sequence_strs.cli import REPLACE_SEQUENCE_STRS_SUB_CMD
-from actions.pre_commit.touch_empty_py.cli import TOUCH_EMPTY_PY_SUB_CMD
+from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.constants import (
+    REPLACE_SEQUENCE_STRS_SUB_CMD,
+)
+from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
@@ -640,7 +643,7 @@ def add_pre_commit_config_yaml(
     script: str | None = SETTINGS.script,
 ) -> None:
     with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
-        _add_pre_commit_config_repo(dict_, ACTIONS_URL, "conformalize-repo")
+        _add_pre_commit_config_repo(dict_, ACTIONS_URL, CONFORMALIZE_REPO_SUB_CMD)
         _add_pre_commit_config_repo(
             dict_, PRE_COMMIT_HOOKS_URL, "check-executables-have-shebangs"
         )

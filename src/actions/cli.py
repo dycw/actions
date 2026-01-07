@@ -9,18 +9,15 @@ import actions.run_hooks.doc
 import actions.tag_commit.doc
 from actions.clean_dir.cli import clean_dir_sub_cmd
 from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
-from actions.pre_commit.format_requirements.cli import (
-    FORMAT_REQUIREMENTS_SUB_CMD,
-    format_requirements_sub_cmd,
-)
-from actions.pre_commit.replace_sequence_strs.cli import (
+from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
+from actions.pre_commit.format_requirements.cli import format_requirements_sub_cmd
+from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.cli import replace_sequence_strs_sub_cmd
+from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
-    replace_sequence_strs_sub_cmd,
 )
-from actions.pre_commit.touch_empty_py.cli import (
-    TOUCH_EMPTY_PY_SUB_CMD,
-    touch_empty_py_sub_cmd,
-)
+from actions.pre_commit.touch_empty_py.cli import touch_empty_py_sub_cmd
+from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.random_sleep.cli import random_sleep_sub_cmd
 from actions.run_hooks.cli import run_hooks_sub_cmd
@@ -59,7 +56,7 @@ def pre_commit_sub_cmd() -> None: ...
 
 
 _ = pre_commit_sub_cmd.command(
-    name="conformalize-repo", help="Conformalize a repo", **CONTEXT_SETTINGS
+    name=CONFORMALIZE_REPO_SUB_CMD, help="Conformalize a repo", **CONTEXT_SETTINGS
 )(conformalize_repo_sub_cmd)
 _ = pre_commit_sub_cmd.command(
     name=FORMAT_REQUIREMENTS_SUB_CMD,
