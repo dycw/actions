@@ -4,9 +4,10 @@ from string import Template
 from typing import TYPE_CHECKING
 
 from utilities.platform import SYSTEM
-from utilities.subprocess import run
-from utilities.tempfile import TemporaryFile
+from utilities.subprocess import chmod, chown, tee
+from utilities.text import strip_and_dedent
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.setup_cronjob.constants import PATH_CONFIGS
 from actions.setup_cronjob.settings import SETTINGS
@@ -30,10 +31,35 @@ def setup_cronjob(
     logs_keep: int = SETTINGS.logs_keep,
 ) -> None:
     """Set up a cronjob & logrotate."""
+    LOGGER.info(
+        strip_and_dedent("""
+            Running '%s' (version %s) with settings:
+             - name         = %s
+             - prepend_path = %s
+             - schedule     = %s
+             - user         = %s
+             - timeout      = %d
+             - kill_after   = %d
+             - command      = %s
+             - args         = %s
+             - logs_keep    = %d
+        """),
+        setup_cronjob.__name__,
+        __version__,
+        name,
+        prepend_path,
+        schedule,
+        user,
+        timeout,
+        kill_after,
+        command,
+        args,
+        logs_keep,
+    )
     if SYSTEM != "linux":
         msg = f"System must be 'linux'; got {SYSTEM!r}"
         raise TypeError(msg)
-    _write_file(
+    _tee_and_perms(
         f"/etc/cron.d/{name}",
         _get_crontab(
             prepend_path=prepend_path,
@@ -46,7 +72,7 @@ def setup_cronjob(
             args=args,
         ),
     )
-    _write_file(
+    _tee_and_perms(
         f"/etc/logrotate.d/{name}", _get_logrotate(name=name, logs_keep=logs_keep)
     )
 
@@ -85,13 +111,10 @@ def _get_logrotate(
     )
 
 
-def _write_file(path: PathLike, text: str, /) -> None:
-    LOGGER.info("Writing '%s'...", path)
-    with TemporaryFile() as src:
-        _ = src.write_text(text)
-        run("sudo", "mv", str(src), str(path))
-    run("sudo", "chown", "root:root", str(path))
-    run("sudo", "chmod", "u=rw,g=r,o=r", str(path))
+def _tee_and_perms(path: PathLike, text: str, /) -> None:
+    tee(path, text, sudo=True)
+    chown(path, sudo=True, user="root", group="root")
+    chmod(path, "u=rw,g=r,o=r", sudo=True)
 
 
 __all__ = ["setup_cronjob"]
