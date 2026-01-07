@@ -1,37 +1,25 @@
 from __future__ import annotations
 
+from io import StringIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, assert_never, overload
+from typing import TYPE_CHECKING, Any, Literal, assert_never, overload
 
 from typed_settings import EnvLoader, Secret
 from utilities.atomicwrites import writer
 from utilities.subprocess import run
 
+from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
 
-    from libcst import Module
-    from tomlkit import TOMLDocument
     from utilities.types import PathLike, StrStrMapping
 
     from actions.types import SecretLike
 
 
 LOADER = EnvLoader("")
-
-
-def are_docs_unequal(left: TOMLDocument, right: TOMLDocument, /) -> bool:
-    return not (left == right)  # noqa: SIM201
-
-
-def are_modules_equal(left: Module, right: Module, /) -> bool:
-    return are_texts_equal(left.code, right.code)
-
-
-def are_texts_equal(left: str, right: str, /) -> bool:
-    return ensure_new_line(left) == ensure_new_line(right)
 
 
 def convert_list_strs(
@@ -149,11 +137,17 @@ def write_text(
         modifications.add(Path(path))
 
 
+def yaml_dump(obj: Any, /) -> str:
+    stream = StringIO()
+    YAML_INSTANCE.dump(obj, stream)
+    return stream.getvalue()
+
+
+##
+
+
 __all__ = [
     "LOADER",
-    "are_docs_unequal",
-    "are_modules_equal",
-    "are_texts_equal",
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
@@ -161,4 +155,5 @@ __all__ = [
     "ensure_new_line",
     "logged_run",
     "write_text",
+    "yaml_dump",
 ]

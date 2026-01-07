@@ -11,10 +11,9 @@ from actions import __version__
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
+    from collections.abc import MutableSet
+
     from utilities.types import PathLike
-
-
-_MODIFICATIONS: set[Path] = set()
 
 
 def touch_py_typed(*paths: PathLike) -> None:
@@ -27,17 +26,20 @@ def touch_py_typed(*paths: PathLike) -> None:
         __version__,
         paths,
     )
+    modifications: set[Path] = set()
     for path in paths:
-        _format_path(path)
-    if len(_MODIFICATIONS) >= 1:
+        _format_path(path, modifications=modifications)
+    if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr_str, sorted(_MODIFICATIONS))),
+            ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
 
 
-def _format_path(path: PathLike, /) -> None:
+def _format_path(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> None:
     path = Path(path)
     if not path.is_file():
         msg = f"Expected a file; {str(path)!r} is not"
@@ -55,7 +57,8 @@ def _format_path(path: PathLike, /) -> None:
     py_typed = non_tests / "py.typed"
     if not py_typed.exists():
         py_typed.touch()
-        _MODIFICATIONS.add(py_typed)
+        if modifications is not None:
+            modifications.add(py_typed)
 
 
 __all__ = ["touch_py_typed"]

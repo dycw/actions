@@ -1,30 +1,23 @@
 from __future__ import annotations
 
-import json
 import sys
 from contextlib import contextmanager, suppress
-from io import StringIO
 from itertools import product
 from pathlib import Path
-from re import MULTILINE, escape, sub
+from re import MULTILINE, escape, search, sub
 from shlex import join
 from string import Template
 from subprocess import CalledProcessError
-from typing import TYPE_CHECKING, Any, Literal, assert_never
+from typing import TYPE_CHECKING, Literal, assert_never
 
 import tomlkit
-from rich.pretty import pretty_repr
 from ruamel.yaml.scalarstring import LiteralScalarString
-from tomlkit import TOMLDocument, aot, array, document, table
+from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
-from tomlkit.items import AoT, Array, Table
-from utilities.functions import ensure_class
 from utilities.inflect import counted_noun
-from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.pathlib import get_repo_root
 from utilities.re import extract_groups
-from utilities.subprocess import append_text, ripgrep
-from utilities.tempfile import TemporaryFile
+from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
 from utilities.version import ParseVersionError, Version, parse_version
 from utilities.whenever import HOUR, get_now
@@ -74,14 +67,30 @@ from actions.pre_commit.replace_sequence_strs.constants import (
 )
 from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
-from actions.utilities import are_texts_equal, copy_text, logged_run, write_text
+from actions.pre_commit.utilities import (
+    ensure_aot_contains,
+    ensure_contains,
+    ensure_contains_partial,
+    ensure_not_contains,
+    get_aot,
+    get_array,
+    get_dict,
+    get_list,
+    get_table,
+    yield_json_dict,
+    yield_text_file,
+    yield_toml_doc,
+    yield_yaml_dict,
+)
+from actions.utilities import logged_run, write_text
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, MutableSet
+    from collections.abc import Iterator, MutableSet
 
+    from tomlkit.items import Table
     from utilities.types import PathLike
 
-    from actions.types import HasAppend, HasSetDefault, StrDict
+    from actions.types import StrDict
 
 
 def conformalize_repo(
@@ -418,31 +427,27 @@ def add_envrc(
     python_version: str = SETTINGS.python_version,
     script: str | None = SETTINGS.script,
 ) -> None:
-    with yield_text_file(ENVRC, modifications=modifications) as temp:
+    with yield_text_file(ENVRC, modifications=modifications) as context:
         shebang = strip_and_dedent("""
             #!/usr/bin/env sh
             # shellcheck source=/dev/null
         """)
-        append_text(temp, shebang, skip_if_present=True, flags=MULTILINE, blank_lines=2)
+        if search(escape(shebang), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{shebang}"
 
         echo = strip_and_dedent("""
             # echo
             echo_date() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" >&2; }
         """)
-        append_text(temp, echo, skip_if_present=True, flags=MULTILINE, blank_lines=2)
+        if search(escape(echo), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{echo}"
 
         if uv:
-            append_text(
-                temp,
-                _add_envrc_uv_text(
-                    native_tls=uv__native_tls,
-                    python_version=python_version,
-                    script=script,
-                ),
-                skip_if_present=True,
-                flags=MULTILINE,
-                blank_lines=2,
+            uv_text = _add_envrc_uv_text(
+                native_tls=uv__native_tls, python_version=python_version, script=script
             )
+            if search(escape(uv_text), context.output, flags=MULTILINE) is None:
+                context.output += f"\n\n{echo}"
 
 
 def _add_envrc_uv_text(
@@ -622,9 +627,10 @@ def add_github_push_yaml(
 
 
 def add_gitignore(*, modifications: MutableSet[Path] | None = None) -> None:
-    with yield_text_file(GITIGNORE, modifications=modifications) as temp:
+    with yield_text_file(GITIGNORE, modifications=modifications) as context:
         text = (PATH_CONFIGS / "gitignore").read_text()
-        append_text(temp, text, skip_if_present=True, flags=MULTILINE)
+        if search(escape(text), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{text}"
 
 
 ##
@@ -932,13 +938,15 @@ def add_readme_md(
     name: str | None = SETTINGS.package_name,
     description: str | None = SETTINGS.description,
 ) -> None:
-    with yield_text_file(README_MD, modifications=modifications) as temp:
+    with yield_text_file(README_MD, modifications=modifications) as context:
         lines: list[str] = []
         if name is not None:
             lines.append(f"# `{name}`")
         if description is not None:
             lines.append(description)
-        write_text(temp, "\n\n".join(lines))
+        text = "\n".join(lines)
+        if search(escape(text), context.output, flags=MULTILINE) is None:
+            context.output += f"\n\n{text}"
 
 
 ##
@@ -1035,112 +1043,6 @@ def check_versions() -> None:
     except CalledProcessError:
         msg = f"Inconsistent versions; should be {version}"
         raise ValueError(msg) from None
-
-
-##
-
-
-def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
-    for table_ in tables:
-        if table_ not in array:
-            array.append(table_)
-
-
-def ensure_contains(array: HasAppend, /, *objs: Any) -> None:
-    if isinstance(array, AoT):
-        msg = f"Use {ensure_aot_contains.__name__!r} instead of {ensure_contains.__name__!r}"
-        raise TypeError(msg)
-    for obj in objs:
-        if obj not in array:
-            array.append(obj)
-
-
-def ensure_contains_partial(
-    container: HasAppend, partial: StrDict, /, *, extra: StrDict | None = None
-) -> StrDict:
-    try:
-        return get_partial_dict(container, partial, skip_log=True)
-    except OneEmptyError:
-        dict_ = partial | ({} if extra is None else extra)
-        container.append(dict_)
-        return dict_
-
-
-def ensure_not_contains(array: Array, /, *objs: Any) -> None:
-    for obj in objs:
-        try:
-            index = next(i for i, o in enumerate(array) if o == obj)
-        except StopIteration:
-            pass
-        else:
-            del array[index]
-
-
-##
-
-
-def get_aot(container: HasSetDefault, key: str, /) -> AoT:
-    return ensure_class(container.setdefault(key, aot()), AoT)
-
-
-def get_array(container: HasSetDefault, key: str, /) -> Array:
-    return ensure_class(container.setdefault(key, array()), Array)
-
-
-def get_dict(container: HasSetDefault, key: str, /) -> StrDict:
-    return ensure_class(container.setdefault(key, {}), dict)
-
-
-def get_list(container: HasSetDefault, key: str, /) -> list[Any]:
-    return ensure_class(container.setdefault(key, []), list)
-
-
-def get_table(container: HasSetDefault, key: str, /) -> Table:
-    return ensure_class(container.setdefault(key, table()), Table)
-
-
-##
-
-
-def get_partial_dict(
-    iterable: Iterable[Any], dict_: StrDict, /, *, skip_log: bool = False
-) -> StrDict:
-    try:
-        return one(i for i in iterable if is_partial_dict(dict_, i))
-    except OneEmptyError:
-        if not skip_log:
-            LOGGER.exception(
-                "Expected %s to contain %s (as a partial)",
-                pretty_repr(iterable),
-                pretty_repr(dict_),
-            )
-        raise
-    except OneNonUniqueError as error:
-        LOGGER.exception(
-            "Expected %s to contain %s uniquely (as a partial); got %s, %s and perhaps more",
-            pretty_repr(iterable),
-            pretty_repr(dict_),
-            pretty_repr(error.first),
-            pretty_repr(error.second),
-        )
-        raise
-
-
-def is_partial_dict(obj: Any, dict_: StrDict, /) -> bool:
-    if not isinstance(obj, dict):
-        return False
-    results: dict[str, bool] = {}
-    for key, obj_value in obj.items():
-        try:
-            dict_value = dict_[key]
-        except KeyError:
-            results[key] = False
-        else:
-            if isinstance(obj_value, dict) and isinstance(dict_value, dict):
-                results[key] = is_partial_dict(obj_value, dict_value)
-            else:
-                results[key] = obj_value == dict_value
-    return all(results.values())
 
 
 ##
@@ -1252,15 +1154,14 @@ def run_ripgrep_and_replace(
     )
     if result is None:
         return
-    for path in map(Path, result.splitlines()):
-        with yield_text_file(path, modifications=modifications) as temp:
-            text = sub(
+    for path in result.splitlines():
+        with yield_text_file(path, modifications=modifications) as context:
+            context.output = sub(
                 r'# requires-python = ">=\d+\.\d+"',
                 rf'# requires-python = ">={version}"',
-                path.read_text(),
+                context.input,
                 flags=MULTILINE,
             )
-            write_text(temp, text)
 
 
 ##
@@ -1323,15 +1224,6 @@ def update_action_versions(*, modifications: MutableSet[Path] | None = None) -> 
 ##
 
 
-def yaml_dump(obj: Any, /) -> str:
-    stream = StringIO()
-    YAML_INSTANCE.dump(obj, stream)
-    return stream.getvalue()
-
-
-##
-
-
 @contextmanager
 def yield_bumpversion_toml(
     *, modifications: MutableSet[Path] | None = None
@@ -1342,19 +1234,6 @@ def yield_bumpversion_toml(
         bumpversion["allow_dirty"] = True
         bumpversion.setdefault("current_version", str(Version(0, 1, 0)))
         yield doc
-
-
-##
-
-
-@contextmanager
-def yield_json_dict(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[StrDict]:
-    with yield_write_context(
-        path, json.loads, dict, json.dumps, modifications=modifications
-    ) as dict_:
-        yield dict_
 
 
 ##
@@ -1383,75 +1262,6 @@ def _yield_python_version_tuple(version: str, /) -> tuple[int, int]:
 ##
 
 
-@contextmanager
-def yield_text_file(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[Path]:
-    path = Path(path)
-    try:
-        current = path.read_text()
-    except FileNotFoundError:
-        with TemporaryFile() as temp:
-            yield temp
-            copy_text(temp, path, modifications=modifications)
-    else:
-        with TemporaryFile(text=current) as temp:
-            yield temp
-            if not are_texts_equal(temp.read_text(), current):
-                copy_text(temp, path, modifications=modifications)
-
-
-##
-
-
-@contextmanager
-def yield_toml_doc(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[TOMLDocument]:
-    with yield_write_context(
-        path, tomlkit.parse, document, tomlkit.dumps, modifications=modifications
-    ) as doc:
-        yield doc
-
-
-##
-
-
-@contextmanager
-def yield_write_context[T](
-    path: PathLike,
-    loads: Callable[[str], T],
-    get_default: Callable[[], T],
-    dumps: Callable[[T], str],
-    /,
-    *,
-    modifications: MutableSet[Path] | None = None,
-) -> Iterator[T]:
-    try:
-        current = Path(path).read_text()
-    except FileNotFoundError:
-        yield (default := get_default())
-        write_text(path, dumps(default), modifications=modifications)
-    else:
-        data = loads(current)
-        yield data
-        if not (data == loads(current)):  # noqa: SIM201
-            write_text(path, dumps(data), modifications=modifications)
-
-
-##
-
-
-@contextmanager
-def yield_yaml_dict(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[StrDict]:
-    with yield_write_context(
-        path, YAML_INSTANCE.load, dict, yaml_dump, modifications=modifications
-    ) as dict_:
-        yield dict_
-
-
 __all__ = [
     "add_bumpversion_toml",
     "add_coveragerc_toml",
@@ -1466,33 +1276,16 @@ __all__ = [
     "add_readme_md",
     "add_ruff_toml",
     "check_versions",
-    "ensure_aot_contains",
-    "ensure_contains",
-    "ensure_contains_partial",
-    "ensure_not_contains",
-    "get_aot",
-    "get_array",
-    "get_dict",
-    "get_list",
-    "get_partial_dict",
     "get_python_package_name",
-    "get_table",
     "get_version_from_bumpversion_toml",
     "get_version_from_git_show",
     "get_version_from_git_tag",
-    "is_partial_dict",
     "run_bump_my_version",
     "run_pre_commit_update",
     "run_ripgrep_and_replace",
     "set_version",
     "update_action_file_extensions",
     "update_action_versions",
-    "yaml_dump",
     "yield_bumpversion_toml",
-    "yield_json_dict",
     "yield_python_versions",
-    "yield_text_file",
-    "yield_toml_doc",
-    "yield_write_context",
-    "yield_yaml_dict",
 ]
