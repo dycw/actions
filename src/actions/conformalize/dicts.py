@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import actions.publish_package.doc
+import actions.random_sleep.doc
+import actions.run_hooks.doc
 import actions.tag_commit.doc
 from actions.conformalize.defaults import GITHUB_TOKEN, PRERELEASE, RESOLUTION
 
@@ -26,7 +28,7 @@ def run_action_pre_commit_dict(
     _add_item(dict_, "hooks", value=hooks)
     dict_["sleep"] = sleep
     return {
-        "name": "Run 'pre-commit'",
+        "name": actions.run_hooks.doc.DOCSTRING,
         "uses": "dycw/action-pre-commit@latest",
         "with": dict_,
     }
@@ -121,8 +123,8 @@ def run_action_random_sleep_dict(
         "log-freq": log_freq,
     }
     return {
-        "name": actions.tag_commit.doc.DOCSTRING,
-        "uses": "dycw/action-tag@latest",
+        "name": actions.random_sleep.doc.DOCSTRING,
+        "uses": "dycw/action-random-sleep@latest",
         "with": dict_,
     }
 
@@ -154,8 +156,8 @@ def run_action_tag_dict(
     _add_boolean(dict_, "major", value=major)
     _add_boolean(dict_, "latest", value=latest)
     return {
-        "name": "Tag latest commit",
-        "uses": "dycw/action-tag@latest",
+        "name": actions.tag_commit.doc.DOCSTRING,
+        "uses": "dycw/action-tag-commit@latest",
         "with": dict_,
     }
 
