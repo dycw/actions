@@ -9,7 +9,7 @@ from actions.utilities import LOADER
 
 @settings
 class CleanDirSettings:
-    path: Path = option(default=Path.cwd(), help="The directory to clean")
+    dir: Path = option(default=Path.cwd(), help="The directory to clean")
 
 
 CLEAN_DIR_SETTINGS = load_settings(CleanDirSettings, [LOADER])

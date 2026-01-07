@@ -16,7 +16,9 @@ from actions.tag_commit.cli import tag_sub_cmd
 def _main() -> None: ...
 
 
-_ = _main.command(name="clean-dir", **CONTEXT_SETTINGS)(clean_dir)
+_ = _main.command(name="clean-dir", help="Clean a directory", **CONTEXT_SETTINGS)(
+    clean_dir
+)
 _ = _main.command(name="hooks", **CONTEXT_SETTINGS)(hooks_sub_cmd)
 _ = _main.command(name="publish", **CONTEXT_SETTINGS)(publish_sub_cmd)
 _ = _main.command(name="requirements", **CONTEXT_SETTINGS)(requirements_sub_cmd)

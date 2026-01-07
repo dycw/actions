@@ -27,7 +27,7 @@ def clean_dir_sub_cmd(settings: CleanDirSettings, /) -> None:
         __version__,
         pretty_repr(settings),
     )
-    clean_dir(path=settings.path)
+    clean_dir(dir_=settings.dir)
 
 
 __all__ = ["clean_dir_sub_cmd"]
