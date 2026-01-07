@@ -73,6 +73,7 @@ from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
 )
 from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
+from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
 from actions.utilities import are_texts_equal, copy_text, logged_run, write_text
 
 if TYPE_CHECKING:
@@ -686,6 +687,7 @@ def add_pre_commit_config_yaml(
                 dict_, ACTIONS_URL, REPLACE_SEQUENCE_STRS_SUB_CMD
             )
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD)
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
