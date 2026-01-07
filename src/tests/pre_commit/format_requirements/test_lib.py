@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 @fixture
 def root(*, tests_pre_commit: Path) -> Path:
-    return tests_pre_commit / "requirements"
+    return tests_pre_commit / "format_requirements"
 
 
 class TestFormatPath:

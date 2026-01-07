@@ -21,8 +21,8 @@ class TestFormatPath:
         path = tmp_path / "file.py"
         _ = path.write_text((root / "in_.py").read_text())
         _format_path(path)
-        result = path.read_text()
-        expected = root.joinpath("out.py").read_text()
+        result = parse_module(path.read_text())
+        expected = parse_module(root.joinpath("out.py").read_text())
         assert result == expected
 
 
