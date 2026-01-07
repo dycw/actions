@@ -24,3 +24,10 @@
   language: python
   types: [python]
   description: Touch empty '.py' files
+- id: touch-py-typed
+  name: touch-py-typed
+  entry: action pre-commit touch-py-typed
+  language: python
+  types: [toml]
+  files: pyproject\.toml
+  description: Touch 'py.typed'

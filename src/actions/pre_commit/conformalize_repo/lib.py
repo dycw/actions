@@ -18,7 +18,6 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, aot, array, document, table
 from tomlkit.exceptions import NonExistentKey
 from tomlkit.items import AoT, Array, Table
-from utilities.atomicwrites import writer
 from utilities.functions import ensure_class
 from utilities.inflect import counted_noun
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
@@ -74,7 +73,8 @@ from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
 )
 from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
-from actions.utilities import logged_run
+from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
+from actions.utilities import are_texts_equal, copy_text, logged_run, write_text
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
@@ -687,6 +687,7 @@ def add_pre_commit_config_yaml(
                 dict_, ACTIONS_URL, REPLACE_SEQUENCE_STRS_SUB_CMD
             )
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD)
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
@@ -937,7 +938,7 @@ def add_readme_md(
             lines.append(f"# `{name}`")
         if description is not None:
             lines.append(description)
-        _ = temp.write_text("\n\n".join(lines))
+        write_text(temp, "\n\n".join(lines))
 
 
 ##
@@ -1220,25 +1221,19 @@ def run_bump_my_version(*, modifications: MutableSet[Path] | None = None) -> Non
 
 def run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> None:
     cache = xdg_cache_home() / "conformalize" / get_repo_root().name
-
-    def run_autoupdate() -> None:
-        current = PRE_COMMIT_CONFIG_YAML.read_text()
-        logged_run("pre-commit", "autoupdate", print=True)
-        with writer(cache, overwrite=True) as temp:
-            _ = temp.write_text(get_now().format_iso())
-        if (modifications is not None) and (
-            PRE_COMMIT_CONFIG_YAML.read_text() != current
-        ):
-            modifications.add(PRE_COMMIT_CONFIG_YAML)
-
     try:
         text = cache.read_text()
     except FileNotFoundError:
-        run_autoupdate()
+        ...
     else:
         prev = ZonedDateTime.parse_iso(text.rstrip("\n"))
-        if prev < (get_now() - 12 * HOUR):
-            run_autoupdate()
+        if prev >= (get_now() - 12 * HOUR):
+            return
+    write_text(cache, get_now().format_iso())
+    current = PRE_COMMIT_CONFIG_YAML.read_text()
+    logged_run("pre-commit", "autoupdate", print=True)
+    if (modifications is not None) and (PRE_COMMIT_CONFIG_YAML.read_text() != current):
+        modifications.add(PRE_COMMIT_CONFIG_YAML)
 
 
 ##
@@ -1265,7 +1260,7 @@ def run_ripgrep_and_replace(
                 path.read_text(),
                 flags=MULTILINE,
             )
-            _ = temp.write_text(text)
+            write_text(temp, text)
 
 
 ##
@@ -1323,26 +1318,6 @@ def update_action_versions(*, modifications: MutableSet[Path] | None = None) -> 
         with yield_yaml_dict(path, modifications=modifications) as dict_:
             dict_.clear()
             dict_.update(YAML_INSTANCE.load(text))
-
-
-##
-
-
-def write_text(
-    verb: str,
-    src: PathLike,
-    dest: PathLike,
-    /,
-    *,
-    modifications: MutableSet[Path] | None = None,
-) -> None:
-    src, dest = map(Path, [src, dest])
-    LOGGER.info("%s '%s'...", verb, dest)
-    text = src.read_text().rstrip("\n") + "\n"
-    with writer(dest, overwrite=True) as temp:
-        _ = temp.write_text(text)
-    if modifications is not None:
-        modifications.add(dest)
 
 
 ##
@@ -1418,12 +1393,12 @@ def yield_text_file(
     except FileNotFoundError:
         with TemporaryFile() as temp:
             yield temp
-            write_text("Writing", temp, path, modifications=modifications)
+            copy_text(temp, path, modifications=modifications)
     else:
         with TemporaryFile(text=current) as temp:
             yield temp
-            if temp.read_text().rstrip("\n") != current.rstrip("\n"):
-                write_text("Writing", temp, path, modifications=modifications)
+            if not are_texts_equal(temp.read_text(), current):
+                copy_text(temp, path, modifications=modifications)
 
 
 ##
@@ -1452,24 +1427,17 @@ def yield_write_context[T](
     *,
     modifications: MutableSet[Path] | None = None,
 ) -> Iterator[T]:
-    path = Path(path)
-
-    def run_write(verb: str, data: T, /) -> None:
-        with writer(path, overwrite=True) as temp:
-            _ = temp.write_text(dumps(data))
-            write_text(verb, temp, path, modifications=modifications)
-
     try:
-        current = path.read_text()
+        current = Path(path).read_text()
     except FileNotFoundError:
         yield (default := get_default())
-        run_write("Writing", default)
+        write_text(path, dumps(default), modifications=modifications)
     else:
         data = loads(current)
         yield data
-        is_equal = data == loads(current)  # tomlkit cannot handle !=
-        if not is_equal:
-            run_write("Modifying", data)
+        new = dumps(data)
+        if not are_texts_equal(new, current):
+            write_text(path, new, modifications=modifications)
 
 
 ##
@@ -1520,7 +1488,6 @@ __all__ = [
     "set_version",
     "update_action_file_extensions",
     "update_action_versions",
-    "write_text",
     "yaml_dump",
     "yield_bumpversion_toml",
     "yield_json_dict",

@@ -3,51 +3,72 @@ from __future__ import annotations
 from click import group
 from utilities.click import CONTEXT_SETTINGS
 
-import actions.publish_package.doc
-import actions.random_sleep.doc
-import actions.run_hooks.doc
-import actions.tag_commit.doc
 from actions.clean_dir.cli import clean_dir_sub_cmd
+from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
 from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
-from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
+from actions.pre_commit.conformalize_repo.constants import (
+    CONFORMALIZE_REPO_DOCSTRING,
+    CONFORMALIZE_REPO_SUB_CMD,
+)
 from actions.pre_commit.format_requirements.cli import format_requirements_sub_cmd
-from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.format_requirements.constants import (
+    FORMAT_REQUIREMENTS_DOCSTRING,
+    FORMAT_REQUIREMENTS_SUB_CMD,
+)
 from actions.pre_commit.replace_sequence_strs.cli import replace_sequence_strs_sub_cmd
 from actions.pre_commit.replace_sequence_strs.constants import (
+    REPLACE_SEQUENCE_STRS_DOCSTRING,
     REPLACE_SEQUENCE_STRS_SUB_CMD,
 )
 from actions.pre_commit.touch_empty_py.cli import touch_empty_py_sub_cmd
-from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
+from actions.pre_commit.touch_empty_py.constants import (
+    TOUCH_EMPTY_PY_DOCSTRING,
+    TOUCH_EMPTY_PY_SUB_CMD,
+)
+from actions.pre_commit.touch_py_typed.cli import touch_py_typed_sub_cmd
+from actions.pre_commit.touch_py_typed.constants import (
+    TOUCH_PY_TYPED_DOCSTRING,
+    TOUCH_PY_TYPED_SUB_CMD,
+)
 from actions.publish_package.cli import publish_package_sub_cmd
+from actions.publish_package.constants import (
+    PUBLISH_PACKAGE_DOCSTRING,
+    PUBLISH_PACKAGE_SUB_CMD,
+)
 from actions.random_sleep.cli import random_sleep_sub_cmd
+from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING, RANDOM_SLEEP_SUB_CMD
 from actions.run_hooks.cli import run_hooks_sub_cmd
+from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING, RUN_HOOKS_SUB_CMD
 from actions.setup_cronjob.cli import setup_cronjob_sub_cmd
+from actions.setup_cronjob.constants import (
+    SETUP_CRONJOB_DOCSTRING,
+    SETUP_CRONJOB_SUB_CMD,
+)
 from actions.tag_commit.cli import tag_commit_sub_cmd
+from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CMD
 
 
 @group(**CONTEXT_SETTINGS)
 def _main() -> None: ...
 
 
-_ = _main.command(name="clean-dir", help="Clean a directory", **CONTEXT_SETTINGS)(
+_ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_SUB_CMD, **CONTEXT_SETTINGS)(
     clean_dir_sub_cmd
 )
 _ = _main.command(
-    name="publish-package",
-    help=actions.publish_package.doc.DOCSTRING,
-    **CONTEXT_SETTINGS,
+    name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)
-_ = _main.command(
-    name="run-hooks", help=actions.run_hooks.doc.DOCSTRING, **CONTEXT_SETTINGS
-)(run_hooks_sub_cmd)
-_ = _main.command(
-    name="random-sleep", help=actions.random_sleep.doc.DOCSTRING, **CONTEXT_SETTINGS
-)(random_sleep_sub_cmd)
-_ = _main.command(name="setup-cronjob", help="Setup a cronjob", **CONTEXT_SETTINGS)(
-    setup_cronjob_sub_cmd
+_ = _main.command(name=RUN_HOOKS_SUB_CMD, help=RUN_HOOKS_DOCSTRING, **CONTEXT_SETTINGS)(
+    run_hooks_sub_cmd
 )
 _ = _main.command(
-    name="tag-commit", help=actions.tag_commit.doc.DOCSTRING, **CONTEXT_SETTINGS
+    name=RANDOM_SLEEP_SUB_CMD, help=RANDOM_SLEEP_DOCSTRING, **CONTEXT_SETTINGS
+)(random_sleep_sub_cmd)
+_ = _main.command(
+    name=SETUP_CRONJOB_SUB_CMD, help=SETUP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
+)(setup_cronjob_sub_cmd)
+_ = _main.command(
+    name=TAG_COMMIT_SUB_CMD, help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS
 )(tag_commit_sub_cmd)
 
 
@@ -56,21 +77,24 @@ def pre_commit_sub_cmd() -> None: ...
 
 
 _ = pre_commit_sub_cmd.command(
-    name=CONFORMALIZE_REPO_SUB_CMD, help="Conformalize a repo", **CONTEXT_SETTINGS
+    name=CONFORMALIZE_REPO_SUB_CMD, help=CONFORMALIZE_REPO_DOCSTRING, **CONTEXT_SETTINGS
 )(conformalize_repo_sub_cmd)
 _ = pre_commit_sub_cmd.command(
     name=FORMAT_REQUIREMENTS_SUB_CMD,
-    help="Format a set of requirements",
+    help=FORMAT_REQUIREMENTS_DOCSTRING,
     **CONTEXT_SETTINGS,
 )(format_requirements_sub_cmd)
 _ = pre_commit_sub_cmd.command(
     name=REPLACE_SEQUENCE_STRS_SUB_CMD,
-    help="Replace 'Sequence[str]' with 'list[str]'",
+    help=REPLACE_SEQUENCE_STRS_DOCSTRING,
     **CONTEXT_SETTINGS,
 )(replace_sequence_strs_sub_cmd)
 _ = pre_commit_sub_cmd.command(
-    name=TOUCH_EMPTY_PY_SUB_CMD, help="Touch empty '.py' files", **CONTEXT_SETTINGS
+    name=TOUCH_EMPTY_PY_SUB_CMD, help=TOUCH_EMPTY_PY_DOCSTRING, **CONTEXT_SETTINGS
 )(touch_empty_py_sub_cmd)
+_ = pre_commit_sub_cmd.command(
+    name=TOUCH_PY_TYPED_SUB_CMD, help=TOUCH_PY_TYPED_DOCSTRING, **CONTEXT_SETTINGS
+)(touch_py_typed_sub_cmd)
 
 
 if __name__ == "__main__":
