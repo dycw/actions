@@ -46,6 +46,9 @@ _ = _main.command(
 _ = _main.command(
     name="random-sleep", help=actions.random_sleep.doc.DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)
+_ = _main.command(name="setup-cronjob", help="Setup a cronjob", **CONTEXT_SETTINGS)(
+    tag_commit_sub_cmd
+)
 _ = _main.command(
     name="tag-commit", help=actions.tag_commit.doc.DOCSTRING, **CONTEXT_SETTINGS
 )(tag_commit_sub_cmd)

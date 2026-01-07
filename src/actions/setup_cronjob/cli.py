@@ -1,23 +1,32 @@
 from __future__ import annotations
 
-from click import command
 from rich.pretty import pretty_repr
-from setup_cronjob.lib import setup_cronjob
-from setup_cronjob.logging import LOGGER
-from setup_cronjob.settings import LOADER, Settings
 from typed_settings import click_options
-from utilities.click import CONTEXT_SETTINGS
 from utilities.logging import basic_config
 from utilities.os import is_pytest
+from utilities.text import strip_and_dedent
+
+from actions import __version__
+from actions.logging import LOGGER
+from actions.setup_cronjob.lib import setup_cronjob
+from actions.setup_cronjob.settings import Settings
+from actions.utilities import LOADER
 
 
-@command(**CONTEXT_SETTINGS)
 @click_options(Settings, [LOADER], show_envvars_in_help=True)
-def _main(settings: Settings, /) -> None:
+def setup_cronjob_sub_cmd(settings: Settings, /) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
-    LOGGER.info("Settings = %s", pretty_repr(settings))
+    LOGGER.info(
+        strip_and_dedent("""
+            Running '%s' (version %s) with settings:
+            %s
+        """),
+        setup_cronjob.__name__,
+        __version__,
+        pretty_repr(settings),
+    )
     setup_cronjob(
         name=settings.name,
         prepend_path=settings.prepend_path,
@@ -31,5 +40,4 @@ def _main(settings: Settings, /) -> None:
     )
 
 
-if __name__ == "__main__":
-    _main()
+__all__ = ["setup_cronjob_sub_cmd"]
