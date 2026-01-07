@@ -1,3 +1,3 @@
-# `conformalize`
+# `actions`
 
 Library of actions
