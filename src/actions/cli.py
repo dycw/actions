@@ -3,6 +3,7 @@ from __future__ import annotations
 from click import group
 from utilities.click import CONTEXT_SETTINGS
 
+import actions.publish_package.doc
 import actions.random_sleep.doc
 import actions.run_hooks.doc
 import actions.tag_commit.doc
@@ -26,7 +27,9 @@ _ = _main.command(
     name="format-requirements", help="Format a set of requirements", **CONTEXT_SETTINGS
 )(format_requirements_sub_cmd)
 _ = _main.command(
-    name="publish-package", help=actions.run_hooks.doc.DOCSTRING, **CONTEXT_SETTINGS
+    name="publish-package",
+    help=actions.publish_package.doc.DOCSTRING,
+    **CONTEXT_SETTINGS,
 )(publish_package_sub_cmd)
 _ = _main.command(
     name="replace-sequence-strs", help="Replace `Sequence[str]`", **CONTEXT_SETTINGS
