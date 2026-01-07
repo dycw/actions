@@ -8,6 +8,7 @@ import actions.random_sleep.doc
 import actions.run_hooks.doc
 import actions.tag_commit.doc
 from actions.clean_dir.cli import clean_dir_sub_cmd
+from actions.conformalize_repo.cli import conformalize_repo_sub_cmd
 from actions.format_requirements.cli import format_requirements_sub_cmd
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.random_sleep.cli import random_sleep_sub_cmd
@@ -24,6 +25,9 @@ _ = _main.command(name="clean-dir", help="Clean a directory", **CONTEXT_SETTINGS
     clean_dir_sub_cmd
 )
 _ = _main.command(
+    name="conformalize-repo", help="Conformalize a repo", **CONTEXT_SETTINGS
+)(conformalize_repo_sub_cmd)
+_ = _main.command(
     name="format-requirements", help="Format a set of requirements", **CONTEXT_SETTINGS
 )(format_requirements_sub_cmd)
 _ = _main.command(
@@ -32,7 +36,9 @@ _ = _main.command(
     **CONTEXT_SETTINGS,
 )(publish_package_sub_cmd)
 _ = _main.command(
-    name="replace-sequence-strs", help="Replace `Sequence[str]`", **CONTEXT_SETTINGS
+    name="replace-sequence-strs",
+    help="Replace 'Sequence[str]' with 'list[str]'",
+    **CONTEXT_SETTINGS,
 )(sequence_strs_sub_cmd)
 _ = _main.command(
     name="run-hooks", help=actions.run_hooks.doc.DOCSTRING, **CONTEXT_SETTINGS
