@@ -40,13 +40,13 @@ from actions.conformalize.dicts import (
 )
 from actions.conformalize_repo.constants import (
     BUMPVERSION_TOML,
-    CONFIGS,
     COVERAGERC_TOML,
     ENVRC,
     GITHUB_PULL_REQUEST_YAML,
     GITHUB_PUSH_YAML,
     GITIGNORE,
     MAX_PYTHON_VERSION,
+    PATH_CONFIGS,
     PRE_COMMIT_CONFIG_YAML,
     PYPROJECT_TOML,
     PYRIGHTCONFIG_JSON,
@@ -55,8 +55,8 @@ from actions.conformalize_repo.constants import (
     RUFF_TOML,
     YAML_INSTANCE,
 )
-from actions.conformalize_repo.logging import LOGGER
 from actions.conformalize_repo.settings import SETTINGS
+from actions.logging import LOGGER
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
@@ -332,7 +332,7 @@ def add_github_push_yaml(
 
 def add_gitignore(*, modifications: MutableSet[Path] | None = None) -> None:
     with yield_text_file(GITIGNORE, modifications=modifications) as temp:
-        text = (CONFIGS / "gitignore").read_text()
+        text = (PATH_CONFIGS / "gitignore").read_text()
         append_text(temp, text, skip_if_present=True, flags=MULTILINE)
 
 
