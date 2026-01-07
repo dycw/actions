@@ -12,6 +12,8 @@ from actions.pre_commit.conformalize_repo.lib import conformalize_repo
 from actions.pre_commit.conformalize_repo.settings import Settings
 from actions.utilities import LOADER
 
+FORMAT_REQUIREMENTS_SUB_CMD = "format-requirements"
+
 
 @click_options(Settings, [LOADER], show_envvars_in_help=True)
 def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
