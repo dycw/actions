@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/conformalize
-    rev: 0.13.6
+    rev: 0.13.7
     hooks:
       - args:
           - --description=GitHub actions
@@ -47,7 +47,7 @@ repos:
           - --autofix
       - id: trailing-whitespace
   - repo: https://github.com/dycw/actions
-    rev: 0.3.41
+    rev: 0.3.42
     hooks:
       - id: format-requirements
         exclude: src/tests/.*/\.py$
@@ -81,7 +81,7 @@ repos:
           - reorder_keys=true
         exclude: src/tests/.*/.*\.toml$
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.21
+    rev: 0.9.22
     hooks:
       - id: uv-lock
         args:

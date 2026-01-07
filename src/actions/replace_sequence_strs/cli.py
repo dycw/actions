@@ -10,7 +10,7 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.sequence_strs.lib import replace_sequence_strs
+from actions.replace_sequence_strs.lib import replace_sequence_strs
 
 
 @argument(
