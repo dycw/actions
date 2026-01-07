@@ -9,6 +9,7 @@ class TestCLI:
     @mark.parametrize(
         "cmd",
         [
+            param("clean-dir"),
             param("hooks"),
             param("publish"),
             param("requirements"),
