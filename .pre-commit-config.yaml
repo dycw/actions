@@ -1,8 +1,8 @@
-exclude: src/tests/pre_commit/touch_empty_py/out\.py
+exclude: src/tests/pre_commit/.*/(in.*|out.*)\.*
 
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.6.9
+    rev: 0.6.11
     hooks:
       - id: conformalize-repo
         args:
@@ -34,6 +34,7 @@ repos:
       - id: format-requirements
       - id: replace-sequence-strs
       - id: touch-empty-py
+      - id: touch-py-typed
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
