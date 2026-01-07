@@ -1435,9 +1435,8 @@ def yield_write_context[T](
     else:
         data = loads(current)
         yield data
-        new = dumps(data)
-        if not are_texts_equal(new, current):
-            write_text(path, new, modifications=modifications)
+        if not (data == loads(current)):  # noqa: SIM201
+            write_text(path, dumps(data), modifications=modifications)
 
 
 ##
