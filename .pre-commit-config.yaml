@@ -48,10 +48,6 @@ repos:
         args:
           - --autofix
       - id: trailing-whitespace
-  - repo: https://github.com/dycw/conformalize
-    rev: 0.13.7
-    hooks:
-      - id: conformalize
   - repo: local
     hooks:
       - id: prettier
