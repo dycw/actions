@@ -21,8 +21,8 @@ class TestFormatPath:
         path = tmp_path / "file.toml"
         _ = path.write_text((path_tests_i / "in.toml").read_text())
         _format_path(path)
-        result = path.read_text()
-        expected = path_tests_i.joinpath("out.toml").read_text()
+        result = loads(path.read_text())
+        expected = loads(path_tests_i.joinpath("out.toml").read_text())
         assert result == expected
 
 
