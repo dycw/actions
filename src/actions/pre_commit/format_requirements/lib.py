@@ -46,8 +46,6 @@ def _format_path(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> None:
     with yield_toml_doc(path, modifications=modifications) as doc:
-        dep_grps = get_table
-        doc.clear()
         if isinstance(dep_grps := doc.get("dependency-groups"), Table):
             for key, value in dep_grps.items():
                 if isinstance(value, Array):

@@ -15,13 +15,13 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.pre_commit.utilities import yield_python_file, yield_text_file
 from actions.utilities import are_modules_equal, write_text
 
 if TYPE_CHECKING:
+    from collections.abc import MutableSet
+
     from utilities.types import PathLike
-
-
-_MODIFICATIONS: set[Path] = set()
 
 
 def replace_sequence_strs(*paths: PathLike) -> None:
@@ -34,28 +34,28 @@ def replace_sequence_strs(*paths: PathLike) -> None:
         __version__,
         paths,
     )
+    modifications: set[Path] = set()
     for path in paths:
-        _format_path(path)
-    if len(_MODIFICATIONS) >= 1:
+        _format_path(path, modifications=modifications)
+    if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr_str, sorted(_MODIFICATIONS))),
+            ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
 
 
-def _format_path(path: PathLike, /) -> None:
-    path = Path(path)
-    if not path.is_file():
-        msg = f"Expected a file; {str(path)!r} is not"
-        raise FileNotFoundError(msg)
-    if path.suffix != ".py":
-        msg = f"Expected a Python file; got {str(path)!r}"
-        raise TypeError(msg)
-    current = parse_module(path.read_text())
+def _format_path(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> None:
+    with yield_python_file(path, modifications=modifications) as temp:
+        wrapper = MetadataWrapper(parse_module(path.read_text()))
+        return wrapper.module.visit(SequenceToListTransformer())
+        temp.write_text()
     expected = _get_formatted(path)
     if not are_modules_equal(current, expected):
         write_text(path, expected.code, modifications=_MODIFICATIONS)
+    return None
 
 
 def _get_formatted(path: PathLike, /) -> Module:

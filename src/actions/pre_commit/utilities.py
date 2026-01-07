@@ -3,10 +3,12 @@ from __future__ import annotations
 import json
 from collections.abc import Iterator, MutableSet
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import tomlkit
+from libcst import Module, parse_module
 from rich.pretty import pretty_repr
 from tomlkit import TOMLDocument, aot, array, document, table
 from tomlkit.items import AoT, Array, Table
@@ -148,6 +150,23 @@ def yield_json_dict(
 
 
 @contextmanager
+def yield_python_file(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> Iterator[Module]:
+    with yield_write_context(
+        path,
+        parse_module,
+        lambda: Module(body=[]),
+        lambda module: module.code,
+        modifications=modifications,
+    ) as module:
+        yield module
+
+
+##
+
+
+@contextmanager
 def yield_text_file(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[Path]:
@@ -206,6 +225,40 @@ def yield_write_context[T](
 ##
 
 
+@dataclass(kw_only=True, slots=True)
+class ImmutableWriteContext[T]:
+    input: T
+    output: T | None = None
+
+
+@contextmanager
+def yield_immutable_write_context[T](
+    path: PathLike,
+    loads: Callable[[str], T],
+    get_default: Callable[[], T],
+    dumps: Callable[[T], str],
+    /,
+    *,
+    modifications: MutableSet[Path] | None = None,
+) -> Iterator[ImmutableWriteContext[T]]:
+    try:
+        current = Path(path).read_text()
+    except FileNotFoundError:
+        current = None
+        input_ = get_default()
+    else:
+        input_ = loads(current)
+    yield (context := ImmutableWriteContext(input=input_))
+    if (output := context.output) is None:
+        msg = "Context output is missing"
+        raise ValueError(msg)
+    if (current is None) or (not (output == loads(current))):  # noqa: SIM201
+        write_text(path, dumps(output), modifications=modifications)
+
+
+##
+
+
 @contextmanager
 def yield_yaml_dict(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
@@ -228,7 +281,9 @@ __all__ = [
     "get_partial_dict",
     "get_table",
     "is_partial_dict",
+    "yield_immutable_write_context",
     "yield_json_dict",
+    "yield_python_file",
     "yield_text_file",
     "yield_toml_doc",
     "yield_write_context",
