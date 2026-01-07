@@ -1,3 +1,3 @@
 # `actions`
 
-GitHub actions
+Library of actions

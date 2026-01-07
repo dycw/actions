@@ -3,7 +3,7 @@ repos:
     rev: 0.13.7
     hooks:
       - args:
-          - --description=GitHub actions
+          - --description=Library of actions
           - --envrc
           - --envrc--uv
           - --github--pull-request--pre-commit
