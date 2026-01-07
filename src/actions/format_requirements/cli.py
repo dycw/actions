@@ -9,8 +9,8 @@ from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
 
 from actions import __version__
+from actions.format_requirements.lib import format_requirements
 from actions.logging import LOGGER
-from actions.requirements.lib import format_requirements
 
 
 @argument(
