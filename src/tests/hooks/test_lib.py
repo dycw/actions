@@ -3,8 +3,10 @@ from __future__ import annotations
 from pytest import mark, param
 
 from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
-from actions.pre_commit.format_requirements.cli import FORMAT_REQUIREMENTS_SUB_CMD
-from actions.pre_commit.replace_sequence_strs.cli import REPLACE_SEQUENCE_STRS_SUB_CMD
+from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
+from actions.pre_commit.replace_sequence_strs.constants import (
+    REPLACE_SEQUENCE_STRS_SUB_CMD,
+)
 from actions.run_hooks.lib import _yield_hooks
 
 
