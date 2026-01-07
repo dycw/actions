@@ -47,8 +47,12 @@ def touch_empty_py(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
+    if not path.is_file():
+        msg = f"Expected a file; {str(path)!r} is not"
+        raise FileNotFoundError(msg)
     if path.suffix != ".py":
-        return
+        msg = f"Expected a Python file; got {str(path)!r}"
+        raise TypeError(path)
     current = parse_module(path.read_text())
     expected = _get_formatted(path)
     if not are_modules_equal(current, expected):

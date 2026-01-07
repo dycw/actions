@@ -46,6 +46,9 @@ def replace_sequence_strs(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
+    if not path.is_file():
+        msg = f"Expected a file; {str(path)!r} is not"
+        raise FileNotFoundError(msg)
     if path.suffix != ".py":
         msg = f"Expected a Python file; got {str(path)!r}"
         raise TypeError(msg)

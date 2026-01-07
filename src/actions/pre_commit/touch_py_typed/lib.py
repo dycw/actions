@@ -4,19 +4,11 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from libcst import (
-    ImportAlias,
-    ImportFrom,
-    Module,
-    Name,
-    SimpleStatementLine,
-    parse_module,
-)
+from utilities.iterables import one
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.utilities import are_modules_equal, write_text
 
 if TYPE_CHECKING:
     from utilities.types import PathLike
@@ -47,28 +39,23 @@ def touch_empty_py(*paths: PathLike) -> None:
 
 def _format_path(path: PathLike, /) -> None:
     path = Path(path)
+    if not path.is_file():
+        msg = f"Expected a file; {str(path)!r} is not"
+        raise FileNotFoundError(msg)
     if path.name != "pyproject.toml":
         msg = f"Expected 'pyproject.toml'; got {str(path)!r}"
         raise TypeError(msg)
-    current = parse_module(path.read_text())
-    expected = _get_formatted(path)
-    if not are_modules_equal(current, expected):
-        write_text(path, expected.code, modifications=_MODIFICATIONS)
-
-
-def _get_formatted(path: PathLike, /) -> Module:
-    path = Path(path)
-    module = parse_module(path.read_text())
-    if len(module.body) >= 1:
-        return module
-    line = SimpleStatementLine(
-        body=[
-            ImportFrom(
-                module=Name("__future__"), names=[ImportAlias(name=Name("annotations"))]
-            )
-        ]
-    )
-    return module.with_changes(body=[line])
+    src = path / "src"
+    if not src.exists():
+        return
+    if not src.is_dir():
+        msg = f"Expected a directory; {str(src)!r} is not"
+        raise NotADirectoryError(msg)
+    non_tests = one(p for p in src.iterdir() if p.name != "tests")
+    py_typed = non_tests / "py.typed"
+    if not py_typed.exists():
+        py_typed.touch()
+        _MODIFICATIONS.add(py_typed)
 
 
 __all__ = ["touch_empty_py"]
