@@ -2,7 +2,7 @@ exclude: src/tests/pre_commit/.*/(in.*|out.*)\.*
 
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.6.11
+    rev: 0.6.12
     hooks:
       - id: conformalize-repo
         args:
