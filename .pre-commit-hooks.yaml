@@ -1,13 +1,13 @@
 - id: format-requirements
   name: format-requirements
-  entry: action requirements
+  entry: action format-requirements
   language: python
   types: [toml]
   files: pyproject\.toml
-  description: Format requirements
+  description: Format a set of requirements
 - id: replace-sequence-strs
   name: replace-sequence-strs
-  entry: action sequence-strs
+  entry: action replace-sequence-strs
   language: python
   types: [python]
   description: Replace `Sequence[str]`

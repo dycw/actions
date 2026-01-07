@@ -50,7 +50,7 @@ def run_action_publish_dict(
     _add_native_tls(dict_, native_tls=native_tls)
     return {
         "name": actions.publish_package.doc.DOCSTRING,
-        "uses": "dycw/action-publish@latest",
+        "uses": "dycw/action-publish-package@latest",
         "with": dict_,
     }
 
