@@ -936,7 +936,7 @@ def add_readme_md(
             lines.append(f"# `{name}`")
         if description is not None:
             lines.append(description)
-        write_text(temp, "\n\n".join(lines), modifications=modifications)
+        write_text(temp, "\n\n".join(lines))
 
 
 ##
