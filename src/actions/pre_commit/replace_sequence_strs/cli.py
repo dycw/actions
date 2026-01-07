@@ -1,23 +1,21 @@
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-import click
-from click import argument
 from utilities.logging import basic_config
 from utilities.os import is_pytest
 from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.pre_commit.click import path_argument
 from actions.pre_commit.replace_sequence_strs.lib import replace_sequence_strs
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-@argument(
-    "paths",
-    nargs=-1,
-    type=click.Path(exists=True, file_okay=True, dir_okay=False, path_type=Path),
-)
+
+@path_argument
 def sequence_strs_sub_cmd(*, paths: tuple[Path, ...]) -> None:
     if is_pytest():
         return
