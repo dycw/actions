@@ -29,7 +29,7 @@ def run_action_pre_commit_dict(
     dict_["sleep"] = sleep
     return {
         "name": actions.run_hooks.doc.DOCSTRING,
-        "uses": "dycw/action-pre-commit@latest",
+        "uses": "dycw/action-run-hooks@latest",
         "with": dict_,
     }
 
