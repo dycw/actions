@@ -42,6 +42,7 @@ from actions.action_dicts.lib import (
     run_action_tag_dict,
 )
 from actions.conformalize_repo.constants import (
+    ACTIONS_URL,
     BUMPVERSION_TOML,
     COVERAGERC_TOML,
     ENVRC,
@@ -51,11 +52,13 @@ from actions.conformalize_repo.constants import (
     MAX_PYTHON_VERSION,
     PATH_CONFIGS,
     PRE_COMMIT_CONFIG_YAML,
+    PRE_COMMIT_HOOKS_URL,
     PYPROJECT_TOML,
     PYRIGHTCONFIG_JSON,
     PYTEST_TOML,
     README_MD,
     RUFF_TOML,
+    RUFF_URL,
 )
 from actions.conformalize_repo.settings import SETTINGS
 from actions.constants import YAML_INSTANCE
@@ -90,8 +93,8 @@ def conformalize_repo(
     gitignore: bool = SETTINGS.gitignore,
     package_name: str | None = SETTINGS.package_name,
     pre_commit__dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
-    pre_commit__dycw: bool = SETTINGS.pre_commit__dycw,
     pre_commit__prettier: bool = SETTINGS.pre_commit__prettier,
+    pre_commit__python: bool = SETTINGS.pre_commit__python,
     pre_commit__ruff: bool = SETTINGS.pre_commit__ruff,
     pre_commit__shell: bool = SETTINGS.pre_commit__shell,
     pre_commit__taplo: bool = SETTINGS.pre_commit__taplo,
@@ -137,8 +140,8 @@ def conformalize_repo(
              - gitignore = %s
              - package_name = %s
              - pre_commit__dockerfmt = %s
-             - pre_commit__dycw = %s
              - pre_commit__prettier = %s
+             - pre_commit__python = %s
              - pre_commit__ruff = %s
              - pre_commit__shell = %s
              - pre_commit__taplo = %s
@@ -181,8 +184,8 @@ def conformalize_repo(
         gitignore,
         package_name,
         pre_commit__dockerfmt,
-        pre_commit__dycw,
         pre_commit__prettier,
+        pre_commit__python,
         pre_commit__ruff,
         pre_commit__shell,
         pre_commit__taplo,
@@ -219,8 +222,8 @@ def conformalize_repo(
     add_pre_commit_config_yaml(
         modifications=modifications,
         dockerfmt=pre_commit__dockerfmt,
-        dycw=pre_commit__dycw,
         prettier=pre_commit__prettier,
+        python=pre_commit__python,
         ruff=pre_commit__ruff,
         shell=pre_commit__shell,
         taplo=pre_commit__taplo,
@@ -500,7 +503,7 @@ def add_github_pull_request_yaml(
                 run_action_pre_commit_dict(
                     repos=LiteralScalarString(
                         strip_and_dedent("""
-                            dycw/conformalize
+                            dycw/actions
                             pre-commit/pre-commit-hooks
                         """)
                     )
@@ -612,8 +615,8 @@ def add_pre_commit_config_yaml(
     *,
     modifications: MutableSet[Path] | None = None,
     dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
-    dycw: bool = SETTINGS.pre_commit__dycw,
     prettier: bool = SETTINGS.pre_commit__prettier,
+    python: bool = SETTINGS.pre_commit__python,
     ruff: bool = SETTINGS.pre_commit__ruff,
     shell: bool = SETTINGS.pre_commit__shell,
     taplo: bool = SETTINGS.pre_commit__taplo,
@@ -621,27 +624,27 @@ def add_pre_commit_config_yaml(
     script: str | None = SETTINGS.script,
 ) -> None:
     with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
+        _add_pre_commit_config_repo(dict_, ACTIONS_URL, "conformalize-repo")
         _add_pre_commit_config_repo(
-            dict_, "https://github.com/dycw/conformalize", "conformalize"
+            dict_, PRE_COMMIT_HOOKS_URL, "check-executables-have-shebangs"
         )
-        pre_com_url = "https://github.com/pre-commit/pre-commit-hooks"
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "check-merge-conflict")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "check-symlinks")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "destroyed-symlinks")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "detect-private-key")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "end-of-file-fixer")
         _add_pre_commit_config_repo(
-            dict_, pre_com_url, "check-executables-have-shebangs"
+            dict_, PRE_COMMIT_HOOKS_URL, "mixed-line-ending", args=("add", ["--fix=lf"])
         )
-        _add_pre_commit_config_repo(dict_, pre_com_url, "check-merge-conflict")
-        _add_pre_commit_config_repo(dict_, pre_com_url, "check-symlinks")
-        _add_pre_commit_config_repo(dict_, pre_com_url, "destroyed-symlinks")
-        _add_pre_commit_config_repo(dict_, pre_com_url, "detect-private-key")
-        _add_pre_commit_config_repo(dict_, pre_com_url, "end-of-file-fixer")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "no-commit-to-branch")
         _add_pre_commit_config_repo(
-            dict_, pre_com_url, "mixed-line-ending", args=("add", ["--fix=lf"])
+            dict_,
+            PRE_COMMIT_HOOKS_URL,
+            "pretty-format-json",
+            args=("add", ["--autofix"]),
         )
-        _add_pre_commit_config_repo(dict_, pre_com_url, "no-commit-to-branch")
-        _add_pre_commit_config_repo(
-            dict_, pre_com_url, "pretty-format-json", args=("add", ["--autofix"])
-        )
-        _add_pre_commit_config_repo(dict_, pre_com_url, "no-commit-to-branch")
-        _add_pre_commit_config_repo(dict_, pre_com_url, "trailing-whitespace")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "no-commit-to-branch")
+        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "trailing-whitespace")
         if dockerfmt:
             _add_pre_commit_config_repo(
                 dict_,
@@ -649,7 +652,7 @@ def add_pre_commit_config_yaml(
                 "dockerfmt",
                 args=("add", ["--newline", "--write"]),
             )
-        if dycw:
+        if python:
             dycw_url = "https://github.com/dycw/actions"
             _add_pre_commit_config_repo(dict_, dycw_url, "format-requirements")
             _add_pre_commit_config_repo(dict_, dycw_url, "replace-sequence-strs")
@@ -664,11 +667,10 @@ def add_pre_commit_config_yaml(
                 types_or=["markdown", "yaml"],
             )
         if ruff:
-            ruff_url = "https://github.com/astral-sh/ruff-pre-commit"
             _add_pre_commit_config_repo(
-                dict_, ruff_url, "ruff-check", args=("add", ["--fix"])
+                dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
             )
-            _add_pre_commit_config_repo(dict_, ruff_url, "ruff-format")
+            _add_pre_commit_config_repo(dict_, RUFF_URL, "ruff-format")
         if shell:
             _add_pre_commit_config_repo(
                 dict_, "https://github.com/scop/pre-commit-shfmt", "shfmt"

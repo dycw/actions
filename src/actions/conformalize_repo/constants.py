@@ -8,6 +8,11 @@ from utilities.pytest import IS_CI
 
 from actions.constants import PATH_ACTIONS
 
+ACTIONS_URL = "https://github.com/dycw/actions"
+PRE_COMMIT_HOOKS_URL = "https://github.com/pre-commit/pre-commit-hooks"
+RUFF_URL = "https://github.com/astral-sh/ruff-pre-commit"
+
+
 BUMPVERSION_TOML = Path(".bumpversion.toml")
 COVERAGERC_TOML = Path(".coveragerc.toml")
 ENVRC = Path(".envrc")
@@ -34,6 +39,7 @@ PATH_CONFIGS = PATH_ACTIONS / "conformalize_repo/configs"
 
 
 __all__ = [
+    "ACTIONS_URL",
     "BUMPVERSION_TOML",
     "COVERAGERC_TOML",
     "ENVRC",
@@ -44,11 +50,13 @@ __all__ = [
     "MAX_PYTHON_VERSION",
     "PATH_CONFIGS",
     "PRE_COMMIT_CONFIG_YAML",
+    "PRE_COMMIT_HOOKS_URL",
     "PYPROJECT_TOML",
     "PYRIGHTCONFIG_JSON",
     "PYTEST_TOML",
     "README_MD",
     "REPO_ROOT",
     "RUFF_TOML",
+    "RUFF_URL",
     "RUN_VERSION_BUMP",
 ]
