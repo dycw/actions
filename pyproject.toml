@@ -20,7 +20,7 @@
     "xdg-base-dirs >=6.0.2, <7",
   ]
   description = "Library of actions"
-  name = "dycw-actions"
+  name = "dycw-conformalize"
   readme = "README.md"
   requires-python = ">= 3.12"
   version = "0.6.0"
@@ -31,5 +31,5 @@
 [tool]
   [tool.uv]
     [tool.uv.build-backend]
-      module-name = "actions"
+      module-name = "conformalize"
       module-root = "src"

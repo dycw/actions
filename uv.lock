@@ -178,8 +178,8 @@ wheels = [
 ]
 
 [[package]]
-name = "dycw-actions"
-version = "0.6.0"
+name = "dycw-conformalize"
+version = "0.5.1"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
