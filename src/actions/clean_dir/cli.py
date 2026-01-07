@@ -8,13 +8,13 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.clean_dir.lib import clean_dir
-from actions.clean_dir.settings import CleanDirSettings
+from actions.clean_dir.settings import Settings
 from actions.logging import LOGGER
 from actions.utilities import LOADER
 
 
-@click_options(CleanDirSettings, [LOADER], show_envvars_in_help=True)
-def clean_dir_sub_cmd(settings: CleanDirSettings, /) -> None:
+@click_options(Settings, [LOADER], show_envvars_in_help=True)
+def clean_dir_sub_cmd(settings: Settings, /) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)

@@ -9,12 +9,12 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.random_sleep.lib import random_sleep
-from actions.random_sleep.settings import SleepSettings
+from actions.random_sleep.settings import Settings
 from actions.utilities import LOADER
 
 
-@click_options(SleepSettings, [LOADER], show_envvars_in_help=True, argname="sleep")
-def random_sleep_sub_cmd(*, sleep: SleepSettings) -> None:
+@click_options(Settings, [LOADER], show_envvars_in_help=True, argname="sleep")
+def random_sleep_sub_cmd(*, sleep: Settings) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)

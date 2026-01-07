@@ -6,7 +6,7 @@ from actions.utilities import LOADER, convert_list_strs
 
 
 @settings
-class HooksSettings:
+class Settings:
     repos: list[str] | None = option(
         default=None,
         converter=convert_list_strs,
@@ -18,7 +18,7 @@ class HooksSettings:
     sleep: int = option(default=1, help="Sleep in between runs")
 
 
-HOOKS_SETTINGS = load_settings(HooksSettings, [LOADER])
+SETTINGS = load_settings(Settings, [LOADER])
 
 
-__all__ = ["HOOKS_SETTINGS", "HooksSettings"]
+__all__ = ["SETTINGS", "Settings"]

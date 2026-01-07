@@ -7,7 +7,7 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.publish_package.settings import PUBLISH_SETTINGS
+from actions.publish_package.settings import SETTINGS
 from actions.utilities import log_run
 
 if TYPE_CHECKING:
@@ -16,11 +16,11 @@ if TYPE_CHECKING:
 
 def publish_package(
     *,
-    username: str | None = PUBLISH_SETTINGS.username,
-    password: Secret[str] | None = PUBLISH_SETTINGS.password,
-    publish_url: str | None = PUBLISH_SETTINGS.publish_url,
-    trusted_publishing: bool = PUBLISH_SETTINGS.trusted_publishing,
-    native_tls: bool = PUBLISH_SETTINGS.native_tls,
+    username: str | None = SETTINGS.username,
+    password: Secret[str] | None = SETTINGS.password,
+    publish_url: str | None = SETTINGS.publish_url,
+    trusted_publishing: bool = SETTINGS.trusted_publishing,
+    native_tls: bool = SETTINGS.native_tls,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""

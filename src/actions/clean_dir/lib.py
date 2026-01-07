@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from utilities.text import strip_and_dedent
 
 from actions import __version__
-from actions.clean_dir.settings import CLEAN_DIR_SETTINGS
+from actions.clean_dir.settings import SETTINGS
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from utilities.types import PathLike
 
 
-def clean_dir(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> None:
+def clean_dir(*, dir_: PathLike = SETTINGS.dir) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
@@ -44,13 +44,13 @@ def clean_dir(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> None:
             return
 
 
-def _yield_dirs(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> Iterator[Path]:
+def _yield_dirs(*, dir_: PathLike = SETTINGS.dir) -> Iterator[Path]:
     for path in Path(dir_).rglob("**/*"):
         if path.is_dir() and (len(list(path.iterdir())) == 0):
             yield path
 
 
-def _yield_files(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> Iterator[Path]:
+def _yield_files(*, dir_: PathLike = SETTINGS.dir) -> Iterator[Path]:
     dir_ = Path(dir_)
     yield from dir_.rglob("**/*.pyc")
     yield from dir_.rglob("**/*.pyo")
