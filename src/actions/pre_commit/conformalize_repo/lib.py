@@ -1258,7 +1258,7 @@ def run_ripgrep_and_replace(
                 path.read_text(),
                 flags=MULTILINE,
             )
-            _ = temp.write_text(text)
+            write_text(temp, text)
 
 
 ##
