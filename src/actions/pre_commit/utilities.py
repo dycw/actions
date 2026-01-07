@@ -140,7 +140,7 @@ def is_partial_dict(obj: Any, dict_: StrDict, /) -> bool:
 def yield_json_dict(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[StrDict]:
-    with yield_write_context(
+    with yield_mutable_write_context(
         path, json.loads, dict, json.dumps, modifications=modifications
     ) as dict_:
         yield dict_
@@ -153,7 +153,7 @@ def yield_json_dict(
 def yield_python_file(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[Module]:
-    with yield_write_context(
+    with yield_mutable_write_context(
         path,
         parse_module,
         lambda: Module(body=[]),
@@ -191,7 +191,7 @@ def yield_text_file(
 def yield_toml_doc(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[TOMLDocument]:
-    with yield_write_context(
+    with yield_mutable_write_context(
         path, tomlkit.parse, document, tomlkit.dumps, modifications=modifications
     ) as doc:
         yield doc
@@ -201,7 +201,7 @@ def yield_toml_doc(
 
 
 @contextmanager
-def yield_write_context[T](
+def yield_mutable_write_context[T](
     path: PathLike,
     loads: Callable[[str], T],
     get_default: Callable[[], T],
@@ -228,7 +228,7 @@ def yield_write_context[T](
 @dataclass(kw_only=True, slots=True)
 class ImmutableWriteContext[T]:
     input: T
-    output: T | None = None
+    output: T
 
 
 @contextmanager
@@ -248,10 +248,8 @@ def yield_immutable_write_context[T](
         input_ = get_default()
     else:
         input_ = loads(current)
-    yield (context := ImmutableWriteContext(input=input_))
-    if (output := context.output) is None:
-        msg = "Context output is missing"
-        raise ValueError(msg)
+    yield (context := ImmutableWriteContext(input=input_, output=input_))
+    output = context.output
     if (current is None) or (not (output == loads(current))):  # noqa: SIM201
         write_text(path, dumps(output), modifications=modifications)
 
@@ -263,7 +261,7 @@ def yield_immutable_write_context[T](
 def yield_yaml_dict(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[StrDict]:
-    with yield_write_context(
+    with yield_mutable_write_context(
         path, YAML_INSTANCE.load, dict, yaml_dump, modifications=modifications
     ) as dict_:
         yield dict_
@@ -283,9 +281,9 @@ __all__ = [
     "is_partial_dict",
     "yield_immutable_write_context",
     "yield_json_dict",
+    "yield_mutable_write_context",
     "yield_python_file",
     "yield_text_file",
     "yield_toml_doc",
-    "yield_write_context",
     "yield_yaml_dict",
 ]

@@ -3,17 +3,20 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
-from pytest import mark, param
+from pytest import mark, param, raises
 from utilities.iterables import one
 
 from actions.pre_commit.utilities import (
     get_partial_dict,
     is_partial_dict,
-    yield_write_context,
+    yield_immutable_write_context,
+    yield_mutable_write_context,
 )
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from actions.types import StrDict
 
 
 class TestGetPartialDict:
@@ -51,13 +54,32 @@ class TestIsPartialDict:
         assert is_partial_dict(obj, dict_) is expected
 
 
-class TestYieldWriteContext:
+class TestYieldImmutableWriteContext:
+    @mark.parametrize("init", [param("init"), param("init\n"), param("init\n\n")])
+    def test_modified(self, *, tmp_path: Path, init: str) -> None:
+        path = tmp_path / "file.txt"
+        _ = path.write_text(init)
+        with yield_immutable_write_context(path, str, lambda: "", str) as context:
+            context.output = context.input.replace("init", "init\npost")
+        expected = "init\npost\n"
+        assert path.read_text() == expected
+
+    @mark.parametrize("init", [param("init"), param("init\n"), param("init\n\n")])
+    def test_unmodified(self, *, tmp_path: Path, init: str) -> None:
+        path = tmp_path / "file.txt"
+        _ = path.write_text(init)
+        with yield_immutable_write_context(path, str, lambda: "", str):
+            ...
+        assert path.read_text() == init
+
+
+class TestYieldMutableWriteContext:
     @mark.parametrize("leading", [param(""), param("\n"), param("\n\n")])
     @mark.parametrize("trailing", [param(""), param("\n"), param("\n\n")])
     def test_modified(self, *, tmp_path: Path, leading: str, trailing: str) -> None:
         path = tmp_path / "file.json"
         _ = path.write_text(leading + json.dumps({"a": 1}) + trailing)
-        with yield_write_context(path, json.loads, dict, json.dumps) as temp:
+        with yield_mutable_write_context(path, json.loads, dict, json.dumps) as temp:
             temp["b"] = 2
         expected = '{"a": 1, "b": 2}\n'
         assert path.read_text() == expected
@@ -68,6 +90,6 @@ class TestYieldWriteContext:
         path = tmp_path / "file.json"
         initial = leading + json.dumps({"a": 1}) + trailing
         _ = path.write_text(initial)
-        with yield_write_context(path, json.loads, dict, json.dumps):
+        with yield_mutable_write_context(path, json.loads, dict, json.dumps):
             ...
         assert path.read_text() == initial
