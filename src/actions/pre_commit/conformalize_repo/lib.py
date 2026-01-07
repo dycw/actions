@@ -1488,7 +1488,6 @@ __all__ = [
     "set_version",
     "update_action_file_extensions",
     "update_action_versions",
-    "write_text",
     "yaml_dump",
     "yield_bumpversion_toml",
     "yield_json_dict",
