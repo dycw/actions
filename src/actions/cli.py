@@ -14,6 +14,7 @@ from actions.publish_package.cli import publish_package_sub_cmd
 from actions.random_sleep.cli import random_sleep_sub_cmd
 from actions.replace_sequence_strs.cli import sequence_strs_sub_cmd
 from actions.run_hooks.cli import run_hooks_sub_cmd
+from actions.setup_cronjob.cli import setup_cronjob_sub_cmd
 from actions.tag_commit.cli import tag_commit_sub_cmd
 
 
@@ -47,7 +48,7 @@ _ = _main.command(
     name="random-sleep", help=actions.random_sleep.doc.DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)
 _ = _main.command(name="setup-cronjob", help="Setup a cronjob", **CONTEXT_SETTINGS)(
-    tag_commit_sub_cmd
+    setup_cronjob_sub_cmd
 )
 _ = _main.command(
     name="tag-commit", help=actions.tag_commit.doc.DOCSTRING, **CONTEXT_SETTINGS
