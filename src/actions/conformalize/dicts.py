@@ -14,16 +14,14 @@ if TYPE_CHECKING:
 
 def run_action_pre_commit_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     submodules: str | None = None,
-    token_uv: str = GITHUB_TOKEN,
     repos: Any | None = None,
     hooks: Any | None = None,
     sleep: int = 1,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout}
+    dict_: StrDict = {"token": token}
     _add_item(dict_, "submodules", value=submodules)
-    dict_["token-uv"] = token_uv
     _add_item(dict_, "repos", value=repos)
     _add_item(dict_, "hooks", value=hooks)
     dict_["sleep"] = sleep
@@ -36,15 +34,14 @@ def run_action_pre_commit_dict(
 
 def run_action_publish_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
-    token_uv: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     username: str | None = None,
     password: str | None = None,
     publish_url: str | None = None,
     trusted_publishing: bool = False,
     native_tls: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    dict_: StrDict = {"token": token}
     _add_item(dict_, "username", value=username)
     _add_item(dict_, "password", value=password)
     _add_item(dict_, "publish-url", value=publish_url)
@@ -59,15 +56,14 @@ def run_action_publish_dict(
 
 def run_action_pyright_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
-    token_uv: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     python_version: str | None = None,
     resolution: str = RESOLUTION,
     prerelease: str = PRERELEASE,
     native_tls: bool = False,
     with_requirements: str | None = None,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    dict_: StrDict = {"token": token}
     _add_python_version(dict_, python_version=python_version)
     dict_["resolution"] = resolution
     dict_["prerelease"] = prerelease
@@ -82,22 +78,17 @@ def run_action_pyright_dict(
 
 def run_action_pytest_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
-    token_uv: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     python_version: str | None = None,
     sops_age_key: str | None = None,
-    token_sops: str = GITHUB_TOKEN,
-    token_age: str = GITHUB_TOKEN,
     resolution: str = RESOLUTION,
     prerelease: str = PRERELEASE,
     native_tls: bool = False,
     with_requirements: str | None = None,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    dict_: StrDict = {"token": token}
     _add_python_version(dict_, python_version=python_version)
     _add_item(dict_, "sops-age-key", value=sops_age_key)
-    dict_["token-sops"] = token_sops
-    dict_["token-age"] = token_age
     dict_["resolution"] = resolution
     dict_["prerelease"] = prerelease
     _add_native_tls(dict_, native_tls=native_tls)
@@ -107,16 +98,14 @@ def run_action_pytest_dict(
 
 def run_action_random_sleep_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
-    token_uv: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     min: int = 0,  # noqa: A002
     max: int = 3600,  # noqa: A002
     step: int = 1,
     log_freq: int = 1,
 ) -> StrDict:
     dict_: StrDict = {
-        "token-checkout": token_checkout,
-        "token-uv": token_uv,
+        "token": token,
         "min": min,
         "max": max,
         "step": step,
@@ -129,29 +118,21 @@ def run_action_random_sleep_dict(
     }
 
 
-def run_action_ruff_dict(
-    *, token_checkout: str = GITHUB_TOKEN, token_ruff: str = GITHUB_TOKEN
-) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-ruff": token_ruff}
+def run_action_ruff_dict(*, token: str = GITHUB_TOKEN) -> StrDict:
+    dict_: StrDict = {"token": token}
     return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
 
 
 def run_action_tag_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
-    token_uv: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     user_name: str = "github-actions-bot",
     user_email: str = "noreply@github.com",
     major_minor: bool = False,
     major: bool = False,
     latest: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {
-        "token-checkout": token_checkout,
-        "token-uv": token_uv,
-        "user-name": user_name,
-        "user-email": user_email,
-    }
+    dict_: StrDict = {"token": token, "user-name": user_name, "user-email": user_email}
     _add_boolean(dict_, "major-minor", value=major_minor)
     _add_boolean(dict_, "major", value=major)
     _add_boolean(dict_, "latest", value=latest)
