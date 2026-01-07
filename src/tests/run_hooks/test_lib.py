@@ -7,6 +7,7 @@ from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS
 from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
 )
+from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.run_hooks.lib import _yield_hooks
 
 
@@ -21,6 +22,7 @@ class TestYieldHooks:
                     CONFORMALIZE_REPO_SUB_CMD,
                     FORMAT_REQUIREMENTS_SUB_CMD,
                     REPLACE_SEQUENCE_STRS_SUB_CMD,
+                    TOUCH_EMPTY_PY_SUB_CMD,
                 ],
             ),
         ],

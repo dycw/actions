@@ -2,7 +2,7 @@ exclude: src/tests/pre_commit/touch_empty_py/out\.py
 
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.6.7
+    rev: 0.6.8
     hooks:
       - id: conformalize-repo
         args:
@@ -33,6 +33,7 @@ repos:
           - --ruff
       - id: format-requirements
       - id: replace-sequence-strs
+      - id: touch-empty-py
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
