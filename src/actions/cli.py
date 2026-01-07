@@ -3,6 +3,9 @@ from __future__ import annotations
 from click import group
 from utilities.click import CONTEXT_SETTINGS
 
+import actions.random_sleep.doc
+import actions.run_hooks.doc
+import actions.tag_commit.doc
 from actions.clean_dir.cli import clean_dir_sub_cmd
 from actions.format_requirements.cli import format_requirements_sub_cmd
 from actions.publish_package.cli import publish_package_sub_cmd
@@ -22,21 +25,21 @@ _ = _main.command(name="clean-dir", help="Clean a directory", **CONTEXT_SETTINGS
 _ = _main.command(
     name="format-requirements", help="Format a set of requirements", **CONTEXT_SETTINGS
 )(format_requirements_sub_cmd)
-_ = _main.command(name="publish-package", help="Publish a package", **CONTEXT_SETTINGS)(
-    publish_package_sub_cmd
-)
+_ = _main.command(
+    name="publish-package", help=actions.run_hooks.doc.DOCSTRING, **CONTEXT_SETTINGS
+)(publish_package_sub_cmd)
 _ = _main.command(
     name="replace-sequence-strs", help="Replace `Sequence[str]`", **CONTEXT_SETTINGS
 )(sequence_strs_sub_cmd)
-_ = _main.command(name="run-hooks", help="Run `pre-commit` hooks", **CONTEXT_SETTINGS)(
-    run_hooks_sub_cmd
-)
 _ = _main.command(
-    name="random-sleep", help="Sleep for a random duration", **CONTEXT_SETTINGS
+    name="run-hooks", help=actions.run_hooks.doc.DOCSTRING, **CONTEXT_SETTINGS
+)(run_hooks_sub_cmd)
+_ = _main.command(
+    name="random-sleep", help=actions.random_sleep.doc.DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)
-_ = _main.command(name="tag-commit", help="Tag the current commit", **CONTEXT_SETTINGS)(
-    tag_commit_sub_cmd
-)
+_ = _main.command(
+    name="tag-commit", help=actions.tag_commit.doc.DOCSTRING, **CONTEXT_SETTINGS
+)(tag_commit_sub_cmd)
 
 
 if __name__ == "__main__":
