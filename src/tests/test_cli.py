@@ -16,6 +16,7 @@ class TestCLI:
             param("random-sleep"),
             param("replace-sequence-strs"),
             param("run-hooks"),
+            param("setup-cronjob"),
             param("tag-commit"),
         ],
     )
