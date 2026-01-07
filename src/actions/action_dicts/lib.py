@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any
 
 import actions.publish_package.doc
 import actions.random_sleep.doc
-import actions.run_hooks.doc
 import actions.tag_commit.doc
 from actions.action_dicts.constants import GITHUB_TOKEN, PRERELEASE, RESOLUTION
+from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING
 
 if TYPE_CHECKING:
     from actions.types import StrDict
@@ -28,7 +28,7 @@ def run_action_pre_commit_dict(
     dict_["sleep"] = sleep
     return {
         "if": f"{_runner(gitea=gitea)}.event_name == 'pull_request'",
-        "name": actions.run_hooks.doc.DOCSTRING,
+        "name": RUN_HOOKS_DOCSTRING,
         "uses": "dycw/action-run-hooks@latest",
         "with": dict_,
     }
