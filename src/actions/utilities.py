@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 LOADER = EnvLoader("")
 
 
-def are_modules_equal(left: Module, right: Module, /) -> None:
+def are_modules_equal(left: Module, right: Module, /) -> bool:
     return left.code.rstrip("\n") == right.code.rstrip("\n")
 
 
