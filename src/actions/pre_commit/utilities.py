@@ -152,15 +152,15 @@ def yield_json_dict(
 @contextmanager
 def yield_python_file(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[Module]:
-    with yield_mutable_write_context(
+) -> Iterator[WriteContext[Module]]:
+    with yield_immutable_write_context(
         path,
         parse_module,
         lambda: Module(body=[]),
         lambda module: module.code,
         modifications=modifications,
-    ) as module:
-        yield module
+    ) as context:
+        yield context
 
 
 ##
@@ -169,19 +169,11 @@ def yield_python_file(
 @contextmanager
 def yield_text_file(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[Path]:
-    path = Path(path)
-    try:
-        current = path.read_text()
-    except FileNotFoundError:
-        with TemporaryFile() as temp:
-            yield temp
-            copy_text(temp, path, modifications=modifications)
-    else:
-        with TemporaryFile(text=current) as temp:
-            yield temp
-            if not are_texts_equal(temp.read_text(), current):
-                copy_text(temp, path, modifications=modifications)
+) -> Iterator[WriteContext[str]]:
+    with yield_immutable_write_context(
+        path, str, lambda: "", str, modifications=modifications
+    ) as context:
+        yield context
 
 
 ##
@@ -210,23 +202,17 @@ def yield_mutable_write_context[T](
     *,
     modifications: MutableSet[Path] | None = None,
 ) -> Iterator[T]:
-    try:
-        current = Path(path).read_text()
-    except FileNotFoundError:
-        yield (default := get_default())
-        write_text(path, dumps(default), modifications=modifications)
-    else:
-        data = loads(current)
-        yield data
-        if not (data == loads(current)):  # noqa: SIM201
-            write_text(path, dumps(data), modifications=modifications)
+    with yield_immutable_write_context(
+        path, loads, get_default, dumps, modifications=modifications
+    ) as context:
+        yield context.output
 
 
 ##
 
 
 @dataclass(kw_only=True, slots=True)
-class ImmutableWriteContext[T]:
+class WriteContext[T]:
     input: T
     output: T
 
@@ -240,15 +226,17 @@ def yield_immutable_write_context[T](
     /,
     *,
     modifications: MutableSet[Path] | None = None,
-) -> Iterator[ImmutableWriteContext[T]]:
+) -> Iterator[WriteContext[T]]:
     try:
         current = Path(path).read_text()
     except FileNotFoundError:
         current = None
         input_ = get_default()
+        output = get_default()
     else:
         input_ = loads(current)
-    yield (context := ImmutableWriteContext(input=input_, output=input_))
+        output = loads(current)
+    yield (context := WriteContext(input=input_, output=input_))
     output = context.output
     if (current is None) or (not (output == loads(current))):  # noqa: SIM201
         write_text(path, dumps(output), modifications=modifications)

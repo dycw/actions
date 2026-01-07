@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
+from libcst import SimpleStatementLine, parse_statement
 from pytest import mark, param, raises
 from utilities.iterables import one
 
@@ -11,6 +12,8 @@ from actions.pre_commit.utilities import (
     is_partial_dict,
     yield_immutable_write_context,
     yield_mutable_write_context,
+    yield_python_file,
+    yield_text_file,
 )
 
 if TYPE_CHECKING:
@@ -54,13 +57,13 @@ class TestIsPartialDict:
         assert is_partial_dict(obj, dict_) is expected
 
 
-class TestYieldImmutableWriteContext:
+class TestYieldWriteContext:
     @mark.parametrize("init", [param("init"), param("init\n"), param("init\n\n")])
     def test_modified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.txt"
         _ = path.write_text(init)
-        with yield_immutable_write_context(path, str, lambda: "", str) as context:
-            context.output = context.input.replace("init", "init\npost")
+        with yield_immutable_write_context(path, str, lambda: "", str) as temp:
+            temp.output = temp.input.replace("init", "init\npost")
         expected = "init\npost\n"
         assert path.read_text() == expected
 
@@ -74,22 +77,73 @@ class TestYieldImmutableWriteContext:
 
 
 class TestYieldMutableWriteContext:
-    @mark.parametrize("leading", [param(""), param("\n"), param("\n\n")])
-    @mark.parametrize("trailing", [param(""), param("\n"), param("\n\n")])
-    def test_modified(self, *, tmp_path: Path, leading: str, trailing: str) -> None:
+    @mark.parametrize("init", [param("{}"), param("{}\n"), param("{}\n\n")])
+    def test_modified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.json"
-        _ = path.write_text(leading + json.dumps({"a": 1}) + trailing)
+        _ = path.write_text(init)
         with yield_mutable_write_context(path, json.loads, dict, json.dumps) as temp:
-            temp["b"] = 2
-        expected = '{"a": 1, "b": 2}\n'
+            temp["a"] = 1
+        expected = '{"a": 1}\n'
         assert path.read_text() == expected
 
-    @mark.parametrize("leading", [param(""), param("\n"), param("\n\n")])
-    @mark.parametrize("trailing", [param(""), param("\n"), param("\n\n")])
-    def test_unmodified(self, *, tmp_path: Path, leading: str, trailing: str) -> None:
+    @mark.parametrize("init", [param("{}"), param("{}\n"), param("{}\n\n")])
+    def test_unmodified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.json"
-        initial = leading + json.dumps({"a": 1}) + trailing
-        _ = path.write_text(initial)
+        _ = path.write_text(init)
         with yield_mutable_write_context(path, json.loads, dict, json.dumps):
             ...
-        assert path.read_text() == initial
+        assert path.read_text() == init
+
+
+class TestYieldPythonFile:
+    @mark.parametrize(
+        ("init", "expected"),
+        [
+            param("", "import abc\n"),
+            param("\n", "\nimport abc\n"),
+            param("\n\n", "\n\nimport abc\n"),
+            param("\n\n\n", "\n\n\nimport abc\n"),
+        ],
+    )
+    def test_modified(self, *, tmp_path: Path, init: str, expected: str) -> None:
+        path = tmp_path / "file.py"
+        _ = path.write_text(init)
+        with yield_python_file(path) as temp:
+            body = [*temp.input.body, parse_statement("import abc")]
+            temp.output = temp.input.with_changes(body=body)
+        assert path.read_text() == expected
+
+    @mark.parametrize(
+        ("init", "expected"),
+        [
+            param("", "\n"),
+            param("\n", "\n"),
+            param("\n\n", "\n"),
+            param("\n\n\n", "\n"),
+        ],
+    )
+    def test_unmodified(self, *, tmp_path: Path, init: str, expected: str) -> None:
+        path = tmp_path / "file.py"
+        _ = path.write_text(init)
+        with yield_python_file(path):
+            ...
+        assert path.read_text() == expected
+
+
+class TestYieldTextFile:
+    @mark.parametrize("init", [param("init"), param("init\n"), param("init\n\n")])
+    def test_modified(self, *, tmp_path: Path, init: str) -> None:
+        path = tmp_path / "file.txt"
+        _ = path.write_text(init)
+        with yield_text_file(path) as temp:
+            temp.output = temp.input.replace("init", "init\npost")
+        expected = "init\npost\n"
+        assert path.read_text() == expected
+
+    @mark.parametrize("init", [param("init"), param("init\n"), param("init\n\n")])
+    def test_unmodified(self, *, tmp_path: Path, init: str) -> None:
+        path = tmp_path / "file.txt"
+        _ = path.write_text(init)
+        with yield_text_file(path):
+            ...
+        assert path.read_text() == init
