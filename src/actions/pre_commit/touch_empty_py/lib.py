@@ -16,6 +16,7 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.utilities import are_modules_equal
 
 if TYPE_CHECKING:
     from utilities.types import PathLike
@@ -48,7 +49,7 @@ def _format_path(path: PathLike, /) -> None:
     path = Path(path)
     current = parse_module(path.read_text())
     expected = _get_formatted(path)
-    if current.code != expected.code:
+    if not are_modules_equal(current, expected):
         _ = path.write_text(expected.code.rstrip("\n") + "\n")
         _MODIFICATIONS.add(path)
 

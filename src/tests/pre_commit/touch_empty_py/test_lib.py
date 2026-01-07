@@ -6,6 +6,7 @@ from libcst import parse_module
 from pytest import fixture
 
 from actions.pre_commit.touch_empty_py.lib import _format_path, _get_formatted
+from actions.utilities import are_modules_equal
 from tests.testing import check_modules_equal
 
 if TYPE_CHECKING:
@@ -27,7 +28,7 @@ class TestFormatPath:
         _format_path(path)
         result = parse_module(path.read_text())
         expected = parse_module(root.joinpath("out.py").read_text())
-        check_modules_equal(result, expected)
+        assert are_modules_equal(result, expected)
 
 
 class TestGetFormatted:
@@ -35,3 +36,4 @@ class TestGetFormatted:
         result = _get_formatted(root.joinpath("in_.py"))
         expected = parse_module(root.joinpath("out.py").read_text())
         check_modules_equal(result, expected)
+        assert are_modules_equal(result, expected)

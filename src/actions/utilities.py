@@ -8,12 +8,17 @@ from utilities.subprocess import run
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
+    from libcst import Module
     from utilities.types import StrStrMapping
 
     from actions.types import SecretLike
 
 
 LOADER = EnvLoader("")
+
+
+def are_modules_equal(left: Module, right: Module, /) -> None:
+    return left.code.rstrip("\n") == right.code.rstrip("\n")
 
 
 def convert_list_strs(
@@ -111,6 +116,7 @@ def logged_run(
 
 __all__ = [
     "LOADER",
+    "are_modules_equal",
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
