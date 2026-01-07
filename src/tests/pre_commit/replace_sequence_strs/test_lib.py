@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from libcst import parse_module
 from pytest import fixture
+from utilities.text import strip_and_dedent
 
 from actions.pre_commit.replace_sequence_strs.lib import _format_path, _get_formatted
 from actions.utilities import are_modules_equal
@@ -13,22 +14,39 @@ if TYPE_CHECKING:
 
 
 @fixture
-def root(*, tests_pre_commit: Path) -> Path:
-    return tests_pre_commit / "replace_sequence_strs"
+def input_() -> str:
+    return strip_and_dedent("""
+from collections.abc import Sequence
+
+x: Sequence[str]
+""")
+
+
+@fixture
+def output() -> str:
+    return strip_and_dedent(
+        """
+from collections.abc import Sequence
+
+x: list[str]
+""",
+        trailing=True,
+    )
 
 
 class TestFormatPath:
-    def test_main(self, *, root: Path, tmp_path: Path) -> None:
+    def test_main(self, *, tmp_path: Path, input_: str, output: str) -> None:
         path = tmp_path / "file.py"
-        _ = path.write_text((root / "in_.py").read_text())
+        _ = path.write_text(input_)
         _format_path(path)
-        result = parse_module(path.read_text())
-        expected = parse_module(root.joinpath("out.py").read_text())
-        assert are_modules_equal(result, expected)
+        result = path.read_text()
+        assert result == output
 
 
 class TestGetFormatted:
-    def test_main(self, *, root: Path) -> None:
-        result = _get_formatted(root.joinpath("in_.py"))
-        expected = parse_module(root.joinpath("out.py").read_text())
+    def test_main(self, *, tmp_path: Path, input_: str, output: str) -> None:
+        path = tmp_path / "file.py"
+        _ = path.write_text(input_)
+        result = _get_formatted(path)
+        expected = parse_module(output)
         assert are_modules_equal(result, expected)

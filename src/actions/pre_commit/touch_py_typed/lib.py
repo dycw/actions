@@ -45,7 +45,7 @@ def _format_path(path: PathLike, /) -> None:
     if path.name != "pyproject.toml":
         msg = f"Expected 'pyproject.toml'; got {str(path)!r}"
         raise TypeError(msg)
-    src = path / "src"
+    src = path.parent / "src"
     if not src.exists():
         return
     if not src.is_dir():

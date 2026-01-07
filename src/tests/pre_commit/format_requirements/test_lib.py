@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from pytest import fixture
 from tomlkit import loads
+from utilities.text import strip_and_dedent
 
 from actions.pre_commit.format_requirements.lib import _format_path, _get_formatted
 
@@ -12,22 +13,93 @@ if TYPE_CHECKING:
 
 
 @fixture
-def root(*, tests_pre_commit: Path) -> Path:
-    return tests_pre_commit / "format_requirements"
+def input_() -> str:
+    return strip_and_dedent("""
+[dependency-groups]
+  group = [
+    "unbounded",
+    "lower>=1.2.3",
+    "upper<1.3",
+    "lower-and-upper1>=1.2.3,<1.3",
+  ]
+
+[project]
+  dependencies = [
+    "unbounded",
+    "lower1>=1.2.3",
+    "lower2    >=    1.2.3",
+    "upper1<1.3",
+    "upper2    <    1.3",
+    "lower-and-upper1>=1.2.3,<1.3",
+    "lower-and-upper2<1.3,>=1.2.3",
+    "lower-and-upper3    >=    1.2.3    ,    <1.3",
+    "with-extra[extra]",
+    "with-extra[extra]>=1.2.3",
+    "with-extra[extra]    >=    1.2.3",
+  ]
+
+  [project.optional-dependencies]
+    group = [
+      "unbounded",
+      "lower>=1.2.3",
+      "upper<1.3",
+      "lower-and-upper1>=1.2.3,<1.3",
+    ]
+""")
+
+
+@fixture
+def output() -> str:
+    return strip_and_dedent(
+        """
+[dependency-groups]
+  group = [
+      "unbounded",
+      "lower >=1.2.3",
+      "upper <1.3",
+      "lower-and-upper1 >=1.2.3, <1.3",
+  ]
+
+[project]
+  dependencies = [
+      "unbounded",
+      "lower1 >=1.2.3",
+      "lower2 >=1.2.3",
+      "upper1 <1.3",
+      "upper2 <1.3",
+      "lower-and-upper1 >=1.2.3, <1.3",
+      "lower-and-upper2 >=1.2.3, <1.3",
+      "lower-and-upper3 >=1.2.3, <1.3",
+      "with-extra[extra]",
+      "with-extra[extra] >=1.2.3",
+      "with-extra[extra] >=1.2.3",
+  ]
+
+  [project.optional-dependencies]
+    group = [
+        "unbounded",
+        "lower >=1.2.3",
+        "upper <1.3",
+        "lower-and-upper1 >=1.2.3, <1.3",
+    ]
+""",
+        trailing=True,
+    )
 
 
 class TestFormatPath:
-    def test_main(self, *, root: Path, tmp_path: Path) -> None:
+    def test_main(self, *, tmp_path: Path, input_: str, output: str) -> None:
         path = tmp_path / "file.toml"
-        _ = path.write_text((root / "in.toml").read_text())
+        _ = path.write_text(input_)
         _format_path(path)
         result = path.read_text()
-        expected = root.joinpath("out.toml").read_text()
-        assert result == expected
+        assert result == output
 
 
 class TestGetFormatted:
-    def test_main(self, *, root: Path) -> None:
-        result = _get_formatted(root.joinpath("in.toml"))
-        expected = loads(root.joinpath("out.toml").read_text())
+    def test_main(self, *, tmp_path: Path, input_: str, output: str) -> None:
+        path = tmp_path / "file.toml"
+        _ = path.write_text(input_)
+        result = _get_formatted(path)
+        expected = loads(output)
         assert result == expected
