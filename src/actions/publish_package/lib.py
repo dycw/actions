@@ -8,7 +8,7 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.publish_package.settings import SETTINGS
-from actions.utilities import log_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from typed_settings import Secret
@@ -40,8 +40,8 @@ def publish_package(
         native_tls,
     )
     with TemporaryDirectory() as temp:
-        log_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
-        log_run(
+        logged_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
+        logged_run(
             "uv",
             "publish",
             *([] if username is None else ["--username", username]),

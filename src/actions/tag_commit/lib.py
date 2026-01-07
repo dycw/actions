@@ -9,7 +9,7 @@ from utilities.version import parse_version
 from actions import __version__
 from actions.logging import LOGGER
 from actions.tag_commit.settings import SETTINGS
-from actions.utilities import log_run
+from actions.utilities import logged_run
 
 
 def tag_commit(
@@ -37,10 +37,10 @@ def tag_commit(
         major,
         latest,
     )
-    log_run("git", "config", "--global", "user.name", user_name)
-    log_run("git", "config", "--global", "user.email", user_email)
+    logged_run("git", "config", "--global", "user.name", user_name)
+    logged_run("git", "config", "--global", "user.email", user_email)
     version = parse_version(
-        log_run("bump-my-version", "show", "current_version", return_=True)
+        logged_run("bump-my-version", "show", "current_version", return_=True)
     )
     _tag(str(version))
     if major_minor:
@@ -53,11 +53,11 @@ def tag_commit(
 
 def _tag(version: str, /) -> None:
     with suppress(CalledProcessError):
-        log_run("git", "tag", "--delete", version)
+        logged_run("git", "tag", "--delete", version)
     with suppress(CalledProcessError):
-        log_run("git", "push", "--delete", "origin", version)
-    log_run("git", "tag", "-a", version, "HEAD", "-m", version)
-    log_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
+        logged_run("git", "push", "--delete", "origin", version)
+    logged_run("git", "tag", "-a", version, "HEAD", "-m", version)
+    logged_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
 
 
 __all__ = ["tag_commit"]

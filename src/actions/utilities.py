@@ -61,43 +61,51 @@ def convert_str(x: str | None, /) -> str | None:
 
 
 @overload
-def log_run(
+def logged_run(
     cmd: SecretLike,
     /,
-    *cmds: SecretLike,
+    *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,
     return_: Literal[True],
 ) -> str: ...
 @overload
-def log_run(
+def logged_run(
     cmd: SecretLike,
     /,
-    *cmds: SecretLike,
+    *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,
     return_: Literal[False] = False,
 ) -> None: ...
 @overload
-def log_run(
+def logged_run(
     cmd: SecretLike,
     /,
-    *cmds: SecretLike,
+    *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,
     return_: bool = False,
 ) -> str | None: ...
-def log_run(
+def logged_run(
     cmd: SecretLike,
     /,
-    *cmds: SecretLike,
+    *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,  # noqa: A002
     return_: bool = False,
 ) -> str | None:
-    all_cmds = [cmd, *cmds]
-    LOGGER.info("Running '%s'...", " ".join(map(str, all_cmds)))
-    unwrapped = [c if isinstance(c, str) else c.get_secret_value() for c in all_cmds]
+    cmds_and_args = [cmd, *cmds_or_args]
+    LOGGER.info("Running '%s'...", " ".join(map(str, cmds_and_args)))
+    unwrapped: list[str] = []
+    for ca in cmds_and_args:
+        match ca:
+            case Secret():
+                unwrapped.append(ca.get_secret_value())
+            case str():
+                unwrapped.append(ca)
+            case never:
+                assert_never(never)
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
 
@@ -106,5 +114,5 @@ __all__ = [
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
-    "log_run",
+    "logged_run",
 ]

@@ -14,7 +14,7 @@ from yaml import safe_load
 from actions import __version__
 from actions.logging import LOGGER
 from actions.run_hooks.settings import SETTINGS
-from actions.utilities import log_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -77,7 +77,7 @@ def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
 def _run_hook(hook: str, /, *, sleep: int = SETTINGS.sleep) -> bool:
     LOGGER.info("Running '%s'...", hook)
     try:
-        log_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
+        logged_run("pre-commit", "run", "--verbose", "--all-files", hook, print=True)
     except CalledProcessError:
         is_success = False
     else:
