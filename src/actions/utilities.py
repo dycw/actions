@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal, assert_never, overload
 
 from tomlkit import dumps
@@ -10,6 +11,8 @@ from utilities.subprocess import run
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
+    from collections.abc import MutableSet
+
     from libcst import Module
     from tomlkit import TOMLDocument
     from utilities.types import PathLike, StrStrMapping
@@ -76,6 +79,14 @@ def convert_str(x: str | None, /) -> str | None:
             assert_never(never)
 
 
+def copy_text(
+    src: PathLike, dest: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> None:
+    LOGGER.info("Copying '%s' -> '%s'...", str(src), str(dest))
+    text = Path(src).read_text()
+    write_text(dest, text, modifications=modifications)
+
+
 def ensure_new_line(text: str, /) -> str:
     return text.rstrip("\n") + "\n"
 
@@ -129,9 +140,14 @@ def logged_run(
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
 
-def write_text(path: PathLike, text: str, /) -> None:
+def write_text(
+    path: PathLike, text: str, /, *, modifications: MutableSet[Path] | None = None
+) -> None:
+    LOGGER.info("Writing '%s'...", str(path))
     with writer(path, overwrite=True) as temp:
         _ = temp.write_text(ensure_new_line(text))
+    if modifications is not None:
+        modifications.add(Path(path))
 
 
 __all__ = [
