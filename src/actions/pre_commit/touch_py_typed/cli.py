@@ -9,7 +9,7 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.click import path_argument
-from actions.pre_commit.touch_empty_py.lib import touch_empty_py
+from actions.pre_commit.touch_py_typed.lib import touch_py_typed
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -25,11 +25,11 @@ def touch_py_typed_sub_cmd(*, paths: tuple[Path, ...]) -> None:
             Running '%s' (version %s) with settings:
              - paths = %s
         """),
-        touch_empty_py.__name__,
+        touch_py_typed.__name__,
         __version__,
         paths,
     )
-    touch_empty_py(*paths)
+    touch_py_typed(*paths)
 
 
 __all__ = ["touch_py_typed_sub_cmd"]

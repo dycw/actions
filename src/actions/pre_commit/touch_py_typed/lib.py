@@ -17,13 +17,13 @@ if TYPE_CHECKING:
 _MODIFICATIONS: set[Path] = set()
 
 
-def touch_empty_py(*paths: PathLike) -> None:
+def touch_py_typed(*paths: PathLike) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
              - paths = %s
         """),
-        touch_empty_py.__name__,
+        touch_py_typed.__name__,
         __version__,
         paths,
     )
@@ -58,4 +58,4 @@ def _format_path(path: PathLike, /) -> None:
         _MODIFICATIONS.add(py_typed)
 
 
-__all__ = ["touch_empty_py"]
+__all__ = ["touch_py_typed"]
