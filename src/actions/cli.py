@@ -13,7 +13,14 @@ from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
 )
 from actions.pre_commit.touch_empty_py.cli import touch_empty_py_sub_cmd
-from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
+from actions.pre_commit.touch_empty_py.constants import (
+    TOUCH_EMPTY_PY_DOCSTRING,
+    TOUCH_EMPTY_PY_SUB_CMD,
+)
+from actions.pre_commit.touch_py_typed.constants import (
+    TOUCH_PY_TYPED_DOCSTRING,
+    TOUCH_PY_TYPED_SUB_CMD,
+)
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
 from actions.random_sleep.cli import random_sleep_sub_cmd
@@ -67,7 +74,10 @@ _ = pre_commit_sub_cmd.command(
     **CONTEXT_SETTINGS,
 )(replace_sequence_strs_sub_cmd)
 _ = pre_commit_sub_cmd.command(
-    name=TOUCH_EMPTY_PY_SUB_CMD, help="Touch empty '.py' files", **CONTEXT_SETTINGS
+    name=TOUCH_EMPTY_PY_SUB_CMD, help=TOUCH_EMPTY_PY_DOCSTRING, **CONTEXT_SETTINGS
+)(touch_empty_py_sub_cmd)
+_ = pre_commit_sub_cmd.command(
+    name=TOUCH_PY_TYPED_SUB_CMD, help=TOUCH_PY_TYPED_DOCSTRING, **CONTEXT_SETTINGS
 )(touch_empty_py_sub_cmd)
 
 
