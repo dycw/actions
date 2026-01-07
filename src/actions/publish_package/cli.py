@@ -8,8 +8,8 @@ from utilities.text import strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.publish.lib import publish_package
-from actions.publish.settings import PublishSettings
+from actions.publish_package.lib import publish_package
+from actions.publish_package.settings import PublishSettings
 from actions.settings import CommonSettings
 from actions.utilities import LOADER
 

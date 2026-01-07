@@ -7,7 +7,7 @@ from click.testing import CliRunner
 from pytest import mark, param
 from typed_settings import Secret, click_options, option, secret, settings
 
-from actions.publish.settings import convert_str
+from actions.publish_package.settings import convert_str
 from actions.utilities import LOADER, convert_list_strs, convert_secret_str
 
 if TYPE_CHECKING:

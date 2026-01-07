@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typed_settings import load_settings
 
-from actions.publish.settings import PublishSettings
+from actions.publish_package.settings import PublishSettings
 from actions.utilities import LOADER
 
 
