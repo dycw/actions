@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from contextlib import contextmanager, suppress
 from io import StringIO
 from itertools import product
@@ -12,19 +13,25 @@ from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any, Literal, assert_never
 
 import tomlkit
+from click import command
 from rich.pretty import pretty_repr
 from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, aot, array, document, table
 from tomlkit.exceptions import NonExistentKey
 from tomlkit.items import AoT, Array, Table
+from typed_settings import click_options
 from utilities.atomicwrites import writer
+from utilities.click import CONTEXT_SETTINGS
 from utilities.functions import ensure_class
+from utilities.inflect import counted_noun
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
+from utilities.logging import basic_config
+from utilities.os import is_pytest
 from utilities.pathlib import get_repo_root
 from utilities.re import extract_groups
 from utilities.subprocess import append_text, ripgrep, run
 from utilities.tempfile import TemporaryFile
-from utilities.text import strip_and_dedent
+from utilities.text import repr_str, strip_and_dedent
 from utilities.version import ParseVersionError, Version, parse_version
 from utilities.whenever import HOUR, get_now
 from whenever import ZonedDateTime
@@ -56,6 +63,7 @@ from actions.conformalize_repo.constants import (
     RUFF_TOML,
 )
 from actions.conformalize_repo.settings import SETTINGS, Settings
+from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
@@ -201,136 +209,117 @@ def conformalize_repo(
         run_version_bump,
         script,
     )
-    if is_pytest():
-        return
-    basic_config(obj=LOGGER)
-    LOGGER.info(
-        strip_and_dedent("""
-            Running 'conformalize' (version %s) with settings:
-            %s
-        """),
-        __version__,
-        pretty_repr(settings),
-    )
     modifications: set[Path] = set()
     add_bumpversion_toml(
         modifications=modifications,
-        pyproject=settings.pyproject,
-        python_package_name_use=settings.python_package_name_use,
+        pyproject=pyproject,
+        python_package_name_use=python_package_name_use,
     )
     check_versions()
     run_pre_commit_update(modifications=modifications)
-    run_ripgrep_and_replace(
-        modifications=modifications, version=settings.python_version
-    )
+    run_ripgrep_and_replace(modifications=modifications, version=python_version)
     update_action_file_extensions(modifications=modifications)
     update_action_versions(modifications=modifications)
     add_pre_commit_config_yaml(
         modifications=modifications,
-        dockerfmt=settings.pre_commit__dockerfmt,
-        dycw=settings.pre_commit__dycw,
-        prettier=settings.pre_commit__prettier,
-        ruff=settings.pre_commit__ruff,
-        shell=settings.pre_commit__shell,
-        taplo=settings.pre_commit__taplo,
-        uv=settings.pre_commit__uv,
-        script=settings.script,
+        dockerfmt=pre_commit__dockerfmt,
+        dycw=pre_commit__dycw,
+        prettier=pre_commit__prettier,
+        ruff=pre_commit__ruff,
+        shell=pre_commit__shell,
+        taplo=pre_commit__taplo,
+        uv=pre_commit__uv,
+        script=script,
     )
-    if settings.coverage:
+    if coverage:
         add_coveragerc_toml(modifications=modifications)
-    if settings.envrc or settings.envrc__uv or settings.envrc__uv__native_tls:
+    if envrc or envrc__uv or envrc__uv__native_tls:
         add_envrc(
             modifications=modifications,
-            uv=settings.envrc__uv,
-            uv__native_tls=settings.envrc__uv__native_tls,
-            python_version=settings.python_version,
-            script=settings.script,
+            uv=envrc__uv,
+            uv__native_tls=envrc__uv__native_tls,
+            python_version=python_version,
+            script=script,
         )
     if (
-        settings.github__pull_request__pre_commit
-        or settings.github__pull_request__pyright
-        or settings.github__pull_request__pytest__windows
-        or settings.github__pull_request__pytest__macos
-        or settings.github__pull_request__pytest__ubuntu
-        or settings.github__pull_request__ruff
+        github__pull_request__pre_commit
+        or github__pull_request__pyright
+        or github__pull_request__pytest__windows
+        or github__pull_request__pytest__macos
+        or github__pull_request__pytest__ubuntu
+        or github__pull_request__ruff
     ):
         add_github_pull_request_yaml(
             modifications=modifications,
-            pre_commit=settings.github__pull_request__pre_commit,
-            pyright=settings.github__pull_request__pyright,
-            pytest__windows=settings.github__pull_request__pytest__windows,
-            pytest__macos=settings.github__pull_request__pytest__macos,
-            pytest__ubuntu=settings.github__pull_request__pytest__ubuntu,
-            pytest__timeout=settings.pytest__timeout,
-            python_version=settings.python_version,
-            ruff=settings.ruff,
-            script=settings.script,
+            pre_commit=github__pull_request__pre_commit,
+            pyright=github__pull_request__pyright,
+            pytest__windows=github__pull_request__pytest__windows,
+            pytest__macos=github__pull_request__pytest__macos,
+            pytest__ubuntu=github__pull_request__pytest__ubuntu,
+            pytest__timeout=pytest__timeout,
+            python_version=python_version,
+            ruff=ruff,
+            script=script,
         )
     if (
-        settings.github__push__publish
-        or settings.github__push__tag
-        or settings.github__push__tag__major_minor
-        or settings.github__push__tag__major
-        or settings.github__push__tag__latest
+        github__push__publish
+        or github__push__tag
+        or github__push__tag__major_minor
+        or github__push__tag__major
+        or github__push__tag__latest
     ):
         add_github_push_yaml(
             modifications=modifications,
-            publish=settings.github__push__publish,
-            tag=settings.github__push__tag,
-            tag__major_minor=settings.github__push__tag__major_minor,
-            tag__major=settings.github__push__tag__major,
-            tag__latest=settings.github__push__tag__latest,
+            publish=github__push__publish,
+            tag=github__push__tag,
+            tag__major_minor=github__push__tag__major_minor,
+            tag__major=github__push__tag__major,
+            tag__latest=github__push__tag__latest,
         )
-    if settings.gitignore:
+    if gitignore:
         add_gitignore(modifications=modifications)
     if (
-        settings.pyproject
-        or settings.pyproject__project__optional_dependencies__scripts
-        or (len(settings.pyproject__tool__uv__indexes) >= 1)
+        pyproject
+        or pyproject__project__optional_dependencies__scripts
+        or (len(pyproject__tool__uv__indexes) >= 1)
     ):
         add_pyproject_toml(
             modifications=modifications,
-            python_version=settings.python_version,
-            description=settings.description,
-            package_name=settings.package_name,
-            readme=settings.readme,
-            optional_dependencies__scripts=settings.pyproject__project__optional_dependencies__scripts,
-            python_package_name=settings.python_package_name,
-            python_package_name_use=settings.python_package_name_use,
-            tool__uv__indexes=settings.pyproject__tool__uv__indexes,
+            python_version=python_version,
+            description=description,
+            package_name=package_name,
+            readme=readme,
+            optional_dependencies__scripts=pyproject__project__optional_dependencies__scripts,
+            python_package_name=python_package_name,
+            python_package_name_use=python_package_name_use,
+            tool__uv__indexes=pyproject__tool__uv__indexes,
         )
-    if settings.pyright:
+    if pyright:
         add_pyrightconfig_json(
-            modifications=modifications,
-            python_version=settings.python_version,
-            script=settings.script,
+            modifications=modifications, python_version=python_version, script=script
         )
     if (
-        settings.pytest
-        or settings.pytest__asyncio
-        or settings.pytest__ignore_warnings
-        or (settings.pytest__timeout is not None)
+        pytest
+        or pytest__asyncio
+        or pytest__ignore_warnings
+        or (pytest__timeout is not None)
     ):
         add_pytest_toml(
             modifications=modifications,
-            asyncio=settings.pytest__asyncio,
-            ignore_warnings=settings.pytest__ignore_warnings,
-            timeout=settings.pytest__timeout,
-            coverage=settings.coverage,
-            python_package_name=settings.python_package_name_use,
-            script=settings.script,
+            asyncio=pytest__asyncio,
+            ignore_warnings=pytest__ignore_warnings,
+            timeout=pytest__timeout,
+            coverage=coverage,
+            python_package_name=python_package_name_use,
+            script=script,
         )
-    if settings.readme:
+    if readme:
         add_readme_md(
-            modifications=modifications,
-            name=settings.repo_name,
-            description=settings.description,
+            modifications=modifications, name=repo_name, description=description
         )
-    if settings.ruff:
-        add_ruff_toml(
-            modifications=modifications, python_version=settings.python_version
-        )
-    if settings.run_version_bump:
+    if ruff:
+        add_ruff_toml(modifications=modifications, python_version=python_version)
+    if run_version_bump:
         run_bump_my_version(modifications=modifications)
     if len(modifications) >= 1:
         LOGGER.info(
@@ -1127,6 +1116,21 @@ def is_partial_dict(obj: Any, dict_: StrDict, /) -> bool:
 ##
 
 
+def get_python_package_name(
+    *,
+    package_name: str | None = SETTINGS.package_name,
+    python_package_name: str | None = SETTINGS.python_package_name,
+) -> str | None:
+    if python_package_name is not None:
+        return python_package_name
+    if package_name is not None:
+        return package_name.replace("-", "_")
+    return None
+
+
+##
+
+
 def get_version_from_bumpversion_toml(
     *, obj: TOMLDocument | str | None = None
 ) -> Version:
@@ -1475,6 +1479,7 @@ __all__ = [
     "get_dict",
     "get_list",
     "get_partial_dict",
+    "get_python_package_name",
     "get_table",
     "get_version_from_bumpversion_toml",
     "get_version_from_git_show",
