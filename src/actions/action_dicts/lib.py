@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import actions.publish_package.doc
-import actions.random_sleep.doc
-import actions.tag_commit.doc
 from actions.action_dicts.constants import GITHUB_TOKEN, PRERELEASE, RESOLUTION
+from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
+from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING
 from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING
+from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING
 
 if TYPE_CHECKING:
     from actions.types import StrDict
@@ -50,7 +50,7 @@ def run_action_publish_dict(
     _add_boolean(dict_, "trusted-publishing", value=trusted_publishing)
     _add_native_tls(dict_, native_tls=native_tls)
     return {
-        "name": actions.publish_package.doc.DOCSTRING,
+        "name": PUBLISH_PACKAGE_DOCSTRING,
         "uses": "dycw/action-publish-package@latest",
         "with": dict_,
     }
@@ -114,7 +114,7 @@ def run_action_random_sleep_dict(
         "log-freq": log_freq,
     }
     return {
-        "name": actions.random_sleep.doc.DOCSTRING,
+        "name": RANDOM_SLEEP_DOCSTRING,
         "uses": "dycw/action-random-sleep@latest",
         "with": dict_,
     }
@@ -139,7 +139,7 @@ def run_action_tag_dict(
     _add_boolean(dict_, "major", value=major)
     _add_boolean(dict_, "latest", value=latest)
     return {
-        "name": actions.tag_commit.doc.DOCSTRING,
+        "name": TAG_COMMIT_DOCSTRING,
         "uses": "dycw/action-tag-commit@latest",
         "with": dict_,
     }
