@@ -52,8 +52,7 @@ def _format_path(path: PathLike, /) -> None:
     current = parse_module(path.read_text())
     expected = _get_formatted(path)
     if not are_modules_equal(current, expected):
-        write_text(path, expected.code)
-        _MODIFICATIONS.add(path)
+        write_text(path, expected.code, modifications=_MODIFICATIONS)
 
 
 def _get_formatted(path: PathLike, /) -> Module:

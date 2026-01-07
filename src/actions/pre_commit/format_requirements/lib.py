@@ -52,8 +52,7 @@ def _format_path(path: PathLike, /) -> None:
     current = loads(path.read_text())
     expected = _get_formatted(path)
     if not are_docs_equal(current, expected):
-        write_text(path, dumps(expected))
-        _MODIFICATIONS.add(path)
+        write_text(path, dumps(expected), modifications=_MODIFICATIONS)
 
 
 def _get_formatted(path: PathLike, /) -> TOMLDocument:
