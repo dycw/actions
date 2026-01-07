@@ -6,6 +6,7 @@ from libcst import parse_module
 from pytest import fixture
 
 from actions.pre_commit.replace_sequence_strs.lib import _format_path, _get_formatted
+from tests.testing import check_modules_equal
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -23,11 +24,11 @@ class TestFormatPath:
         _format_path(path)
         result = parse_module(path.read_text())
         expected = parse_module(root.joinpath("out.py").read_text())
-        assert result.code == expected.code
+        check_modules_equal(result, expected)
 
 
 class TestGetFormatted:
     def test_main(self, *, root: Path) -> None:
         result = _get_formatted(root.joinpath("in_.py"))
         expected = parse_module(root.joinpath("out.py").read_text())
-        assert result.code == expected.code
+        check_modules_equal(result, expected)
