@@ -51,11 +51,11 @@ class Settings:
     pre_commit__dockerfmt: bool = option(
         default=False, help="Set up '.pre-commit-config.yaml' dockerfmt"
     )
-    pre_commit__dycw: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' dockerfmt"
-    )
     pre_commit__prettier: bool = option(
         default=False, help="Set up '.pre-commit-config.yaml' prettier"
+    )
+    pre_commit__python: bool = option(
+        default=False, help="Set up '.pre-commit-config.yaml' python"
     )
     pre_commit__ruff: bool = option(
         default=False, help="Set up '.pre-commit-config.yaml' ruff"
