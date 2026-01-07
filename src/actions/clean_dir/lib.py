@@ -51,11 +51,9 @@ def _yield_dirs(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> Iterator[Path]:
 
 
 def _yield_files(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> Iterator[Path]:
-    yield from _yield_pyc_files(dir_=dir_)
-
-
-def _yield_pyc_files(*, dir_: PathLike = CLEAN_DIR_SETTINGS.dir) -> Iterator[Path]:
-    yield from Path(dir_).rglob("**/*.pyc")
+    dir_ = Path(dir_)
+    yield from dir_.rglob("**/*.pyc")
+    yield from dir_.rglob("**/*.pyo")
 
 
 __all__ = ["clean_dir"]
