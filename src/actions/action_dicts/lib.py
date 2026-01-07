@@ -19,6 +19,7 @@ def run_action_pre_commit_dict(
     repos: Any | None = None,
     hooks: Any | None = None,
     sleep: int = 1,
+    gitea: bool = False,
 ) -> StrDict:
     dict_: StrDict = {"token": token}
     _add_item(dict_, "submodules", value=submodules)
@@ -26,6 +27,7 @@ def run_action_pre_commit_dict(
     _add_item(dict_, "hooks", value=hooks)
     dict_["sleep"] = sleep
     return {
+        "if": f"{_runner(gitea=gitea)}.event_name == 'pull_request'",
         "name": actions.run_hooks.doc.DOCSTRING,
         "uses": "dycw/action-run-hooks@latest",
         "with": dict_,
@@ -167,6 +169,10 @@ def _add_with_requirements(
     dict_: StrDict, /, *, with_requirements: str | None = None
 ) -> None:
     _add_item(dict_, "with-requirements", value=with_requirements)
+
+
+def _runner(*, gitea: bool = False) -> str:
+    return "gitea" if gitea else "github"
 
 
 __all__ = [

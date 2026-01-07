@@ -34,6 +34,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         envrc__uv=settings.envrc__uv,
         envrc__uv__native_tls=settings.envrc__uv__native_tls,
         github__pull_request__pre_commit=settings.github__pull_request__pre_commit,
+        github__pull_request__pre_commit__gitea=settings.github__pull_request__pre_commit__gitea,
         github__pull_request__pyright=settings.github__pull_request__pyright,
         github__pull_request__pytest__macos=settings.github__pull_request__pytest__macos,
         github__pull_request__pytest__ubuntu=settings.github__pull_request__pytest__ubuntu,
