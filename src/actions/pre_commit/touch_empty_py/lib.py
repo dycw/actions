@@ -1,28 +1,20 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 from typing import TYPE_CHECKING
 
-from libcst import (
-    ImportAlias,
-    ImportFrom,
-    Module,
-    Name,
-    SimpleStatementLine,
-    parse_module,
-)
+from libcst import parse_statement
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.utilities import are_modules_equal, write_text
+from actions.pre_commit.utilities import yield_python_file
 
 if TYPE_CHECKING:
+    from collections.abc import MutableSet
+    from pathlib import Path
+
     from utilities.types import PathLike
-
-
-_MODIFICATIONS: set[Path] = set()
 
 
 def touch_empty_py(*paths: PathLike) -> None:
@@ -35,43 +27,28 @@ def touch_empty_py(*paths: PathLike) -> None:
         __version__,
         paths,
     )
+    modifications: set[Path] = set()
     for path in paths:
-        _format_path(path)
-    if len(_MODIFICATIONS) >= 1:
+        _format_path(path, modifications=modifications)
+    if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
-            ", ".join(map(repr_str, sorted(_MODIFICATIONS))),
+            ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
 
 
-def _format_path(path: PathLike, /) -> None:
-    path = Path(path)
-    if not path.is_file():
-        msg = f"Expected a file; {str(path)!r} is not"
-        raise FileNotFoundError(msg)
-    if path.suffix != ".py":
-        msg = f"Expected a Python file; got {str(path)!r}"
-        raise TypeError(path)
-    current = parse_module(path.read_text())
-    expected = _get_formatted(path)
-    if not are_modules_equal(current, expected):
-        write_text(path, expected.code, modifications=_MODIFICATIONS)
-
-
-def _get_formatted(path: PathLike, /) -> Module:
-    path = Path(path)
-    module = parse_module(path.read_text())
-    if len(module.body) >= 1:
-        return module
-    line = SimpleStatementLine(
-        body=[
-            ImportFrom(
-                module=Name("__future__"), names=[ImportAlias(name=Name("annotations"))]
-            )
+def _format_path(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> None:
+    with yield_python_file(path, modifications=modifications) as context:
+        if len(context.input.body) >= 1:
+            return
+        body = [
+            *context.input.body,
+            parse_statement("from __future__ import annotations"),
         ]
-    )
-    return module.with_changes(body=[line])
+        context.output = context.input.with_changes(body=body)
 
 
 __all__ = ["touch_empty_py"]

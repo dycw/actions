@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
-from libcst import SimpleStatementLine, parse_statement
-from pytest import mark, param, raises
+from libcst import parse_statement
+from pytest import mark, param
 from utilities.iterables import one
 
 from actions.pre_commit.utilities import (
@@ -62,8 +62,8 @@ class TestYieldWriteContext:
     def test_modified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.txt"
         _ = path.write_text(init)
-        with yield_immutable_write_context(path, str, lambda: "", str) as temp:
-            temp.output = temp.input.replace("init", "init\npost")
+        with yield_immutable_write_context(path, str, lambda: "", str) as context:
+            context.output = context.input.replace("init", "init\npost")
         expected = "init\npost\n"
         assert path.read_text() == expected
 
@@ -81,8 +81,8 @@ class TestYieldMutableWriteContext:
     def test_modified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.json"
         _ = path.write_text(init)
-        with yield_mutable_write_context(path, json.loads, dict, json.dumps) as temp:
-            temp["a"] = 1
+        with yield_mutable_write_context(path, json.loads, dict, json.dumps) as context:
+            context["a"] = 1
         expected = '{"a": 1}\n'
         assert path.read_text() == expected
 
@@ -108,9 +108,9 @@ class TestYieldPythonFile:
     def test_modified(self, *, tmp_path: Path, init: str, expected: str) -> None:
         path = tmp_path / "file.py"
         _ = path.write_text(init)
-        with yield_python_file(path) as temp:
-            body = [*temp.input.body, parse_statement("import abc")]
-            temp.output = temp.input.with_changes(body=body)
+        with yield_python_file(path) as context:
+            body = [*context.input.body, parse_statement("import abc")]
+            context.output = context.input.with_changes(body=body)
         assert path.read_text() == expected
 
     @mark.parametrize(
@@ -135,8 +135,8 @@ class TestYieldTextFile:
     def test_modified(self, *, tmp_path: Path, init: str) -> None:
         path = tmp_path / "file.txt"
         _ = path.write_text(init)
-        with yield_text_file(path) as temp:
-            temp.output = temp.input.replace("init", "init\npost")
+        with yield_text_file(path) as context:
+            context.output = context.input.replace("init", "init\npost")
         expected = "init\npost\n"
         assert path.read_text() == expected
 

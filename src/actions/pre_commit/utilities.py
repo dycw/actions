@@ -5,7 +5,7 @@ from collections.abc import Iterator, MutableSet
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, assert_never
 
 import tomlkit
 from libcst import Module, parse_module
@@ -14,13 +14,12 @@ from tomlkit import TOMLDocument, aot, array, document, table
 from tomlkit.items import AoT, Array, Table
 from utilities.functions import ensure_class
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
-from utilities.tempfile import TemporaryFile
 from utilities.types import PathLike
 
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.types import StrDict
-from actions.utilities import are_texts_equal, copy_text, write_text, yaml_dump
+from actions.utilities import ensure_new_line, write_text, yaml_dump
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
@@ -236,10 +235,22 @@ def yield_immutable_write_context[T](
     else:
         input_ = loads(current)
         output = loads(current)
-    yield (context := WriteContext(input=input_, output=input_))
-    output = context.output
-    if (current is None) or (not (output == loads(current))):  # noqa: SIM201
-        write_text(path, dumps(output), modifications=modifications)
+    yield (context := WriteContext(input=input_, output=output))
+    if current is None:
+        write_text(path, dumps(context.output), modifications=modifications)
+    else:
+        match context.output, loads(current):
+            case TOMLDocument() as output_doc, TOMLDocument() as current_doc:
+                if not (output_doc == current_doc):  # noqa: SIM201
+                    write_text(path, dumps(output_doc), modifications=modifications)
+            case str() as output_text, str() as current_text:
+                if ensure_new_line(output_text) != ensure_new_line(current_text):
+                    write_text(path, dumps(output_text), modifications=modifications)
+            case output_obj, current_obj:
+                if output_obj != current_obj:
+                    write_text(path, dumps(output_obj), modifications=modifications)
+            case never:
+                assert_never(never)
 
 
 ##
