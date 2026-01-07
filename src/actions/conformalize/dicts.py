@@ -34,15 +34,14 @@ def run_action_pre_commit_dict(
 
 def run_action_publish_dict(
     *,
-    token_checkout: str = GITHUB_TOKEN,
-    token_uv: str = GITHUB_TOKEN,
+    token: str = GITHUB_TOKEN,
     username: str | None = None,
     password: str | None = None,
     publish_url: str | None = None,
     trusted_publishing: bool = False,
     native_tls: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {"token-checkout": token_checkout, "token-uv": token_uv}
+    dict_: StrDict = {"token-checkout": token, "token-uv": token_uv}
     _add_item(dict_, "username", value=username)
     _add_item(dict_, "password", value=password)
     _add_item(dict_, "publish-url", value=publish_url)
