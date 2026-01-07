@@ -22,7 +22,7 @@ def root(*, tests_pre_commit: Path) -> Path:
 class TestFormatPath:
     def test_main(self, *, root: Path, tmp_path: Path) -> None:
         path = tmp_path / "file.py"
-        _ = path.write_text((root / "in.py").read_text())
+        _ = path.write_text((root / "in_.py").read_text())
         _format_path(path)
         result = parse_module(path.read_text())
         expected = parse_module(root.joinpath("out.py").read_text())
@@ -31,6 +31,6 @@ class TestFormatPath:
 
 class TestGetFormatted:
     def test_main(self, *, root: Path) -> None:
-        result = _get_formatted(root.joinpath("in.py"))
+        result = _get_formatted(root.joinpath("in_.py"))
         expected = parse_module(root.joinpath("out.py").read_text())
         assert result == expected
