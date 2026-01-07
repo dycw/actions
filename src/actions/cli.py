@@ -8,7 +8,7 @@ from actions.publish_package.cli import publish_sub_cmd
 from actions.random_sleep.cli import sleep_sub_cmd
 from actions.replace_sequence_strs.cli import sequence_strs_sub_cmd
 from actions.run_hooks.cli import hooks_sub_cmd
-from actions.tag.cli import tag_sub_cmd
+from actions.tag_commit.cli import tag_sub_cmd
 
 
 @group(**CONTEXT_SETTINGS)

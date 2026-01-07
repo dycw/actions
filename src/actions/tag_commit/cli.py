@@ -9,8 +9,8 @@ from utilities.text import strip_and_dedent
 from actions import __version__
 from actions.logging import LOGGER
 from actions.settings import CommonSettings
-from actions.tag.lib import tag_commit
-from actions.tag.settings import TagSettings
+from actions.tag_commit.lib import tag_commit
+from actions.tag_commit.settings import TagSettings
 from actions.utilities import LOADER
 
 
