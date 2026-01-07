@@ -53,7 +53,6 @@ from actions.conformalize_repo.constants import (
     PYTEST_TOML,
     README_MD,
     RUFF_TOML,
-    YAML_INSTANCE,
 )
 from actions.conformalize_repo.settings import SETTINGS
 from actions.logging import LOGGER
@@ -63,6 +62,150 @@ if TYPE_CHECKING:
 
     from conformalize.types import HasAppend, HasSetDefault, StrDict
     from utilities.types import PathLike
+
+
+def conformalize_repo(settings: Settings, /) -> None:
+    if is_pytest():
+        return
+    basic_config(obj=LOGGER)
+    LOGGER.info(
+        strip_and_dedent("""
+            Running 'conformalize' (version %s) with settings:
+            %s
+        """),
+        __version__,
+        pretty_repr(settings),
+    )
+    modifications: set[Path] = set()
+    add_bumpversion_toml(
+        modifications=modifications,
+        pyproject=settings.pyproject,
+        python_package_name_use=settings.python_package_name_use,
+    )
+    check_versions()
+    run_pre_commit_update(modifications=modifications)
+    run_ripgrep_and_replace(
+        modifications=modifications, version=settings.python_version
+    )
+    update_action_file_extensions(modifications=modifications)
+    update_action_versions(modifications=modifications)
+    add_pre_commit_config_yaml(
+        modifications=modifications,
+        dockerfmt=settings.pre_commit__dockerfmt,
+        dycw=settings.pre_commit__dycw,
+        prettier=settings.pre_commit__prettier,
+        ruff=settings.pre_commit__ruff,
+        shell=settings.pre_commit__shell,
+        taplo=settings.pre_commit__taplo,
+        uv=settings.pre_commit__uv,
+        script=settings.script,
+    )
+    if settings.coverage:
+        add_coveragerc_toml(modifications=modifications)
+    if settings.envrc or settings.envrc__uv or settings.envrc__uv__native_tls:
+        add_envrc(
+            modifications=modifications,
+            uv=settings.envrc__uv,
+            uv__native_tls=settings.envrc__uv__native_tls,
+            python_version=settings.python_version,
+            script=settings.script,
+        )
+    if (
+        settings.github__pull_request__pre_commit
+        or settings.github__pull_request__pyright
+        or settings.github__pull_request__pytest__windows
+        or settings.github__pull_request__pytest__macos
+        or settings.github__pull_request__pytest__ubuntu
+        or settings.github__pull_request__ruff
+    ):
+        add_github_pull_request_yaml(
+            modifications=modifications,
+            pre_commit=settings.github__pull_request__pre_commit,
+            pyright=settings.github__pull_request__pyright,
+            pytest__windows=settings.github__pull_request__pytest__windows,
+            pytest__macos=settings.github__pull_request__pytest__macos,
+            pytest__ubuntu=settings.github__pull_request__pytest__ubuntu,
+            pytest__timeout=settings.pytest__timeout,
+            python_version=settings.python_version,
+            ruff=settings.ruff,
+            script=settings.script,
+        )
+    if (
+        settings.github__push__publish
+        or settings.github__push__tag
+        or settings.github__push__tag__major_minor
+        or settings.github__push__tag__major
+        or settings.github__push__tag__latest
+    ):
+        add_github_push_yaml(
+            modifications=modifications,
+            publish=settings.github__push__publish,
+            tag=settings.github__push__tag,
+            tag__major_minor=settings.github__push__tag__major_minor,
+            tag__major=settings.github__push__tag__major,
+            tag__latest=settings.github__push__tag__latest,
+        )
+    if settings.gitignore:
+        add_gitignore(modifications=modifications)
+    if (
+        settings.pyproject
+        or settings.pyproject__project__optional_dependencies__scripts
+        or (len(settings.pyproject__tool__uv__indexes) >= 1)
+    ):
+        add_pyproject_toml(
+            modifications=modifications,
+            python_version=settings.python_version,
+            description=settings.description,
+            package_name=settings.package_name,
+            readme=settings.readme,
+            optional_dependencies__scripts=settings.pyproject__project__optional_dependencies__scripts,
+            python_package_name=settings.python_package_name,
+            python_package_name_use=settings.python_package_name_use,
+            tool__uv__indexes=settings.pyproject__tool__uv__indexes,
+        )
+    if settings.pyright:
+        add_pyrightconfig_json(
+            modifications=modifications,
+            python_version=settings.python_version,
+            script=settings.script,
+        )
+    if (
+        settings.pytest
+        or settings.pytest__asyncio
+        or settings.pytest__ignore_warnings
+        or (settings.pytest__timeout is not None)
+    ):
+        add_pytest_toml(
+            modifications=modifications,
+            asyncio=settings.pytest__asyncio,
+            ignore_warnings=settings.pytest__ignore_warnings,
+            timeout=settings.pytest__timeout,
+            coverage=settings.coverage,
+            python_package_name=settings.python_package_name_use,
+            script=settings.script,
+        )
+    if settings.readme:
+        add_readme_md(
+            modifications=modifications,
+            name=settings.repo_name,
+            description=settings.description,
+        )
+    if settings.ruff:
+        add_ruff_toml(
+            modifications=modifications, python_version=settings.python_version
+        )
+    if settings.run_version_bump:
+        run_bump_my_version(modifications=modifications)
+    if len(modifications) >= 1:
+        LOGGER.info(
+            "Exiting due to %s: %s",
+            counted_noun(modifications, "modification"),
+            ", ".join(map(repr_str, sorted(modifications))),
+        )
+        sys.exit(1)
+
+
+##
 
 
 def add_bumpversion_toml(

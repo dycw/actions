@@ -6,7 +6,7 @@ import actions.publish_package.doc
 import actions.random_sleep.doc
 import actions.run_hooks.doc
 import actions.tag_commit.doc
-from actions.conformalize.defaults import GITHUB_TOKEN, PRERELEASE, RESOLUTION
+from actions.action_dicts.constants import GITHUB_TOKEN, PRERELEASE, RESOLUTION
 
 if TYPE_CHECKING:
     from actions.types import StrDict
