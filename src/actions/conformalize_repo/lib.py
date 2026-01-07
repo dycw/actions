@@ -45,6 +45,7 @@ from actions.conformalize_repo.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
     COVERAGERC_TOML,
+    DOCKERFMT_URL,
     ENVRC,
     GITHUB_PULL_REQUEST_YAML,
     GITHUB_PUSH_YAML,
@@ -59,6 +60,10 @@ from actions.conformalize_repo.constants import (
     README_MD,
     RUFF_TOML,
     RUFF_URL,
+    SHELLCHECK_URL,
+    SHFMT_URL,
+    TAPLO_URL,
+    UV_URL,
 )
 from actions.conformalize_repo.settings import SETTINGS
 from actions.constants import YAML_INSTANCE
@@ -648,7 +653,7 @@ def add_pre_commit_config_yaml(
         if dockerfmt:
             _add_pre_commit_config_repo(
                 dict_,
-                "https://github.com/reteps/dockerfmt",
+                DOCKERFMT_URL,
                 "dockerfmt",
                 args=("add", ["--newline", "--write"]),
             )
@@ -671,16 +676,12 @@ def add_pre_commit_config_yaml(
             )
             _add_pre_commit_config_repo(dict_, RUFF_URL, "ruff-format")
         if shell:
-            _add_pre_commit_config_repo(
-                dict_, "https://github.com/scop/pre-commit-shfmt", "shfmt"
-            )
-            _add_pre_commit_config_repo(
-                dict_, "https://github.com/koalaman/shellcheck-precommit", "shellcheck"
-            )
+            _add_pre_commit_config_repo(dict_, SHFMT_URL, "shfmt")
+            _add_pre_commit_config_repo(dict_, SHELLCHECK_URL, "shellcheck")
         if taplo:
             _add_pre_commit_config_repo(
                 dict_,
-                "https://github.com/compwa/taplo-pre-commit",
+                TAPLO_URL,
                 "taplo-format",
                 args=(
                     "exact",
@@ -697,7 +698,7 @@ def add_pre_commit_config_yaml(
         if uv:
             _add_pre_commit_config_repo(
                 dict_,
-                "https://github.com/astral-sh/uv-pre-commit",
+                UV_URL,
                 "uv-lock",
                 files=None if script is None else rf"^{escape(script)}$",
                 args=(
