@@ -11,6 +11,7 @@ from actions.clean_dir.cli import clean_dir_sub_cmd
 from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
 from actions.pre_commit.format_requirements.cli import format_requirements_sub_cmd
 from actions.pre_commit.replace_sequence_strs.cli import replace_sequence_strs_sub_cmd
+from actions.pre_commit.touch_empty_py.cli import touch_empty_py_sub_cmd
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.random_sleep.cli import random_sleep_sub_cmd
 from actions.run_hooks.cli import run_hooks_sub_cmd
@@ -59,6 +60,9 @@ _ = pre_commit_sub_cmd.command(
     help="Replace 'Sequence[str]' with 'list[str]'",
     **CONTEXT_SETTINGS,
 )(replace_sequence_strs_sub_cmd)
+_ = pre_commit_sub_cmd.command(
+    name="touch-empty-py", help="Touch empty '.py' files", **CONTEXT_SETTINGS
+)(touch_empty_py_sub_cmd)
 
 
 if __name__ == "__main__":

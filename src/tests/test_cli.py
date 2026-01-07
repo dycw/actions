@@ -15,6 +15,7 @@ class TestCLI:
             param(["pre-commit", "conformalize-repo"]),
             param(["pre-commit", "format-requirements"]),
             param(["pre-commit", "replace-sequence-strs"]),
+            param(["pre-commit", "touch-empty-py"]),
             param(["publish-package"]),
             param(["random-sleep"]),
             param(["run-hooks"]),
