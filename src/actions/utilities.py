@@ -158,6 +158,7 @@ __all__ = [
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
+    "copy_text",
     "ensure_new_line",
     "logged_run",
     "write_text",
