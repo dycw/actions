@@ -23,7 +23,7 @@ class TestFormatPath:
         _format_path(path)
         result = parse_module(path.read_text())
         expected = parse_module(root.joinpath("out.py").read_text())
-        assert result == expected
+        assert result.code == expected.code
 
 
 class TestGetFormatted:
