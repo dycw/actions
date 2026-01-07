@@ -50,3 +50,14 @@ jobs:
         uses: dycw/action-ruff@latest
         with:
           token: ${{github.token}}
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run 'pre-commit' hooks
+        uses: dycw/action-run-hooks@latest
+        with:
+          token: ${{github.token}}
+          repos: |-
+            dycw/actions
+            pre-commit/pre-commit-hooks
+          sleep: 1

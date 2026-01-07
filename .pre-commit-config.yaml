@@ -1,12 +1,13 @@
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.5.0
+    rev: 0.6.0
     hooks:
       - id: conformalize-repo
         args:
           - --description=Library of actions
           - --envrc
           - --envrc--uv
+          - --github--pull-request--pre-commit
           - --github--pull-request--pyright
           - --github--pull-request--pytest--macos
           - --github--pull-request--pytest--ubuntu
@@ -15,8 +16,8 @@ repos:
           - --github--push--tag
           - --gitignore
           - --package-name=dycw-actions
-          - --pre-commit--dycw
           - --pre-commit--prettier
+          - --pre-commit--python
           - --pre-commit--ruff
           - --pre-commit--taplo
           - --pre-commit--uv
