@@ -8,8 +8,8 @@ from utilities.text import strip_and_dedent
 
 from actions.pre_commit.update_requirements.classes import (
     Version2,
+    Version2or3,
     Version3,
-    Versions,
     VersionSet,
 )
 from actions.pre_commit.update_requirements.lib import _format_path
@@ -21,110 +21,35 @@ if TYPE_CHECKING:
 
 class TestFormatPath:
     @mark.parametrize(
-        ("input_", "versions", "output"),
+        ("input_", "latest", "output"),
         [
-            param("package", Versions(), "package"),
-            param("package>=1.2", Versions(lower=Version2(1, 2)), "package>=1.2"),
-            param(
-                "package>=1.2",
-                Versions(lower=Version2(1, 2), latest=Version2(1, 2)),
-                "package>=1.2",
-            ),
-            param(
-                "package>=1.2",
-                Versions(lower=Version2(1, 2), latest=Version2(1, 3)),
-                "package>=1.3",
-            ),
-            param(
-                "package>=1.2.3", Versions(lower=Version3(1, 2, 3)), "package>=1.2.3"
-            ),
-            param(
-                "package>=1.2.3",
-                Versions(lower=Version3(1, 2, 3), latest=Version3(1, 2, 3)),
-                "package>=1.2.3",
-            ),
-            param(
-                "package>=1.2.3",
-                Versions(lower=Version3(1, 2, 3), latest=Version3(1, 2, 4)),
-                "package>=1.2.4",
-            ),
-            param("package<2", Versions(upper=2), "package<2"),
-            param("package<2", Versions(upper=2, latest=Version2(1, 2)), "package<2"),
-            param("package<2", Versions(upper=2, latest=Version2(2, 3)), "package<3"),
-            param("package<1.3", Versions(upper=Version2(1, 3)), "package<1.3"),
-            param(
-                "package<1.3",
-                Versions(upper=Version2(1, 3), latest=Version3(1, 2, 3)),
-                "package<1.3",
-            ),
-            param(
-                "package<1.3",
-                Versions(upper=Version2(1, 3), latest=Version3(1, 3, 0)),
-                "package<1.4",
-            ),
-            param(
-                "package>=1.2, <2",
-                Versions(lower=Version2(1, 2), upper=2),
-                "package>=1.2, <2",
-            ),
-            param(
-                "package>=1.2, <2",
-                Versions(lower=Version2(1, 2), upper=2, latest=Version2(1, 2)),
-                "package>=1.2, <2",
-            ),
-            param(
-                "package>=1.2, <2",
-                Versions(lower=Version2(1, 2), upper=2, latest=Version2(1, 3)),
-                "package>=1.3, <2",
-            ),
-            param(
-                "package>=1.2.3, <1.3",
-                Versions(lower=Version3(1, 2, 3), upper=Version2(1, 3)),
-                "package>=1.2.3, <2",
-            ),
-            param(
-                "package>=1.2.3, <1.3",
-                Versions(
-                    lower=Version3(1, 2, 3),
-                    upper=Version2(1, 3),
-                    latest=Version3(1, 2, 3),
-                ),
-                "package>=1.2.3, <2",
-            ),
-            param(
-                "package>=1.2.3, <1.3",
-                Versions(
-                    lower=Version3(1, 2, 3),
-                    upper=Version2(1, 3),
-                    latest=Version3(1, 2, 4),
-                ),
-                "package>=1.2.4, <2",
-            ),
-            param(
-                "package>=1.2.3, <2",
-                Versions(lower=Version3(1, 2, 3), upper=2),
-                "package>=1.2.3, <2",
-            ),
-            param(
-                "package>=1.2.3, <2",
-                Versions(lower=Version3(1, 2, 3), upper=2, latest=Version3(1, 2, 3)),
-                "package>=1.2.3, <2",
-            ),
-            param(
-                "package>=1.2.3, <2",
-                Versions(lower=Version3(1, 2, 3), upper=2, latest=Version3(1, 2, 4)),
-                "package>=1.2.4, <2",
-            ),
-            param(
-                "package[extra]>=1.2.3, <1.2",
-                Versions(),
-                "package[extra]>=1.2.3, <1.2",
-                marks=mark.only,
-            ),
+            param("package", None, "package"),
+            param("package>=1.2", None, "package>=1.2"),
+            param("package>=1.2", Version2(1, 2), "package>=1.2"),
+            param("package>=1.2", Version2(1, 3), "package>=1.3"),
+            param("package>=1.2.3", None, "package>=1.2.3"),
+            param("package>=1.2.3", Version3(1, 2, 3), "package>=1.2.3"),
+            param("package>=1.2.3", Version3(1, 2, 4), "package>=1.2.4"),
+            param("package<2", None, "package<2"),
+            param("package<2", Version2(1, 2), "package<2"),
+            param("package<2", Version2(2, 3), "package<3"),
+            param("package<1.3", None, "package<1.3"),
+            param("package<1.3", Version3(1, 2, 3), "package<1.3"),
+            param("package<1.3", Version3(1, 3, 0), "package<1.4"),
+            param("package>=1.2, <2", None, "package>=1.2, <2"),
+            param("package>=1.2, <2", Version2(1, 2), "package>=1.2, <2"),
+            param("package>=1.2, <2", Version2(1, 3), "package>=1.3, <2"),
+            param("package>=1.2.3, <1.3", Version2(1, 3), "package>=1.2.3, <2"),
+            param("package>=1.2.3, <1.3", Version3(1, 2, 3), "package>=1.2.3, <2"),
+            param("package>=1.2.3, <1.3", Version3(1, 2, 4), "package>=1.2.4, <2"),
+            param("package>=1.2.3, <2", None, "package>=1.2.3, <2"),
+            param("package>=1.2.3, <2", Version3(1, 2, 3), "package>=1.2.3, <2"),
+            param("package>=1.2.3, <2", Version3(1, 2, 4), "package>=1.2.4, <2"),
+            param("package[extra]>=1.2.3, <1.2", None, "package[extra]>=1.2.3, <2"),
         ],
     )
     def test_main(
-        self, *, tmp_path: Path, input_: str, versions: Versions, output: str
+        self, *, tmp_path: Path, input_: str, latest: Version2or3 | None, output: str
     ) -> None:
         path = tmp_path / "file.toml"
         full_input = strip_and_dedent(f"""
@@ -132,8 +57,10 @@ class TestFormatPath:
               dependencies = ["{input_}"]
         """)
         _ = path.write_text(full_input)
-        req = Requirement.new(input_)
-        version_set: VersionSet = {req.name: versions}
+        req = Requirement(input_)
+        version_set: VersionSet = {}
+        if latest is not None:
+            version_set[req.name] = latest
         expected = strip_and_dedent(
             f"""
                 [project]
