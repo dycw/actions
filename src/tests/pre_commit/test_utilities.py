@@ -9,6 +9,7 @@ from utilities.iterables import one
 
 from actions.pre_commit.utilities import (
     ensure_contains_partial_dict,
+    ensure_contains_partial_str,
     get_partial_dict,
     get_partial_str,
     is_partial_dict,
@@ -26,50 +27,44 @@ if TYPE_CHECKING:
 
 
 class TestEnsureContainsPartialDict:
-    def test_main(self) -> None:
-        url = "https://github.com/owner/repo"
+    @mark.parametrize("init", [param(False), param(True)])
+    def test_main(self, *, init: bool) -> None:
         repos: list[StrDict] = []
+        if init:
+            repo: StrDict = {"repo": "url", "rev": "1.2.3"}
+            repos.append(repo)
+            expected: StrDict = repo
+        else:
+            expected: StrDict = {"repo": "url", "rev": "master"}
         for _ in range(2):
             result = ensure_contains_partial_dict(
-                repos,
-                {"repo": url, "rev": "v6.0.0"},
-                extra={"hooks": [{"id": "id1"}, {"id": "id2"}]},
+                repos, {"repo": "url"}, extra={"rev": "master"}
             )
-            assert result == {
-                "repo": url,
-                "rev": "v6.0.0",
-                "hooks": [{"id": "id1"}, {"id": "id2"}],
-            }
-            expected = [result]
-            assert repos == expected
+            assert result == expected
+            assert repos == [expected]
 
 
 class TestEnsureContainsPartialStr:
-    def test_main(self) -> None:
-        url = "https://github.com/owner/repo"
-        dependencies: list[StrDict] = []
+    @mark.parametrize("init", [param(False), param(True)])
+    def test_main(self, *, init: bool) -> None:
+        dependencies: list[str] = []
+        if init:
+            requirement = "package>=1.2.3, <1.3"
+            dependencies.append(requirement)
+            expected = requirement
+        else:
+            expected = "package"
         for _ in range(2):
-            result = ensure_contains_partial_dict(
-                dependencies,
-                {"repo": url, "rev": "v6.0.0"},
-                extra={"hooks": [{"id": "id1"}, {"id": "id2"}]},
-            )
-            assert result == {
-                "repo": url,
-                "rev": "v6.0.0",
-                "hooks": [{"id": "id1"}, {"id": "id2"}],
-            }
-            expected = [result]
-            assert dependencies == expected
+            result = ensure_contains_partial_str(dependencies, "package")
+            assert result == expected
+            assert dependencies == [expected]
 
 
 class TestGetPartialDict:
     def test_main(self) -> None:
-        url = "https://github.com/owner/repo"
-        repos = [
-            {"repo": url, "rev": "v6.0.0", "hooks": [{"id": "id1"}, {"id": "id2"}]}
-        ]
-        result = get_partial_dict(repos, {"repo": url})
+        repo: StrDict = {"repo": "url", "rev": "master"}
+        repos = [repo]
+        result = get_partial_dict(repos, {"repo": "url"})
         assert result == one(repos)
 
 

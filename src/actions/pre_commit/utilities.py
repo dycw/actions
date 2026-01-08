@@ -56,15 +56,12 @@ def ensure_contains_partial_dict(
         return dict_
 
 
-def ensure_contains_partial_str(
-    container: HasAppend, partial: str, /, *, new: str | None = None
-) -> str:
+def ensure_contains_partial_str(container: HasAppend, text: str, /) -> str:
     try:
-        return get_partial_str(container, partial, skip_log=True)
+        return get_partial_str(container, text, skip_log=True)
     except OneEmptyError:
-        out = partial if new is None else new
-        container.append(out)
-        return out
+        container.append(text)
+        return text
 
 
 def ensure_not_contains(array: Array, /, *objs: Any) -> None:
