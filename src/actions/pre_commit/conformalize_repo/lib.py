@@ -96,8 +96,8 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
+    ci__gitea: bool = SETTINGS.ci__gitea,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    ci__pull_request__pre_commit__gitea: bool = SETTINGS.ci__pull_request__pre_commit__gitea,
     ci__pull_request__pyright: bool = SETTINGS.ci__pull_request__pyright,
     ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
@@ -105,9 +105,6 @@ def conformalize_repo(
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
     ci__push__publish: bool = SETTINGS.ci__push__publish,
     ci__push__tag: bool = SETTINGS.ci__push__tag,
-    ci__push__tag__major: bool = SETTINGS.ci__push__tag__major,
-    ci__push__tag__major_minor: bool = SETTINGS.ci__push__tag__major_minor,
-    ci__push__tag__latest: bool = SETTINGS.ci__push__tag__latest,
     coverage: bool = SETTINGS.coverage,
     description: str | None = SETTINGS.description,
     envrc: bool = SETTINGS.envrc,
@@ -144,18 +141,16 @@ def conformalize_repo(
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
-             - ci__pull_request__pre_commit                   = %s
-             - ci__pull_request__pre_commit__gitea            = %s
-             - ci__pull_request__pyright                      = %s
-             - ci__pull_request__pytest__macos                = %s
-             - ci__pull_request__pytest__ubuntu               = %s
-             - ci__pull_request__pytest__windows              = %s
-             - ci__pull_request__ruff                         = %s
-             - ci__push__publish                              = %s
-             - ci__push__tag                                  = %s
-             - ci__push__tag__major                           = %s
-             - ci__push__tag__major_minor                     = %s
-             - ci__push__tag__latest                          = %s
+             - ci__gitea                                          = %s
+             - ci__pull_request__pre_commit                       = %s
+             - ci__pull_request__pre_commit__gitea                = %s
+             - ci__pull_request__pyright                          = %s
+             - ci__pull_request__pytest__macos                    = %s
+             - ci__pull_request__pytest__ubuntu                   = %s
+             - ci__pull_request__pytest__windows                  = %s
+             - ci__pull_request__ruff                             = %s
+             - ci__push__publish                                  = %s
+             - ci__push__tag                                      = %s
              - coverage                                           = %s
              - description                                        = %s
              - envrc                                              = %s
@@ -189,8 +184,8 @@ def conformalize_repo(
         """),
         conformalize_repo.__name__,
         __version__,
+        ci__gitea,
         ci__pull_request__pre_commit,
-        ci__pull_request__pre_commit__gitea,
         ci__pull_request__pyright,
         ci__pull_request__pytest__macos,
         ci__pull_request__pytest__ubuntu,
@@ -198,9 +193,6 @@ def conformalize_repo(
         ci__pull_request__ruff,
         ci__push__publish,
         ci__push__tag,
-        ci__push__tag__major,
-        ci__push__tag__major_minor,
-        ci__push__tag__latest,
         coverage,
         description,
         envrc,
@@ -257,7 +249,6 @@ def conformalize_repo(
     )
     if (
         ci__pull_request__pre_commit
-        or ci__pull_request__pre_commit__gitea
         or ci__pull_request__pyright
         or ci__pull_request__pytest__windows
         or ci__pull_request__pytest__macos
@@ -503,7 +494,7 @@ def add_ci_push_yaml(
     publish: bool = SETTINGS.ci__push__publish,
     tag: bool = SETTINGS.ci__push__tag,
     tag__major_minor: bool = SETTINGS.ci__push__tag__major_minor,
-    tag__major: bool = SETTINGS.ci__push__tag__major,
+    tag__major: bool = SETTINGS.ci__push__tag__all,
     tag__latest: bool = SETTINGS.ci__push__tag__latest,
 ) -> None:
     with yield_yaml_dict(GITHUB_PUSH_YAML, modifications=modifications) as dict_:

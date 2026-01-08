@@ -16,8 +16,8 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         return
     basic_config(obj=LOGGER)
     conformalize_repo(
+        ci__gitea=settings.ci__gitea,
         ci__pull_request__pre_commit=settings.ci__pull_request__pre_commit,
-        ci__pull_request__pre_commit__gitea=settings.ci__pull_request__pre_commit__gitea,
         ci__pull_request__pyright=settings.ci__pull_request__pyright,
         ci__pull_request__pytest__macos=settings.ci__pull_request__pytest__macos,
         ci__pull_request__pytest__ubuntu=settings.ci__pull_request__pytest__ubuntu,
@@ -25,9 +25,6 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         ci__pull_request__ruff=settings.ci__pull_request__ruff,
         ci__push__publish=settings.ci__push__publish,
         ci__push__tag=settings.ci__push__tag,
-        ci__push__tag__major=settings.ci__push__tag__major,
-        ci__push__tag__major_minor=settings.ci__push__tag__major_minor,
-        ci__push__tag__latest=settings.ci__push__tag__latest,
         coverage=settings.coverage,
         description=settings.description,
         envrc=settings.envrc,
