@@ -6,7 +6,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
-from utilities.functions import ensure_str, max_nullable, min_nullable
+from utilities.functions import max_nullable, min_nullable
 from utilities.packaging import Requirement
 from utilities.text import repr_str, strip_and_dedent
 
@@ -27,10 +27,9 @@ from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, MutableSet
+    from collections.abc import MutableSet
     from pathlib import Path
 
-    from tomlkit.items import Array
     from utilities.types import PathLike
 
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
@@ -92,16 +91,22 @@ def _get_version_set(path: PathLike, /) -> VersionSet:
 
 def _get_pyproject_versions(path: PathLike, /) -> dict[str, TwoSidedVersions]:
     items: list[tuple[str, Version2or3 | None, Version1or2 | None]] = []
+
+    def collect(requirement: Requirement, /) -> Requirement:
+        try:
+            lower = parse_version2_or_3(requirement[">="])
+        except KeyError:
+            lower = None
+        try:
+            upper = parse_version1_or_2(requirement["<"])
+        except KeyError:
+            upper = None
+        items.append((requirement.name, lower, upper))
+        return requirement
+
     with yield_toml_doc(path) as doc:
-        project_deps = get_pyproject_dependencies(doc)
-        if (deps := project_deps.dependencies) is not None:
-            items.extend(_get_pyproject_versions_yield_array(deps))
-        if (opt_depedencies := project_deps.opt_dependencies) is not None:
-            for array in opt_depedencies.values():
-                items.extend(_get_pyproject_versions_yield_array(array))
-        if (dep_grps := project_deps.dep_groups) is not None:
-            for array in dep_grps.values():
-                items.extend(_get_pyproject_versions_yield_array(array))
+        get_pyproject_dependencies(doc).apply(collect)
+
     out: dict[str, TwoSidedVersions] = {}
     for key, lower, upper in items:
         try:
@@ -114,22 +119,6 @@ def _get_pyproject_versions(path: PathLike, /) -> dict[str, TwoSidedVersions]:
                 min_nullable([curr_upper, upper], default=None),
             )
     return out
-
-
-def _get_pyproject_versions_yield_array(
-    array: Array, /
-) -> Iterator[tuple[str, Version2or3 | None, Version1or2 | None]]:
-    for item in array:
-        req = Requirement.new(ensure_str(item))
-        try:
-            lower = parse_version2_or_3(req[">="])
-        except KeyError:
-            lower = None
-        try:
-            upper = parse_version1_or_2(req["<"])
-        except KeyError:
-            upper = int(req["<"])
-        yield req.name, lower, upper
 
 
 def _get_pip_list_versions() -> dict[str, Version2or3]:
