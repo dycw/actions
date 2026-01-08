@@ -188,7 +188,7 @@ wheels = [
 
 [[package]]
 name = "dycw-actions"
-version = "0.6.18"
+version = "0.6.19"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -201,7 +201,7 @@ dependencies = [
     { name = "rich" },
     { name = "ruamel-yaml" },
     { name = "tomlkit" },
-    { name = "typed-settings" },
+    { name = "typed-settings", extra = ["attrs", "click"] },
     { name = "xdg-base-dirs" },
 ]
 
@@ -225,7 +225,7 @@ requires-dist = [
     { name = "rich", specifier = ">=14.2.0,<15" },
     { name = "ruamel-yaml", specifier = ">=0.19.0,<1" },
     { name = "tomlkit", specifier = ">=0.13.3,<1" },
-    { name = "typed-settings", specifier = ">=25.3.0,<26" },
+    { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0,<26" },
     { name = "xdg-base-dirs", specifier = ">=6.0.2,<7" },
 ]
 
@@ -1255,6 +1255,14 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/30/19/a8155d9f411ed7cb4a5f510a6c37ac09ea6065542c597c23d0a88ec2fbed/typed_settings-25.3.0.tar.gz", hash = "sha256:865eb52c3184f467705645a1e58db9d719e08b9d7957448a2ad8cbbc22ed21a6", size = 3492969, upload-time = "2025-11-29T22:10:25.768Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/9e/d01ef2bed8e995bbdeeb5307a571729a10545de4a6f8f06d9175fc7a1978/typed_settings-25.3.0-py3-none-any.whl", hash = "sha256:8fe578c84ae2e44f6e8bdde256d2449fbff45f47dca3c4092aeee03900efc12c", size = 63962, upload-time = "2025-11-29T22:10:23.77Z" },
+]
+
+[package.optional-dependencies]
+attrs = [
+    { name = "attrs" },
+]
+click = [
+    { name = "click" },
 ]
 
 [[package]]
