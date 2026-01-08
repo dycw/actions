@@ -12,7 +12,7 @@ from libcst import Module, parse_module
 from rich.pretty import pretty_repr
 from tomlkit import TOMLDocument, aot, array, document, table
 from tomlkit.items import AoT, Array, Table
-from utilities.functions import ensure_class
+from utilities.functions import ensure_class, ensure_str
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.types import PathLike
 
@@ -130,6 +130,35 @@ def is_partial_dict(obj: Any, dict_: StrDict, /) -> bool:
             else:
                 results[key] = obj_value == dict_value
     return all(results.values())
+
+
+##
+
+
+def get_pyproject_dependencies(doc: TOMLDocument, /) -> PyProjectDependencies:
+    out = PyProjectDependencies()
+    if (project_key := "project") in doc:
+        project = get_table(doc, project_key)
+        if (dep_key := "dependencies") in project:
+            out.dependencies = get_array(project, dep_key)
+        if (opt_dep_key := "optional-dependencies") in project:
+            opt_dependencies = get_table(project, opt_dep_key)
+            out.opt_dependencies = {}
+            for key in opt_dependencies:
+                out.opt_dependencies[ensure_str(key)] = get_array(opt_dependencies, key)
+    if (dep_grps_key := "dependency-groups") in doc:
+        dep_grps = get_table(doc, dep_grps_key)
+        out.dep_groups = {}
+        for key in dep_grps:
+            out.dep_groups[ensure_str(key)] = get_array(dep_grps, key)
+    return out
+
+
+@dataclass(kw_only=True, slots=True)
+class PyProjectDependencies:
+    dependencies: Array | None = None
+    opt_dependencies: dict[str, Array] | None = None
+    dep_groups: dict[str, Array] | None = None
 
 
 ##
@@ -272,6 +301,7 @@ def yield_yaml_dict(
 
 
 __all__ = [
+    "PyProjectDependencies",
     "ensure_aot_contains",
     "ensure_contains",
     "ensure_contains_partial",
@@ -281,6 +311,7 @@ __all__ = [
     "get_dict",
     "get_list",
     "get_partial_dict",
+    "get_pyproject_dependencies",
     "get_table",
     "is_partial_dict",
     "yield_immutable_write_context",

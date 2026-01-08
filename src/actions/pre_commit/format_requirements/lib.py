@@ -6,18 +6,23 @@ from typing import TYPE_CHECKING, Any, override
 from packaging._tokenizer import ParserSyntaxError
 from packaging.requirements import InvalidRequirement, Requirement, _parse_requirement
 from packaging.specifiers import Specifier, SpecifierSet
-from tomlkit import array, string
-from tomlkit.items import Array, Table
+from tomlkit import string
+from utilities.functions import ensure_str
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.pre_commit.utilities import yield_toml_doc
+from actions.pre_commit.utilities import (
+    ensure_contains,
+    get_pyproject_dependencies,
+    yield_toml_doc,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
+    from tomlkit.items import Array
     from utilities.types import PathLike
 
 
@@ -46,29 +51,25 @@ def _format_path(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> None:
     with yield_toml_doc(path, modifications=modifications) as doc:
-        if isinstance(dep_grps := doc.get("dependency-groups"), Table):
-            for key, value in dep_grps.items():
-                if isinstance(value, Array):
-                    dep_grps[key] = _format_array(value)
-        if isinstance(project := doc["project"], Table):
-            if isinstance(deps := project["dependencies"], Array):
-                project["dependencies"] = _format_array(deps)
-            if isinstance(optional := project.get("optional-dependencies"), Table):
-                for key, value in optional.items():
-                    if isinstance(value, Array):
-                        optional[key] = _format_array(value)
+        project_deps = get_pyproject_dependencies(doc)
+        if (deps := project_deps.dependencies) is not None:
+            _format_array(deps)
+        if (opt_depedencies := project_deps.opt_dependencies) is not None:
+            for array in opt_depedencies.values():
+                _format_array(array)
+        if (dep_grps := project_deps.dep_groups) is not None:
+            for array in dep_grps.values():
+                _format_array(array)
 
 
-def _format_array(dependencies: Array, /) -> Array:
-    new = array().multiline(multiline=True)
-    new.extend(map(_format_item, dependencies))
-    return new
+def _format_array(dependencies: Array, /) -> None:
+    formatted = list(map(_format_item, dependencies))
+    dependencies.clear()
+    ensure_contains(dependencies, *formatted)
 
 
 def _format_item(item: Any, /) -> Any:
-    if not isinstance(item, str):
-        return item
-    return string(str(_CustomRequirement(item)))
+    return string(str(_CustomRequirement(ensure_str(item))))
 
 
 class _CustomRequirement(Requirement):
