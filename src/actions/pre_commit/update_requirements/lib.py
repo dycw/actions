@@ -95,7 +95,7 @@ def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Require
         case None, int() | Version2(), None:
             new_upper = upper
         case None, int(), Version2():
-            new_upper = max(upper, latest.bump_major())
+            new_upper = max(upper, latest.bump_major().major)
         case None, Version2(), Version3():
             bumped = latest.bump_minor()
             new_upper = max(upper, Version2(bumped.major, bumped.minor))

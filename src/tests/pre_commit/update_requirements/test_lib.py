@@ -6,17 +6,14 @@ from pytest import mark, param
 from utilities.packaging import Requirement
 from utilities.text import strip_and_dedent
 
-from actions.pre_commit.update_requirements.classes import (
-    Version2,
-    Version2or3,
-    Version3,
-    VersionSet,
-)
+from actions.pre_commit.update_requirements.classes import Version2, Version3
 from actions.pre_commit.update_requirements.lib import _format_path
 from actions.utilities import are_equal_modulo_new_line
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
 
 
 class TestFormatPath:
@@ -39,13 +36,23 @@ class TestFormatPath:
             param("package>=1.2, <2", None, "package>=1.2, <2"),
             param("package>=1.2, <2", Version2(1, 2), "package>=1.2, <2"),
             param("package>=1.2, <2", Version2(1, 3), "package>=1.3, <2"),
-            param("package>=1.2.3, <1.3", Version2(1, 3), "package>=1.2.3, <2"),
+            param("package>=1.2.3, <1.3", None, "package>=1.2.3, <2"),
             param("package>=1.2.3, <1.3", Version3(1, 2, 3), "package>=1.2.3, <2"),
             param("package>=1.2.3, <1.3", Version3(1, 2, 4), "package>=1.2.4, <2"),
             param("package>=1.2.3, <2", None, "package>=1.2.3, <2"),
             param("package>=1.2.3, <2", Version3(1, 2, 3), "package>=1.2.3, <2"),
             param("package>=1.2.3, <2", Version3(1, 2, 4), "package>=1.2.4, <2"),
-            param("package[extra]>=1.2.3, <1.2", None, "package[extra]>=1.2.3, <2"),
+            param("package[extra]>=1.2.3, <1.3", None, "package[extra]>=1.2.3, <2"),
+            param(
+                "package[extra]>=1.2.3, <1.3",
+                Version3(1, 2, 3),
+                "package[extra]>=1.2.3, <2",
+            ),
+            param(
+                "package[extra]>=1.2.3, <1.3",
+                Version3(1, 2, 4),
+                "package[extra]>=1.2.4, <2",
+            ),
         ],
     )
     def test_main(
