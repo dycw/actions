@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 from contextlib import contextmanager, suppress
+from hashlib import blake2b
 from itertools import product
 from pathlib import Path
 from re import MULTILINE, escape, search, sub
@@ -15,6 +16,7 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
+from utilities.random import SYSTEM_RANDOM
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
@@ -283,6 +285,7 @@ def conformalize_repo(
             pytest__ubuntu=github__pull_request__pytest__ubuntu,
             pytest__timeout=pytest__timeout,
             python_version=python_version,
+            repo_name=repo_name,
             ruff=ruff,
             script=script,
         )
@@ -503,6 +506,7 @@ def add_github_pull_request_yaml(
     pytest__windows: bool = SETTINGS.github__pull_request__pytest__windows,
     pytest__timeout: int | None = SETTINGS.pytest__timeout,
     python_version: str = SETTINGS.python_version,
+    repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.github__pull_request__ruff,
     script: str | None = SETTINGS.script,
 ) -> None:
@@ -515,7 +519,7 @@ def add_github_pull_request_yaml(
         branches = get_list(pull_request, "branches")
         ensure_contains(branches, "master")
         schedule = get_list(on, "schedule")
-        ensure_contains(schedule, {"cron": "0 0 * * *"})
+        ensure_contains(schedule, {"cron": random_cron_job(repo_name=repo_name)})
         jobs = get_dict(dict_, "jobs")
         if pre_commit:
             pre_commit_dict = get_dict(jobs, "pre-commit")
@@ -1099,6 +1103,21 @@ def get_version_from_git_tag() -> Version:
 ##
 
 
+def random_cron_job(*, repo_name: str | None = SETTINGS.repo_name) -> str:
+    if repo_name is None:
+        hour = SYSTEM_RANDOM.randint(0, 59)
+        minute = SYSTEM_RANDOM.randint(0, 23)
+    else:
+        digest = blake2b(repo_name.encode(), digest_size=8).digest()
+        value = int.from_bytes(digest, "big")
+        minute = value % 60
+        hour = (value // 60) % 24
+    return f"{hour} {minute} * * *"
+
+
+##
+
+
 def run_bump_my_version(*, modifications: MutableSet[Path] | None = None) -> None:
     def run_set_version(version: Version, /) -> None:
         LOGGER.info("Setting version to %s...", version)
@@ -1277,6 +1296,7 @@ __all__ = [
     "get_version_from_bumpversion_toml",
     "get_version_from_git_show",
     "get_version_from_git_tag",
+    "random_cron_job",
     "run_bump_my_version",
     "run_pre_commit_update",
     "run_ripgrep_and_replace",
