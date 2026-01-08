@@ -31,3 +31,10 @@
   types: [toml]
   files: pyproject\.toml
   description: Touch 'py.typed'
+- id: update-requirements
+  name: update-requirements
+  entry: action pre-commit update-requirements
+  language: python
+  types: [toml]
+  files: pyproject\.toml
+  description: Update a set of requirements
