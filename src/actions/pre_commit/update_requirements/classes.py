@@ -26,7 +26,8 @@ type VersionSet = dict[str, Versions]
 
 @dataclass(order=True, unsafe_hash=True, kw_only=True, slots=True)
 class Versions:
-    pyproject: Version2or3
+    pyproject_lower: Version2or3 | None = None
+    pyproject_upper: Version2or3 | None = None
     current: Version2or3 | None = None
     latest: Version2or3 | None = None
 

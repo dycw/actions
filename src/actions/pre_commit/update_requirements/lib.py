@@ -62,8 +62,8 @@ def _format_path(
     versions: dict[str, VersionSet] | None = None,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
-    assert 0, _get_pyproject_versions(path)
-    versions_use = _get_version_set() if versions is None else versions
+    # assert 0, _get_pyproject_versions(path)
+    versions_use = _get_version_set(path) if versions is None else versions
     with yield_toml_doc(path, modifications=modifications) as doc:
         assert 0, versions_use
         get_pyproject_dependencies(doc)
@@ -71,12 +71,21 @@ def _format_path(
         modifications.add(py_typed)
 
 
-def _get_version_set() -> VersionSet:
-    current = _get_pip_list_versions()
-    outdated = _get_pip_list_outdated_versions()
+def _get_version_set(path: PathLike, /) -> VersionSet:
     out: dict[str, Versions] = {}
-    for key, value in current.items():
-        out[key] = Versions(current=value, latest=outdated.get(key))
+    for key, (lower, upper) in _get_pyproject_versions(path).items():
+        versions = out.get(key, Versions())
+        versions.pyproject_lower = lower
+        versions.pyproject_upper = upper
+        out[key] = versions
+    for key, value in _get_pip_list_versions().items():
+        versions = out.get(key, Versions())
+        versions.current = value
+        out[key] = versions
+    for key, value in _get_pip_list_outdated_versions().items():
+        versions = out.get(key, Versions())
+        versions.latest = value
+        out[key] = versions
     return out
 
 
