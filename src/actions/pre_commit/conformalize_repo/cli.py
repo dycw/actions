@@ -17,6 +17,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
     basic_config(obj=LOGGER)
     conformalize_repo(
         ci__gitea=settings.ci__gitea,
+        ci__token=settings.ci__token,
         ci__pull_request__pre_commit=settings.ci__pull_request__pre_commit,
         ci__pull_request__pyright=settings.ci__pull_request__pyright,
         ci__pull_request__pytest__macos=settings.ci__pull_request__pytest__macos,
@@ -29,7 +30,6 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         description=settings.description,
         envrc=settings.envrc,
         envrc__uv=settings.envrc__uv,
-        envrc__uv__native_tls=settings.envrc__uv__native_tls,
         gitignore=settings.gitignore,
         package_name=settings.package_name,
         pre_commit__dockerfmt=settings.pre_commit__dockerfmt,
@@ -55,6 +55,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         ruff=settings.ruff,
         run_version_bump=settings.run_version_bump,
         script=settings.script,
+        uv__native_tls=settings.uv__native_tls,
     )
 
 

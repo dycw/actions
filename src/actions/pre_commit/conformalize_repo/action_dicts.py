@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from actions.action_dicts.constants import GITHUB_TOKEN, PRERELEASE, RESOLUTION
 from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
 from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING
 from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING
@@ -14,14 +13,15 @@ if TYPE_CHECKING:
 
 def run_action_pre_commit_dict(
     *,
-    token: str = GITHUB_TOKEN,
+    token: str | None = None,
     submodules: str | None = None,
     repos: Any | None = None,
     hooks: Any | None = None,
     sleep: int = 1,
     gitea: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {"token": token}
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
     _add_item(dict_, "submodules", value=submodules)
     _add_item(dict_, "repos", value=repos)
     _add_item(dict_, "hooks", value=hooks)
@@ -36,14 +36,15 @@ def run_action_pre_commit_dict(
 
 def run_action_publish_dict(
     *,
-    token: str = GITHUB_TOKEN,
+    token: str | None = None,
     username: str | None = None,
     password: str | None = None,
     publish_url: str | None = None,
     trusted_publishing: bool = False,
     native_tls: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {"token": token}
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
     _add_item(dict_, "username", value=username)
     _add_item(dict_, "password", value=password)
     _add_item(dict_, "publish-url", value=publish_url)
@@ -58,17 +59,18 @@ def run_action_publish_dict(
 
 def run_action_pyright_dict(
     *,
-    token: str = GITHUB_TOKEN,
+    token: str | None = None,
     python_version: str | None = None,
-    resolution: str = RESOLUTION,
-    prerelease: str = PRERELEASE,
+    resolution: str | None = None,
+    prerelease: str | None = None,
     native_tls: bool = False,
     with_requirements: str | None = None,
 ) -> StrDict:
-    dict_: StrDict = {"token": token}
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
     _add_python_version(dict_, python_version=python_version)
-    dict_["resolution"] = resolution
-    dict_["prerelease"] = prerelease
+    _add_resolution(dict_, resolution=resolution)
+    _add_prerelease(dict_, prerelease=prerelease)
     _add_native_tls(dict_, native_tls=native_tls)
     _add_with_requirements(dict_, with_requirements=with_requirements)
     return {
@@ -80,19 +82,20 @@ def run_action_pyright_dict(
 
 def run_action_pytest_dict(
     *,
-    token: str = GITHUB_TOKEN,
+    token: str | None = None,
     python_version: str | None = None,
     sops_age_key: str | None = None,
-    resolution: str = RESOLUTION,
-    prerelease: str = PRERELEASE,
+    resolution: str | None = None,
+    prerelease: str | None = None,
     native_tls: bool = False,
     with_requirements: str | None = None,
 ) -> StrDict:
-    dict_: StrDict = {"token": token}
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
     _add_python_version(dict_, python_version=python_version)
     _add_item(dict_, "sops-age-key", value=sops_age_key)
-    dict_["resolution"] = resolution
-    dict_["prerelease"] = prerelease
+    _add_resolution(dict_, resolution=resolution)
+    _add_prerelease(dict_, prerelease=prerelease)
     _add_native_tls(dict_, native_tls=native_tls)
     _add_with_requirements(dict_, with_requirements=with_requirements)
     return {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest", "with": dict_}
@@ -100,19 +103,18 @@ def run_action_pytest_dict(
 
 def run_action_random_sleep_dict(
     *,
-    token: str = GITHUB_TOKEN,
+    token: str | None = None,
     min: int = 0,  # noqa: A002
     max: int = 3600,  # noqa: A002
     step: int = 1,
     log_freq: int = 1,
 ) -> StrDict:
-    dict_: StrDict = {
-        "token": token,
-        "min": min,
-        "max": max,
-        "step": step,
-        "log-freq": log_freq,
-    }
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    dict_["min"] = min
+    dict_["max"] = max
+    dict_["step"] = step
+    dict_["log-freq"] = log_freq
     return {
         "name": RANDOM_SLEEP_DOCSTRING,
         "uses": "dycw/action-random-sleep@latest",
@@ -120,21 +122,25 @@ def run_action_random_sleep_dict(
     }
 
 
-def run_action_ruff_dict(*, token: str = GITHUB_TOKEN) -> StrDict:
-    dict_: StrDict = {"token": token}
+def run_action_ruff_dict(*, token: str | None = None) -> StrDict:
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
     return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
 
 
 def run_action_tag_dict(
     *,
-    token: str = GITHUB_TOKEN,
-    user_name: str = "github-actions-bot",
-    user_email: str = "noreply@github.com",
+    token: str | None = None,
+    user_name: str | None = None,
+    user_email: str | None = None,
     major_minor: bool = False,
     major: bool = False,
     latest: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {"token": token, "user-name": user_name, "user-email": user_email}
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    _add_item(dict_, "user-name", value=user_name)
+    _add_item(dict_, "user-email", value=user_email)
     _add_boolean(dict_, "major-minor", value=major_minor)
     _add_boolean(dict_, "major", value=major)
     _add_boolean(dict_, "latest", value=latest)
@@ -143,6 +149,9 @@ def run_action_tag_dict(
         "uses": "dycw/action-tag-commit@latest",
         "with": dict_,
     }
+
+
+##
 
 
 def _add_boolean(dict_: StrDict, key: str, /, *, value: bool = False) -> None:
@@ -163,6 +172,18 @@ def _add_python_version(
     dict_: StrDict, /, *, python_version: str | None = None
 ) -> None:
     _add_item(dict_, "python-version", value=python_version)
+
+
+def _add_prerelease(dict_: StrDict, /, *, prerelease: str | None = None) -> None:
+    _add_item(dict_, "prerelease", value=prerelease)
+
+
+def _add_resolution(dict_: StrDict, /, *, resolution: str | None = None) -> None:
+    _add_item(dict_, "resolution", value=resolution)
+
+
+def _add_token(dict_: StrDict, /, *, token: str | None = None) -> None:
+    _add_item(dict_, "token", value=token)
 
 
 def _add_with_requirements(

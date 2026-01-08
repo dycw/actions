@@ -24,7 +24,9 @@ from utilities.version import ParseVersionError, Version, parse_version
 from utilities.whenever import HOUR
 
 from actions import __version__
-from actions.action_dicts.lib import (
+from actions.constants import PATH_THROTTLE_CACHE, YAML_INSTANCE
+from actions.logging import LOGGER
+from actions.pre_commit.conformalize_repo.action_dicts import (
     run_action_pre_commit_dict,
     run_action_publish_dict,
     run_action_pyright_dict,
@@ -32,8 +34,6 @@ from actions.action_dicts.lib import (
     run_action_ruff_dict,
     run_action_tag_dict,
 )
-from actions.constants import PATH_THROTTLE_CACHE, YAML_INSTANCE
-from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
@@ -41,6 +41,8 @@ from actions.pre_commit.conformalize_repo.constants import (
     COVERAGERC_TOML,
     DOCKERFMT_URL,
     ENVRC,
+    GITEA_PULL_REQUEST_YAML,
+    GITEA_PUSH_YAML,
     GITHUB_PULL_REQUEST_YAML,
     GITHUB_PUSH_YAML,
     GITIGNORE,
@@ -97,6 +99,7 @@ if TYPE_CHECKING:
 def conformalize_repo(
     *,
     ci__gitea: bool = SETTINGS.ci__gitea,
+    ci__token: str | None = SETTINGS.ci__token,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     ci__pull_request__pyright: bool = SETTINGS.ci__pull_request__pyright,
     ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
@@ -109,7 +112,6 @@ def conformalize_repo(
     description: str | None = SETTINGS.description,
     envrc: bool = SETTINGS.envrc,
     envrc__uv: bool = SETTINGS.envrc__uv,
-    envrc__uv__native_tls: bool = SETTINGS.envrc__uv__native_tls,
     gitignore: bool = SETTINGS.gitignore,
     package_name: str | None = SETTINGS.package_name,
     pre_commit__dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
@@ -137,13 +139,13 @@ def conformalize_repo(
     ruff: bool = SETTINGS.ruff,
     run_version_bump: bool = SETTINGS.run_version_bump,
     script: str | None = SETTINGS.script,
+    uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
              - ci__gitea                                          = %s
              - ci__pull_request__pre_commit                       = %s
-             - ci__pull_request__pre_commit__gitea                = %s
              - ci__pull_request__pyright                          = %s
              - ci__pull_request__pytest__macos                    = %s
              - ci__pull_request__pytest__ubuntu                   = %s
@@ -155,7 +157,6 @@ def conformalize_repo(
              - description                                        = %s
              - envrc                                              = %s
              - envrc__uv                                          = %s
-             - envrc__uv__native_tls                              = %s
              - gitignore                                          = %s
              - package_name                                       = %s
              - pre_commit__dockerfmt                              = %s
@@ -181,6 +182,7 @@ def conformalize_repo(
              - ruff                                               = %s
              - run_version_bump                                   = %s
              - script                                             = %s
+             - uv__native__tls                                    = %s
         """),
         conformalize_repo.__name__,
         __version__,
@@ -197,7 +199,6 @@ def conformalize_repo(
         description,
         envrc,
         envrc__uv,
-        envrc__uv__native_tls,
         gitignore,
         package_name,
         pre_commit__dockerfmt,
@@ -223,6 +224,7 @@ def conformalize_repo(
         ruff,
         run_version_bump,
         script,
+        uv__native_tls,
     )
     modifications: set[Path] = set()
     add_bumpversion_toml(
@@ -256,9 +258,9 @@ def conformalize_repo(
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
+            gitea=ci__gitea,
             modifications=modifications,
             pre_commit=ci__pull_request__pre_commit,
-            pre_commit__gitea=ci__pull_request__pre_commit__gitea,
             pyright=ci__pull_request__pyright,
             pytest__windows=ci__pull_request__pytest__windows,
             pytest__macos=ci__pull_request__pytest__macos,
@@ -269,28 +271,20 @@ def conformalize_repo(
             ruff=ruff,
             script=script,
         )
-    if (
-        ci__push__publish
-        or ci__push__tag
-        or ci__push__tag__major_minor
-        or ci__push__tag__major
-        or ci__push__tag__latest
-    ):
+    if ci__push__publish or ci__push__tag:
         add_ci_push_yaml(
+            gitea=ci__gitea,
             modifications=modifications,
             publish=ci__push__publish,
             tag=ci__push__tag,
-            tag__major_minor=ci__push__tag__major_minor,
-            tag__major=ci__push__tag__major,
-            tag__latest=ci__push__tag__latest,
         )
     if coverage:
         add_coveragerc_toml(modifications=modifications)
-    if envrc or envrc__uv or envrc__uv__native_tls:
+    if envrc or envrc__uv:
         add_envrc(
             modifications=modifications,
             uv=envrc__uv,
-            uv__native_tls=envrc__uv__native_tls,
+            uv__native_tls=uv__native_tls,
             python_version=python_version,
             script=script,
         )
@@ -395,9 +389,9 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 
 def add_ci_pull_request_yaml(
     *,
+    gitea: bool = SETTINGS.ci__gitea,
     modifications: MutableSet[Path] | None = None,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    pre_commit__gitea: bool = SETTINGS.ci__pull_request__pre_commit__gitea,
     pyright: bool = SETTINGS.ci__pull_request__pyright,
     pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
@@ -408,9 +402,8 @@ def add_ci_pull_request_yaml(
     ruff: bool = SETTINGS.ci__pull_request__ruff,
     script: str | None = SETTINGS.script,
 ) -> None:
-    with yield_yaml_dict(
-        GITHUB_PULL_REQUEST_YAML, modifications=modifications
-    ) as dict_:
+    path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
+    with yield_yaml_dict(path, modifications=modifications) as dict_:
         dict_["name"] = "pull-request"
         on = get_dict(dict_, "on")
         pull_request = get_dict(on, "pull_request")
@@ -490,14 +483,13 @@ def add_ci_pull_request_yaml(
 
 def add_ci_push_yaml(
     *,
+    gitea: bool = SETTINGS.ci__gitea,
     modifications: MutableSet[Path] | None = None,
     publish: bool = SETTINGS.ci__push__publish,
     tag: bool = SETTINGS.ci__push__tag,
-    tag__major_minor: bool = SETTINGS.ci__push__tag__major_minor,
-    tag__major: bool = SETTINGS.ci__push__tag__all,
-    tag__latest: bool = SETTINGS.ci__push__tag__latest,
 ) -> None:
-    with yield_yaml_dict(GITHUB_PUSH_YAML, modifications=modifications) as dict_:
+    path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
+    with yield_yaml_dict(path, modifications=modifications) as dict_:
         dict_["name"] = "push"
         on = get_dict(dict_, "on")
         push = get_dict(on, "push")
@@ -513,15 +505,12 @@ def add_ci_push_yaml(
             publish_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(publish_dict, "steps")
             ensure_contains(steps, run_action_publish_dict())
-        if tag or tag__major_minor or tag__major or tag__latest:
+        if tag:
             tag_dict = get_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(tag_dict, "steps")
             ensure_contains(
-                steps,
-                run_action_tag_dict(
-                    major_minor=tag__major_minor, major=tag__major, latest=tag__latest
-                ),
+                steps, run_action_tag_dict(major_minor=True, major=True, latest=True)
             )
 
 
@@ -551,7 +540,7 @@ def add_envrc(
     *,
     modifications: MutableSet[Path] | None = None,
     uv: bool = SETTINGS.envrc__uv,
-    uv__native_tls: bool = SETTINGS.envrc__uv__native_tls,
+    uv__native_tls: bool = SETTINGS.uv__native_tls,
     python_version: str = SETTINGS.python_version,
     script: str | None = SETTINGS.script,
 ) -> None:
@@ -580,7 +569,7 @@ def add_envrc(
 
 def _add_envrc_uv_text(
     *,
-    native_tls: bool = SETTINGS.envrc__uv__native_tls,
+    native_tls: bool = SETTINGS.uv__native_tls,
     python_version: str = SETTINGS.python_version,
     script: str | None = SETTINGS.script,
 ) -> str:

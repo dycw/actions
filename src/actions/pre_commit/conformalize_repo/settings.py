@@ -9,6 +9,7 @@ from actions.utilities import LOADER
 @settings
 class Settings:
     ci__gitea: bool = option(default=False, help="Set up CI on Gitea")
+    ci__token: str | None = option(default=None, help="Set up CI with this token")
     ci__pull_request__pre_commit: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' pre-commit"
     )
@@ -35,9 +36,6 @@ class Settings:
     description: str | None = option(default=None, help="Repo description")
     envrc: bool = option(default=False, help="Set up '.envrc'")
     envrc__uv: bool = option(default=False, help="Set up '.envrc' with uv")
-    envrc__uv__native_tls: bool = option(
-        default=False, help="Set up '.envrc' with uv native TLS"
-    )
     gitignore: bool = option(default=False, help="Set up '.gitignore'")
     package_name: str | None = option(default=None, help="Package name")
     pre_commit__dockerfmt: bool = option(
@@ -89,6 +87,7 @@ class Settings:
     repo_name: str | None = option(default=None, help="Repo name")
     ruff: bool = option(default=False, help="Set up 'ruff.toml'")
     run_version_bump: bool = option(default=RUN_VERSION_BUMP, help="Run version bump")
+    uv__native_tls: bool = option(default=False, help="Setup 'uv' with native TLS")
     script: str | None = option(
         default=None, help="Set up a script instead of a package"
     )

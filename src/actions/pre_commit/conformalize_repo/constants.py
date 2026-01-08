@@ -21,6 +21,8 @@ UV_URL = "https://github.com/astral-sh/uv-pre-commit"
 BUMPVERSION_TOML = Path(".bumpversion.toml")
 COVERAGERC_TOML = Path(".coveragerc.toml")
 ENVRC = Path(".envrc")
+GITEA = Path(".gitea")
+GITHUB = Path(".github")
 GITIGNORE = Path(".gitignore")
 PRE_COMMIT_CONFIG_YAML = Path(".pre-commit-config.yaml")
 PYPROJECT_TOML = Path("pyproject.toml")
@@ -41,9 +43,13 @@ MAX_PYTHON_VERSION = "3.14"
 RUN_VERSION_BUMP = (search("template", str(REPO_ROOT)) is None) and not IS_CI
 
 
-GITHUB_WORKFLOWS = Path(".github/workflows")
-GITHUB_PULL_REQUEST_YAML = GITHUB_WORKFLOWS / "pull-request.yaml"
-GITHUB_PUSH_YAML = GITHUB_WORKFLOWS / "push.yaml"
+GITHUB_WORKFLOWS, GITEA_WORKFLOWS = [g / "workflows" for g in [GITHUB, GITEA]]
+GITHUB_PULL_REQUEST_YAML, GITEA_PULL_REQUEST_YAML = [
+    w / "pull-request.yaml" for w in [GITHUB_WORKFLOWS, GITEA_WORKFLOWS]
+]
+GITHUB_PUSH_YAML, GITEA_PUSH_YAML = [
+    w / "push.yaml" for w in [GITHUB_WORKFLOWS, GITEA_WORKFLOWS]
+]
 PATH_CONFIGS = PATH_PRE_COMMIT / "conformalize_repo/configs"
 
 
@@ -55,8 +61,13 @@ __all__ = [
     "COVERAGERC_TOML",
     "DOCKERFMT_URL",
     "ENVRC",
+    "GITEA",
+    "GITEA_PUSH_YAML",
+    "GITEA_WORKFLOWS",
+    "GITHUB",
     "GITHUB_PULL_REQUEST_YAML",
     "GITHUB_PUSH_YAML",
+    "GITHUB_WORKFLOWS",
     "GITHUB_WORKFLOWS",
     "GITIGNORE",
     "MAX_PYTHON_VERSION",
