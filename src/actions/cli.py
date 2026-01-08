@@ -30,6 +30,11 @@ from actions.pre_commit.touch_py_typed.constants import (
     TOUCH_PY_TYPED_DOCSTRING,
     TOUCH_PY_TYPED_SUB_CMD,
 )
+from actions.pre_commit.update_requirements.cli import update_requirements_sub_cmd
+from actions.pre_commit.update_requirements.constants import (
+    UPDATE_REQUIREMENTS_DOCSTRING,
+    UPDATE_REQUIREMENTS_SUB_CMD,
+)
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.publish_package.constants import (
     PUBLISH_PACKAGE_DOCSTRING,
@@ -95,7 +100,11 @@ _ = pre_commit_sub_cmd.command(
 _ = pre_commit_sub_cmd.command(
     name=TOUCH_PY_TYPED_SUB_CMD, help=TOUCH_PY_TYPED_DOCSTRING, **CONTEXT_SETTINGS
 )(touch_py_typed_sub_cmd)
-
+_ = pre_commit_sub_cmd.command(
+    name=UPDATE_REQUIREMENTS_SUB_CMD,
+    help=UPDATE_REQUIREMENTS_DOCSTRING,
+    **CONTEXT_SETTINGS,
+)(update_requirements_sub_cmd)
 
 if __name__ == "__main__":
     _main()
