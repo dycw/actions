@@ -71,6 +71,7 @@ from actions.pre_commit.utilities import (
     ensure_aot_contains,
     ensure_contains,
     ensure_contains_partial_dict,
+    ensure_contains_partial_str,
     ensure_not_contains,
     get_aot,
     get_array,
@@ -802,8 +803,9 @@ def add_pyproject_toml(
         project.setdefault("version", "0.1.0")
         dependency_groups = get_table(doc, "dependency-groups")
         dev = get_array(dependency_groups, "dev")
-        ensure_contains(dev, "dycw-utilities[test]")
-        ensure_contains(dev, "rich")
+        _ = ensure_contains_partial_str(dev, "dycw-utilities[test]")
+        _ = ensure_contains_partial_str(dev, "pyright")
+        _ = ensure_contains_partial_str(dev, "rich")
         if optional_dependencies__scripts:
             optional_dependencies = get_table(project, "optional-dependencies")
             scripts = get_array(optional_dependencies, "scripts")
