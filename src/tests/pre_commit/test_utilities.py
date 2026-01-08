@@ -62,8 +62,7 @@ class TestEnsureContainsPartialStr:
 
 class TestGetPartialDict:
     def test_main(self) -> None:
-        repo: StrDict = {"repo": "url", "rev": "master"}
-        repos = [repo]
+        repos = [{"repo": "url", "rev": "master"}]
         result = get_partial_dict(repos, {"repo": "url"})
         assert result == one(repos)
 
