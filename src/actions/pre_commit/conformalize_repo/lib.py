@@ -15,14 +15,12 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
-from utilities.pathlib import get_repo_root
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
+from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
-from utilities.whenever import HOUR, get_now
-from whenever import ZonedDateTime
-from xdg_base_dirs import xdg_cache_home
+from utilities.whenever import HOUR
 
 from actions import __version__
 from actions.action_dicts.lib import (
@@ -33,7 +31,7 @@ from actions.action_dicts.lib import (
     run_action_ruff_dict,
     run_action_tag_dict,
 )
-from actions.constants import YAML_INSTANCE
+from actions.constants import PATH_THROTTLE_CACHE, YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.constants import (
     ACTIONS_URL,
@@ -83,7 +81,7 @@ from actions.pre_commit.utilities import (
     yield_toml_doc,
     yield_yaml_dict,
 )
-from actions.utilities import logged_run, write_text
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
@@ -1123,21 +1121,16 @@ def run_bump_my_version(*, modifications: MutableSet[Path] | None = None) -> Non
 ##
 
 
-def run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> None:
-    cache = xdg_cache_home() / "conformalize" / get_repo_root().name
-    try:
-        text = cache.read_text()
-    except FileNotFoundError:
-        ...
-    else:
-        prev = ZonedDateTime.parse_iso(text.rstrip("\n"))
-        if prev >= (get_now() - 12 * HOUR):
-            return
-    write_text(cache, get_now().format_iso())
+def _run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> None:
     current = PRE_COMMIT_CONFIG_YAML.read_text()
     logged_run("pre-commit", "autoupdate", print=True)
     if (modifications is not None) and (PRE_COMMIT_CONFIG_YAML.read_text() != current):
         modifications.add(PRE_COMMIT_CONFIG_YAML)
+
+
+run_pre_commit_update = throttle(
+    delta=12 * HOUR, path=PATH_THROTTLE_CACHE / _run_pre_commit_update.__name__
+)(_run_pre_commit_update)
 
 
 ##
