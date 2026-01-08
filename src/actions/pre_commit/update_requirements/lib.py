@@ -8,7 +8,7 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.pre_commit.utilities import get_pyproject_dependencies
+from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -42,7 +42,7 @@ def _format_path(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> None:
     with yield_toml_doc(path, modifications=modifications) as doc:
-        get_pyproject_dependencies(doc)
+        project_deps = get_pyproject_dependencies(doc)
     if not path.is_file():
         msg = f"Expected a file; {str(path)!r} is not"
         raise FileNotFoundError(msg)
