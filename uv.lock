@@ -216,14 +216,14 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3.1,<9" },
-    { name = "dycw-utilities", specifier = ">=0.177.0,<1" },
+    { name = "dycw-utilities", specifier = ">=0.178.0,<1" },
     { name = "inflect", specifier = ">=7.5.0,<8" },
     { name = "libcst", specifier = ">=1.8.6,<2" },
     { name = "packaging", specifier = ">=25.0,<26" },
     { name = "pydantic", specifier = ">=2.12.5,<3" },
     { name = "pyyaml", specifier = ">=6.0.3,<7" },
     { name = "rich", specifier = ">=14.2.0,<15" },
-    { name = "ruamel-yaml", specifier = ">=0.19.0,<1" },
+    { name = "ruamel-yaml", specifier = ">=0.19.1,<1" },
     { name = "tomlkit", specifier = ">=0.13.3,<1" },
     { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0,<26" },
     { name = "xdg-base-dirs", specifier = ">=6.0.2,<7" },
@@ -231,9 +231,9 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.157.0,<2" },
+    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.178.0,<1" },
     { name = "orjson", specifier = ">=3.11.5,<4" },
-    { name = "pyright", specifier = ">=1.1.407,<2" },
+    { name = "pyright", specifier = ">=1.1.408,<2" },
     { name = "rich", specifier = ">=14.2.0,<15" },
 ]
 
@@ -251,7 +251,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.177.0"
+version = "0.178.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -260,7 +260,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f0/4b/330d397439d1159d5548a4764d5d602ff5eb1bb8456874f7db79875bf40a/dycw_utilities-0.177.0-py3-none-any.whl", hash = "sha256:870d40aaf2c666e29e314c14ab9a1a61e9acb37d18d8aa1bb06ecab2669832b2", size = 206506, upload-time = "2026-01-08T07:47:04.076Z" },
+    { url = "https://files.pythonhosted.org/packages/87/f2/2027a4273cd736baef6072db9998b9edbbb5e502eac2c8f6e164ac340bab/dycw_utilities-0.178.0-py3-none-any.whl", hash = "sha256:34c3f23afc82ada3cdb47d22f8481b55d46bef51d1eb884188d2db3cf7d424d3", size = 207168, upload-time = "2026-01-08T12:13:03.719Z" },
 ]
 
 [package.optional-dependencies]

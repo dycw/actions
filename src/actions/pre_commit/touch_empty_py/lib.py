@@ -4,8 +4,8 @@ import sys
 from typing import TYPE_CHECKING
 
 from libcst import parse_statement
-from utilities.pytest import throttle
 from utilities.text import repr_str, strip_and_dedent
+from utilities.throttle import throttle
 from utilities.whenever import HOUR
 
 from actions import __version__
@@ -42,7 +42,7 @@ def _touch_empty_py(*paths: PathLike) -> None:
 
 
 touch_empty_py = throttle(
-    root=PATH_THROTTLE_CACHE / _touch_empty_py.__name__, delta=12 * HOUR
+    delta=12 * HOUR, path=PATH_THROTTLE_CACHE / _touch_empty_py.__name__
 )(_touch_empty_py)
 
 

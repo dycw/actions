@@ -5,22 +5,22 @@
 [dependency-groups]
   dev = [
     "orjson>=3.11.5, <4",
-    "pyright>=1.1.407, <2",
+    "pyright>=1.1.408, <2",
     "rich>=14.2.0, <15",
-    "dycw-utilities[test]>=0.157.0, <2",
+    "dycw-utilities[test]>=0.178.0, <1",
   ]
 
 [project]
   dependencies = [
     "click>=8.3.1, <9",
-    "dycw-utilities>=0.177.0, <1",
+    "dycw-utilities>=0.178.0, <1",
     "inflect>=7.5.0, <8",
     "libcst>=1.8.6, <2",
     "packaging>=25.0, <26",
     "pydantic>=2.12.5, <3",
     "pyyaml>=6.0.3, <7",
     "rich>=14.2.0, <15",
-    "ruamel-yaml>=0.19.0, <1",
+    "ruamel-yaml>=0.19.1, <1",
     "tomlkit>=0.13.3, <1",
     "typed-settings[attrs,click]>=25.3.0, <26",
     "xdg-base-dirs>=6.0.2, <7",

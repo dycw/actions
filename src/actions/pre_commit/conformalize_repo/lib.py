@@ -15,10 +15,10 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
-from utilities.pytest import throttle
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
+from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
 from utilities.whenever import HOUR
 
@@ -1129,7 +1129,7 @@ def _run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> 
 
 
 run_pre_commit_update = throttle(
-    root=PATH_THROTTLE_CACHE / _run_pre_commit_update.__name__, delta=12 * HOUR
+    delta=12 * HOUR, path=PATH_THROTTLE_CACHE / _run_pre_commit_update.__name__
 )(_run_pre_commit_update)
 
 
