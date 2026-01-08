@@ -364,6 +364,7 @@ __all__ = [
     "ensure_aot_contains",
     "ensure_contains",
     "ensure_contains_partial_dict",
+    "ensure_contains_partial_str",
     "ensure_not_contains",
     "get_aot",
     "get_array",
