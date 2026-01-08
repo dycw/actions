@@ -7,7 +7,7 @@ from utilities.os import is_pytest
 
 from actions.logging import LOGGER
 from actions.pre_commit.click import path_argument
-from actions.update_requirements.lib import update_requirements
+from actions.pre_commit.update_requirements.lib import update_requirements
 
 if TYPE_CHECKING:
     from pathlib import Path

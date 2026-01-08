@@ -12,8 +12,7 @@ from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
 from actions.logging import LOGGER
-from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
-from actions.update_requirements.classes import (
+from actions.pre_commit.update_requirements.classes import (
     PipListOutdatedOutput,
     PipListOutput,
     TwoSidedVersions,
@@ -24,6 +23,7 @@ from actions.update_requirements.classes import (
     parse_version1_or_2,
     parse_version2_or_3,
 )
+from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from tomlkit.items import Array
     from utilities.types import PathLike
 
-    from actions.update_requirements.classes import Version2or3, VersionSet
+    from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
 
 
 def update_requirements(*paths: PathLike) -> None:
