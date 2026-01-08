@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 
 def clean_dir(*, dir_: PathLike = SETTINGS.dir) -> None:
+    """Clean a directory."""
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
