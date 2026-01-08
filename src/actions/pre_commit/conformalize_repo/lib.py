@@ -96,23 +96,23 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
+    ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
+    ci__pull_request__pre_commit__gitea: bool = SETTINGS.ci__pull_request__pre_commit__gitea,
+    ci__pull_request__pyright: bool = SETTINGS.ci__pull_request__pyright,
+    ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
+    ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
+    ci__pull_request__pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
+    ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
+    ci__push__publish: bool = SETTINGS.ci__push__publish,
+    ci__push__tag: bool = SETTINGS.ci__push__tag,
+    ci__push__tag__major: bool = SETTINGS.ci__push__tag__major,
+    ci__push__tag__major_minor: bool = SETTINGS.ci__push__tag__major_minor,
+    ci__push__tag__latest: bool = SETTINGS.ci__push__tag__latest,
     coverage: bool = SETTINGS.coverage,
     description: str | None = SETTINGS.description,
     envrc: bool = SETTINGS.envrc,
     envrc__uv: bool = SETTINGS.envrc__uv,
     envrc__uv__native_tls: bool = SETTINGS.envrc__uv__native_tls,
-    github__pull_request__pre_commit: bool = SETTINGS.github__pull_request__pre_commit,
-    github__pull_request__pre_commit__gitea: bool = SETTINGS.github__pull_request__pre_commit__gitea,
-    github__pull_request__pyright: bool = SETTINGS.github__pull_request__pyright,
-    github__pull_request__pytest__macos: bool = SETTINGS.github__pull_request__pytest__macos,
-    github__pull_request__pytest__ubuntu: bool = SETTINGS.github__pull_request__pytest__ubuntu,
-    github__pull_request__pytest__windows: bool = SETTINGS.github__pull_request__pytest__windows,
-    github__pull_request__ruff: bool = SETTINGS.github__pull_request__ruff,
-    github__push__publish: bool = SETTINGS.github__push__publish,
-    github__push__tag: bool = SETTINGS.github__push__tag,
-    github__push__tag__major: bool = SETTINGS.github__push__tag__major,
-    github__push__tag__major_minor: bool = SETTINGS.github__push__tag__major_minor,
-    github__push__tag__latest: bool = SETTINGS.github__push__tag__latest,
     gitignore: bool = SETTINGS.gitignore,
     package_name: str | None = SETTINGS.package_name,
     pre_commit__dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
@@ -144,23 +144,23 @@ def conformalize_repo(
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
+             - ci__pull_request__pre_commit                   = %s
+             - ci__pull_request__pre_commit__gitea            = %s
+             - ci__pull_request__pyright                      = %s
+             - ci__pull_request__pytest__macos                = %s
+             - ci__pull_request__pytest__ubuntu               = %s
+             - ci__pull_request__pytest__windows              = %s
+             - ci__pull_request__ruff                         = %s
+             - ci__push__publish                              = %s
+             - ci__push__tag                                  = %s
+             - ci__push__tag__major                           = %s
+             - ci__push__tag__major_minor                     = %s
+             - ci__push__tag__latest                          = %s
              - coverage                                           = %s
              - description                                        = %s
              - envrc                                              = %s
              - envrc__uv                                          = %s
              - envrc__uv__native_tls                              = %s
-             - github__pull_request__pre_commit                   = %s
-             - github__pull_request__pre_commit__gitea            = %s
-             - github__pull_request__pyright                      = %s
-             - github__pull_request__pytest__macos                = %s
-             - github__pull_request__pytest__ubuntu               = %s
-             - github__pull_request__pytest__windows              = %s
-             - github__pull_request__ruff                         = %s
-             - github__push__publish                              = %s
-             - github__push__tag                                  = %s
-             - github__push__tag__major                           = %s
-             - github__push__tag__major_minor                     = %s
-             - github__push__tag__latest                          = %s
              - gitignore                                          = %s
              - package_name                                       = %s
              - pre_commit__dockerfmt                              = %s
@@ -189,23 +189,23 @@ def conformalize_repo(
         """),
         conformalize_repo.__name__,
         __version__,
+        ci__pull_request__pre_commit,
+        ci__pull_request__pre_commit__gitea,
+        ci__pull_request__pyright,
+        ci__pull_request__pytest__macos,
+        ci__pull_request__pytest__ubuntu,
+        ci__pull_request__pytest__windows,
+        ci__pull_request__ruff,
+        ci__push__publish,
+        ci__push__tag,
+        ci__push__tag__major,
+        ci__push__tag__major_minor,
+        ci__push__tag__latest,
         coverage,
         description,
         envrc,
         envrc__uv,
         envrc__uv__native_tls,
-        github__pull_request__pre_commit,
-        github__pull_request__pre_commit__gitea,
-        github__pull_request__pyright,
-        github__pull_request__pytest__macos,
-        github__pull_request__pytest__ubuntu,
-        github__pull_request__pytest__windows,
-        github__pull_request__ruff,
-        github__push__publish,
-        github__push__tag,
-        github__push__tag__major,
-        github__push__tag__major_minor,
-        github__push__tag__latest,
         gitignore,
         package_name,
         pre_commit__dockerfmt,
@@ -255,6 +255,44 @@ def conformalize_repo(
         uv=pre_commit__uv,
         script=script,
     )
+    if (
+        ci__pull_request__pre_commit
+        or ci__pull_request__pre_commit__gitea
+        or ci__pull_request__pyright
+        or ci__pull_request__pytest__windows
+        or ci__pull_request__pytest__macos
+        or ci__pull_request__pytest__ubuntu
+        or ci__pull_request__ruff
+    ):
+        add_ci_pull_request_yaml(
+            modifications=modifications,
+            pre_commit=ci__pull_request__pre_commit,
+            pre_commit__gitea=ci__pull_request__pre_commit__gitea,
+            pyright=ci__pull_request__pyright,
+            pytest__windows=ci__pull_request__pytest__windows,
+            pytest__macos=ci__pull_request__pytest__macos,
+            pytest__ubuntu=ci__pull_request__pytest__ubuntu,
+            pytest__timeout=pytest__timeout,
+            python_version=python_version,
+            repo_name=repo_name,
+            ruff=ruff,
+            script=script,
+        )
+    if (
+        ci__push__publish
+        or ci__push__tag
+        or ci__push__tag__major_minor
+        or ci__push__tag__major
+        or ci__push__tag__latest
+    ):
+        add_ci_push_yaml(
+            modifications=modifications,
+            publish=ci__push__publish,
+            tag=ci__push__tag,
+            tag__major_minor=ci__push__tag__major_minor,
+            tag__major=ci__push__tag__major,
+            tag__latest=ci__push__tag__latest,
+        )
     if coverage:
         add_coveragerc_toml(modifications=modifications)
     if envrc or envrc__uv or envrc__uv__native_tls:
@@ -264,44 +302,6 @@ def conformalize_repo(
             uv__native_tls=envrc__uv__native_tls,
             python_version=python_version,
             script=script,
-        )
-    if (
-        github__pull_request__pre_commit
-        or github__pull_request__pre_commit__gitea
-        or github__pull_request__pyright
-        or github__pull_request__pytest__windows
-        or github__pull_request__pytest__macos
-        or github__pull_request__pytest__ubuntu
-        or github__pull_request__ruff
-    ):
-        add_github_pull_request_yaml(
-            modifications=modifications,
-            pre_commit=github__pull_request__pre_commit,
-            pre_commit__gitea=github__pull_request__pre_commit__gitea,
-            pyright=github__pull_request__pyright,
-            pytest__windows=github__pull_request__pytest__windows,
-            pytest__macos=github__pull_request__pytest__macos,
-            pytest__ubuntu=github__pull_request__pytest__ubuntu,
-            pytest__timeout=pytest__timeout,
-            python_version=python_version,
-            repo_name=repo_name,
-            ruff=ruff,
-            script=script,
-        )
-    if (
-        github__push__publish
-        or github__push__tag
-        or github__push__tag__major_minor
-        or github__push__tag__major
-        or github__push__tag__latest
-    ):
-        add_github_push_yaml(
-            modifications=modifications,
-            publish=github__push__publish,
-            tag=github__push__tag,
-            tag__major_minor=github__push__tag__major_minor,
-            tag__major=github__push__tag__major,
-            tag__latest=github__push__tag__latest,
         )
     if gitignore:
         add_gitignore(modifications=modifications)
@@ -402,6 +402,141 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 ##
 
 
+def add_ci_pull_request_yaml(
+    *,
+    modifications: MutableSet[Path] | None = None,
+    pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
+    pre_commit__gitea: bool = SETTINGS.ci__pull_request__pre_commit__gitea,
+    pyright: bool = SETTINGS.ci__pull_request__pyright,
+    pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
+    pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
+    pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
+    pytest__timeout: int | None = SETTINGS.pytest__timeout,
+    python_version: str = SETTINGS.python_version,
+    repo_name: str | None = SETTINGS.repo_name,
+    ruff: bool = SETTINGS.ci__pull_request__ruff,
+    script: str | None = SETTINGS.script,
+) -> None:
+    with yield_yaml_dict(
+        GITHUB_PULL_REQUEST_YAML, modifications=modifications
+    ) as dict_:
+        dict_["name"] = "pull-request"
+        on = get_dict(dict_, "on")
+        pull_request = get_dict(on, "pull_request")
+        branches = get_list(pull_request, "branches")
+        ensure_contains(branches, "master")
+        schedule = get_list(on, "schedule")
+        ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
+        jobs = get_dict(dict_, "jobs")
+        if pre_commit:
+            pre_commit_dict = get_dict(jobs, "pre-commit")
+            pre_commit_dict["runs-on"] = "ubuntu-latest"
+            steps = get_list(pre_commit_dict, "steps")
+            ensure_contains(
+                steps,
+                run_action_pre_commit_dict(
+                    repos=LiteralScalarString(
+                        strip_and_dedent("""
+                            dycw/actions
+                            pre-commit/pre-commit-hooks
+                        """)
+                    ),
+                    gitea=pre_commit__gitea,
+                ),
+            )
+        if pyright:
+            pyright_dict = get_dict(jobs, "pyright")
+            pyright_dict["runs-on"] = "ubuntu-latest"
+            steps = get_list(pyright_dict, "steps")
+            ensure_contains(
+                steps,
+                run_action_pyright_dict(
+                    python_version=python_version, with_requirements=script
+                ),
+            )
+        if pytest__macos or pytest__ubuntu or pytest__windows:
+            pytest_dict = get_dict(jobs, "pytest")
+            env = get_dict(pytest_dict, "env")
+            env["CI"] = "1"
+            pytest_dict["name"] = (
+                "pytest (${{matrix.os}}, ${{matrix.python-version}}, ${{matrix.resolution}})"
+            )
+            pytest_dict["runs-on"] = "${{matrix.os}}"
+            steps = get_list(pytest_dict, "steps")
+            ensure_contains(
+                steps,
+                run_action_pytest_dict(
+                    python_version="${{matrix.python-version}}",
+                    resolution="${{matrix.resolution}}",
+                    with_requirements=script,
+                ),
+            )
+            strategy_dict = get_dict(pytest_dict, "strategy")
+            strategy_dict["fail-fast"] = False
+            matrix = get_dict(strategy_dict, "matrix")
+            os = get_list(matrix, "os")
+            if pytest__macos:
+                ensure_contains(os, "macos-latest")
+            if pytest__ubuntu:
+                ensure_contains(os, "ubuntu-latest")
+            if pytest__windows:
+                ensure_contains(os, "windows-latest")
+            python_version_dict = get_list(matrix, "python-version")
+            ensure_contains(python_version_dict, *yield_python_versions(python_version))
+            resolution = get_list(matrix, "resolution")
+            ensure_contains(resolution, "highest", "lowest-direct")
+            if pytest__timeout is not None:
+                pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
+        if ruff:
+            ruff_dict = get_dict(jobs, "ruff")
+            ruff_dict["runs-on"] = "ubuntu-latest"
+            steps = get_list(ruff_dict, "steps")
+            ensure_contains(steps, run_action_ruff_dict())
+
+
+##
+
+
+def add_ci_push_yaml(
+    *,
+    modifications: MutableSet[Path] | None = None,
+    publish: bool = SETTINGS.ci__push__publish,
+    tag: bool = SETTINGS.ci__push__tag,
+    tag__major_minor: bool = SETTINGS.ci__push__tag__major_minor,
+    tag__major: bool = SETTINGS.ci__push__tag__major,
+    tag__latest: bool = SETTINGS.ci__push__tag__latest,
+) -> None:
+    with yield_yaml_dict(GITHUB_PUSH_YAML, modifications=modifications) as dict_:
+        dict_["name"] = "push"
+        on = get_dict(dict_, "on")
+        push = get_dict(on, "push")
+        branches = get_list(push, "branches")
+        ensure_contains(branches, "master")
+        jobs = get_dict(dict_, "jobs")
+        if publish:
+            publish_dict = get_dict(jobs, "publish")
+            environment = get_dict(publish_dict, "environment")
+            environment["name"] = "pypi"
+            permissions = get_dict(publish_dict, "permissions")
+            permissions["id-token"] = "write"
+            publish_dict["runs-on"] = "ubuntu-latest"
+            steps = get_list(publish_dict, "steps")
+            ensure_contains(steps, run_action_publish_dict())
+        if tag or tag__major_minor or tag__major or tag__latest:
+            tag_dict = get_dict(jobs, "tag")
+            tag_dict["runs-on"] = "ubuntu-latest"
+            steps = get_list(tag_dict, "steps")
+            ensure_contains(
+                steps,
+                run_action_tag_dict(
+                    major_minor=tag__major_minor, major=tag__major, latest=tag__latest
+                ),
+            )
+
+
+##
+
+
 def add_coveragerc_toml(*, modifications: MutableSet[Path] | None = None) -> None:
     with yield_toml_doc(COVERAGERC_TOML, modifications=modifications) as doc:
         html = get_table(doc, "html")
@@ -489,141 +624,6 @@ def _add_envrc_uv_text(
         args.extend(["--script", script])
     lines.append(join(args))
     return "\n".join(lines)
-
-
-##
-
-
-def add_github_pull_request_yaml(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    pre_commit: bool = SETTINGS.github__pull_request__pre_commit,
-    pre_commit__gitea: bool = SETTINGS.github__pull_request__pre_commit__gitea,
-    pyright: bool = SETTINGS.github__pull_request__pyright,
-    pytest__macos: bool = SETTINGS.github__pull_request__pytest__macos,
-    pytest__ubuntu: bool = SETTINGS.github__pull_request__pytest__ubuntu,
-    pytest__windows: bool = SETTINGS.github__pull_request__pytest__windows,
-    pytest__timeout: int | None = SETTINGS.pytest__timeout,
-    python_version: str = SETTINGS.python_version,
-    repo_name: str | None = SETTINGS.repo_name,
-    ruff: bool = SETTINGS.github__pull_request__ruff,
-    script: str | None = SETTINGS.script,
-) -> None:
-    with yield_yaml_dict(
-        GITHUB_PULL_REQUEST_YAML, modifications=modifications
-    ) as dict_:
-        dict_["name"] = "pull-request"
-        on = get_dict(dict_, "on")
-        pull_request = get_dict(on, "pull_request")
-        branches = get_list(pull_request, "branches")
-        ensure_contains(branches, "master")
-        schedule = get_list(on, "schedule")
-        ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
-        jobs = get_dict(dict_, "jobs")
-        if pre_commit:
-            pre_commit_dict = get_dict(jobs, "pre-commit")
-            pre_commit_dict["runs-on"] = "ubuntu-latest"
-            steps = get_list(pre_commit_dict, "steps")
-            ensure_contains(
-                steps,
-                run_action_pre_commit_dict(
-                    repos=LiteralScalarString(
-                        strip_and_dedent("""
-                            dycw/actions
-                            pre-commit/pre-commit-hooks
-                        """)
-                    ),
-                    gitea=pre_commit__gitea,
-                ),
-            )
-        if pyright:
-            pyright_dict = get_dict(jobs, "pyright")
-            pyright_dict["runs-on"] = "ubuntu-latest"
-            steps = get_list(pyright_dict, "steps")
-            ensure_contains(
-                steps,
-                run_action_pyright_dict(
-                    python_version=python_version, with_requirements=script
-                ),
-            )
-        if pytest__macos or pytest__ubuntu or pytest__windows:
-            pytest_dict = get_dict(jobs, "pytest")
-            env = get_dict(pytest_dict, "env")
-            env["CI"] = "1"
-            pytest_dict["name"] = (
-                "pytest (${{matrix.os}}, ${{matrix.python-version}}, ${{matrix.resolution}})"
-            )
-            pytest_dict["runs-on"] = "${{matrix.os}}"
-            steps = get_list(pytest_dict, "steps")
-            ensure_contains(
-                steps,
-                run_action_pytest_dict(
-                    python_version="${{matrix.python-version}}",
-                    resolution="${{matrix.resolution}}",
-                    with_requirements=script,
-                ),
-            )
-            strategy_dict = get_dict(pytest_dict, "strategy")
-            strategy_dict["fail-fast"] = False
-            matrix = get_dict(strategy_dict, "matrix")
-            os = get_list(matrix, "os")
-            if pytest__macos:
-                ensure_contains(os, "macos-latest")
-            if pytest__ubuntu:
-                ensure_contains(os, "ubuntu-latest")
-            if pytest__windows:
-                ensure_contains(os, "windows-latest")
-            python_version_dict = get_list(matrix, "python-version")
-            ensure_contains(python_version_dict, *yield_python_versions(python_version))
-            resolution = get_list(matrix, "resolution")
-            ensure_contains(resolution, "highest", "lowest-direct")
-            if pytest__timeout is not None:
-                pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
-        if ruff:
-            ruff_dict = get_dict(jobs, "ruff")
-            ruff_dict["runs-on"] = "ubuntu-latest"
-            steps = get_list(ruff_dict, "steps")
-            ensure_contains(steps, run_action_ruff_dict())
-
-
-##
-
-
-def add_github_push_yaml(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    publish: bool = SETTINGS.github__push__publish,
-    tag: bool = SETTINGS.github__push__tag,
-    tag__major_minor: bool = SETTINGS.github__push__tag__major_minor,
-    tag__major: bool = SETTINGS.github__push__tag__major,
-    tag__latest: bool = SETTINGS.github__push__tag__latest,
-) -> None:
-    with yield_yaml_dict(GITHUB_PUSH_YAML, modifications=modifications) as dict_:
-        dict_["name"] = "push"
-        on = get_dict(dict_, "on")
-        push = get_dict(on, "push")
-        branches = get_list(push, "branches")
-        ensure_contains(branches, "master")
-        jobs = get_dict(dict_, "jobs")
-        if publish:
-            publish_dict = get_dict(jobs, "publish")
-            environment = get_dict(publish_dict, "environment")
-            environment["name"] = "pypi"
-            permissions = get_dict(publish_dict, "permissions")
-            permissions["id-token"] = "write"
-            publish_dict["runs-on"] = "ubuntu-latest"
-            steps = get_list(publish_dict, "steps")
-            ensure_contains(steps, run_action_publish_dict())
-        if tag or tag__major_minor or tag__major or tag__latest:
-            tag_dict = get_dict(jobs, "tag")
-            tag_dict["runs-on"] = "ubuntu-latest"
-            steps = get_list(tag_dict, "steps")
-            ensure_contains(
-                steps,
-                run_action_tag_dict(
-                    major_minor=tag__major_minor, major=tag__major, latest=tag__latest
-                ),
-            )
 
 
 ##
@@ -1278,10 +1278,10 @@ def _yield_python_version_tuple(version: str, /) -> tuple[int, int]:
 
 __all__ = [
     "add_bumpversion_toml",
+    "add_ci_pull_request_yaml",
+    "add_ci_push_yaml",
     "add_coveragerc_toml",
     "add_envrc",
-    "add_github_pull_request_yaml",
-    "add_github_push_yaml",
     "add_gitignore",
     "add_pre_commit_config_yaml",
     "add_pyproject_toml",

@@ -8,46 +8,46 @@ from actions.utilities import LOADER
 
 @settings
 class Settings:
+    ci__pull_request__pre_commit: bool = option(
+        default=False, help="Set up 'pull-request.yaml' pre-commit"
+    )
+    ci__pull_request__pre_commit__gitea: bool = option(
+        default=False, help="Set up 'pull-request.yaml' for Gitea"
+    )
+    ci__pull_request__pyright: bool = option(
+        default=False, help="Set up 'pull-request.yaml' pyright"
+    )
+    ci__pull_request__pytest__macos: bool = option(
+        default=False, help="Set up 'pull-request.yaml' pytest with MacOS"
+    )
+    ci__pull_request__pytest__ubuntu: bool = option(
+        default=False, help="Set up 'pull-request.yaml' pytest with Ubuntu"
+    )
+    ci__pull_request__pytest__windows: bool = option(
+        default=False, help="Set up 'pull-request.yaml' pytest with Windows"
+    )
+    ci__pull_request__ruff: bool = option(
+        default=False, help="Set up 'pull-request.yaml' ruff"
+    )
+    ci__push__publish: bool = option(
+        default=False, help="Set up 'push.yaml' publishing"
+    )
+    ci__push__tag: bool = option(default=False, help="Set up 'push.yaml' tagging")
+    ci__push__tag__major: bool = option(
+        default=False, help="Set up 'push.yaml' with the 'major' tag"
+    )
+    ci__push__tag__major_minor: bool = option(
+        default=False, help="Set up 'push.yaml' with the 'major.minor' tag"
+    )
+    ci__push__tag__latest: bool = option(
+        default=False, help="Set up 'push.yaml' tagging"
+    )
     coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")
     description: str | None = option(default=None, help="Repo description")
     envrc: bool = option(default=False, help="Set up '.envrc'")
     envrc__uv: bool = option(default=False, help="Set up '.envrc' with uv")
     envrc__uv__native_tls: bool = option(
         default=False, help="Set up '.envrc' with uv native TLS"
-    )
-    github__pull_request__pre_commit: bool = option(
-        default=False, help="Set up 'pull-request.yaml' pre-commit"
-    )
-    github__pull_request__pre_commit__gitea: bool = option(
-        default=False, help="Set up 'pull-request.yaml' for Gitea"
-    )
-    github__pull_request__pyright: bool = option(
-        default=False, help="Set up 'pull-request.yaml' pyright"
-    )
-    github__pull_request__pytest__macos: bool = option(
-        default=False, help="Set up 'pull-request.yaml' pytest with MacOS"
-    )
-    github__pull_request__pytest__ubuntu: bool = option(
-        default=False, help="Set up 'pull-request.yaml' pytest with Ubuntu"
-    )
-    github__pull_request__pytest__windows: bool = option(
-        default=False, help="Set up 'pull-request.yaml' pytest with Windows"
-    )
-    github__pull_request__ruff: bool = option(
-        default=False, help="Set up 'pull-request.yaml' ruff"
-    )
-    github__push__publish: bool = option(
-        default=False, help="Set up 'push.yaml' publishing"
-    )
-    github__push__tag: bool = option(default=False, help="Set up 'push.yaml' tagging")
-    github__push__tag__major: bool = option(
-        default=False, help="Set up 'push.yaml' with the 'major' tag"
-    )
-    github__push__tag__major_minor: bool = option(
-        default=False, help="Set up 'push.yaml' with the 'major.minor' tag"
-    )
-    github__push__tag__latest: bool = option(
-        default=False, help="Set up 'push.yaml' tagging"
     )
     gitignore: bool = option(default=False, help="Set up '.gitignore'")
     package_name: str | None = option(default=None, help="Package name")
