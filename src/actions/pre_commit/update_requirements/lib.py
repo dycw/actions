@@ -6,7 +6,6 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
-from tomlkit import string
 from utilities.functions import ensure_str, max_nullable, min_nullable
 from utilities.packaging import Requirement
 from utilities.text import repr_str, strip_and_dedent
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
-    from tomlkit.items import Array, String
+    from tomlkit.items import Array
     from utilities.types import PathLike
 
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
@@ -147,7 +146,7 @@ def _get_pip_list_outdated_versions() -> dict[str, Version2or3]:
     return {p.name: parse_version2_or_3(p.version) for p in packages}
 
 
-def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> String:
+def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Requirement:
     parts: list[str] = []
     versions_i = versions[requirement.name]
     match versions_i.pyproject_lower, versions_i.pyproject_upper, versions_i.latest:
@@ -186,8 +185,7 @@ def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> String:
             parts.extend([f">={new_lower}", f"<{bumped.major}"])
         case never:
             raise NotImplementedError(never)
-    new = Requirement.new(" ".join([requirement.name, ",".join(parts)]))
-    return string(str(new))
+    return Requirement.new(" ".join([requirement.name, ",".join(parts)]))
 
 
 __all__ = ["update_requirements"]
