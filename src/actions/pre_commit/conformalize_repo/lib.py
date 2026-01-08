@@ -16,7 +16,6 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
-from utilities.random import SYSTEM_RANDOM
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
@@ -519,7 +518,7 @@ def add_github_pull_request_yaml(
         branches = get_list(pull_request, "branches")
         ensure_contains(branches, "master")
         schedule = get_list(on, "schedule")
-        ensure_contains(schedule, {"cron": random_cron_job(repo_name=repo_name)})
+        ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
         jobs = get_dict(dict_, "jobs")
         if pre_commit:
             pre_commit_dict = get_dict(jobs, "pre-commit")
@@ -1054,6 +1053,20 @@ def check_versions() -> None:
 ##
 
 
+def get_cron_job(*, repo_name: str | None = SETTINGS.repo_name) -> str:
+    if repo_name is None:
+        hour = minute = 0
+    else:
+        digest = blake2b(repo_name.encode(), digest_size=8).digest()
+        value = int.from_bytes(digest, "big")
+        minute = value % 60
+        hour = (value // 60) % 24
+    return f"{hour} {minute} * * *"
+
+
+##
+
+
 def get_python_package_name(
     *,
     package_name: str | None = SETTINGS.package_name,
@@ -1098,21 +1111,6 @@ def get_version_from_git_tag() -> Version:
             return parse_version(line)
     msg = "No valid version from 'git tag'"
     raise ValueError(msg)
-
-
-##
-
-
-def random_cron_job(*, repo_name: str | None = SETTINGS.repo_name) -> str:
-    if repo_name is None:
-        hour = SYSTEM_RANDOM.randint(0, 59)
-        minute = SYSTEM_RANDOM.randint(0, 23)
-    else:
-        digest = blake2b(repo_name.encode(), digest_size=8).digest()
-        value = int.from_bytes(digest, "big")
-        minute = value % 60
-        hour = (value // 60) % 24
-    return f"{hour} {minute} * * *"
 
 
 ##
@@ -1292,11 +1290,11 @@ __all__ = [
     "add_readme_md",
     "add_ruff_toml",
     "check_versions",
+    "get_cron_job",
     "get_python_package_name",
     "get_version_from_bumpversion_toml",
     "get_version_from_git_show",
     "get_version_from_git_tag",
-    "random_cron_job",
     "run_bump_my_version",
     "run_pre_commit_update",
     "run_ripgrep_and_replace",
