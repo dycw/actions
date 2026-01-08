@@ -102,7 +102,8 @@ class TestFormatPath:
                 Versions(
                     pyproject_lower=Version3(1, 2, 3), pyproject_upper=Version2(1, 3)
                 ),
-                "lower>=1.2.3, <1.3",
+                "lower>=1.2.3, <2",
+                marks=mark.only,
             ),
             param(
                 "lower>=1.2.3, <1.3",
@@ -111,7 +112,7 @@ class TestFormatPath:
                     pyproject_upper=Version2(1, 3),
                     latest=Version3(1, 2, 3),
                 ),
-                "lower>=1.2.3, <1.3",
+                "lower>=1.2.3, <2",
             ),
         ],
     )

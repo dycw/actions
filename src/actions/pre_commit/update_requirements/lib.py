@@ -176,7 +176,12 @@ def _format_item(requirement: Requirement, versions: Versions, /) -> String:
         case Version3() as lower, None, Version3() as latest:
             parts.append(f">={max(lower, latest)}")
         case Version3() as lower, Version2() as upper, None:
-            parts.extend([f">={lower}", f"<{upper}"])
+            bumped = lower.bump_major()
+            parts.extend([f">={lower}", f"<{bumped.major}"])
+        case Version3() as lower, Version2() as upper, Version3() as latest:
+            new_lower = max(lower, latest)
+            bumped = new_lower.bump_major()
+            parts.extend([f">={new_lower}", f"<{bumped.major}"])
         case None, Version2() | Version3() as upper, None:
             parts.append(f"<{upper}")
         case None, Version2() as upper, Version3() as latest:
