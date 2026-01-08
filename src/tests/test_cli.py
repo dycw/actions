@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pytest import mark, param
 from utilities.pathlib import get_repo_root
-from utilities.pytest import throttle
+from utilities.pytest import throttle_test
 from utilities.subprocess import run
 from utilities.whenever import MINUTE
 
@@ -40,6 +40,6 @@ class TestCLI:
             param([TAG_COMMIT_SUB_CMD]),
         ],
     )
-    @throttle(delta=MINUTE)
+    @throttle_test(delta=MINUTE)
     def test_main(self, *, args: list[str]) -> None:
         run("action", *args, cwd=get_repo_root())
