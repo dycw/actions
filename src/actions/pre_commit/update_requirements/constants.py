@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-TOUCH_PY_TYPED_DOCSTRING = "Touch 'py.typed'"
-TOUCH_PY_TYPED_SUB_CMD = "touch-py-typed"
+UPDATE_REQUIREMENTS_TYPED_DOCSTRING = "Update a set of requirements"
+UPDATE_REQUIREMENTS_SUB_CMD = "update-requirements"
 
 
-__all__ = ["TOUCH_PY_TYPED_DOCSTRING", "TOUCH_PY_TYPED_SUB_CMD"]
+__all__ = ["UPDATE_REQUIREMENTS_SUB_CMD", "UPDATE_REQUIREMENTS_TYPED_DOCSTRING"]
