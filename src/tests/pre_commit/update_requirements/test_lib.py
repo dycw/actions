@@ -21,6 +21,8 @@ class TestFormatPath:
         ("input_", "latest", "output"),
         [
             param("package", None, "package"),
+            param("package", Version2(1, 2), "package>=1.2, <2"),
+            param("package", Version3(1, 2, 3), "package>=1.2.3, <2"),
             param("package>=1.2", None, "package>=1.2"),
             param("package>=1.2", Version2(1, 2), "package>=1.2"),
             param("package>=1.2", Version2(1, 3), "package>=1.3"),

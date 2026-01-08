@@ -88,6 +88,9 @@ def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Require
     match lower, upper, latest:
         case None, None, None:
             ...
+        case None, None, Version2() | Version3():
+            new_lower = latest
+            new_upper = latest.bump_major().major
         case Version2() | Version3(), None, None:
             new_lower = lower
         case (Version2(), None, Version2()) | (Version3(), None, Version3()):

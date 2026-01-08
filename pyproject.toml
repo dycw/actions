@@ -4,12 +4,10 @@
 
 [dependency-groups]
   dev = [
-    "dycw-utilities>=0.176.6, <1",
     "orjson>=3.11.5, <4",
-    "pyright",
+    "pyright>=1.1.407, <2",
     "rich>=14.2.0, <15",
-    "dycw-utilities[test]",
-    "rich",
+    "dycw-utilities[test]>=0.157.0, <2",
   ]
 
 [project]
@@ -31,7 +29,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.7.0"
+  version = "0.7.1"
 
   [project.scripts]
     action = "actions.cli:_main"
