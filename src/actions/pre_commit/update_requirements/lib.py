@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from packaging.requirements import Requirement
@@ -79,13 +80,14 @@ def _get_version_set(path: PathLike, /) -> VersionSet:
         versions.pyproject_upper = upper
         out[key] = versions
     for key, value in _get_pip_list_versions().items():
-        versions = out.get(key, Versions())
-        versions.current = value
-        out[key] = versions
+        with suppress(KeyError):
+            versions = out[key]
+            versions.current = value
     for key, value in _get_pip_list_outdated_versions().items():
-        versions = out.get(key, Versions())
-        versions.latest = value
-        out[key] = versions
+        with suppress(KeyError):
+            versions = out[key]
+            versions.latest = value
+            out[key] = versions
     return out
 
 
