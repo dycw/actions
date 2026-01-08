@@ -19,15 +19,15 @@ def input_dependencies() -> str:
   dependencies = [
     "unbounded",
     "lower1>=1.2.3",
-    "lower2    >=    1.2.3",
+    "lower2  >=  1.2.3",
     "upper1<1.3",
-    "upper2    <    1.3",
+    "upper2  <  1.3",
     "lower-and-upper1>=1.2.3,<1.3",
     "lower-and-upper2<1.3,>=1.2.3",
-    "lower-and-upper3    >=    1.2.3    ,    <1.3",
+    "lower-and-upper3  >=  1.2.3  ,  <1.3",
     "with-extra[extra1]",
     "with-extra[extra2]>=1.2.3",
-    "with-extra[extra3]    >=    1.2.3",
+    "with-extra[extra3]  >=  1.2.3",
   ]
 """)
 
@@ -37,7 +37,7 @@ def output_dependencies() -> str:
     return strip_and_dedent(
         """
 [project]
-  dependencies = ["unbounded", "lower1 >=1.2.3", "lower2 >=1.2.3", "upper1 <1.3", "upper2 <1.3", "lower-and-upper1 >=1.2.3, <1.3", "lower-and-upper2 >=1.2.3, <1.3", "lower-and-upper3 >=1.2.3, <1.3", "with-extra[extra1]", "with-extra[extra2] >=1.2.3", "with-extra[extra3] >=1.2.3"]
+  dependencies = ["unbounded", "lower1>=1.2.3", "lower2>=1.2.3", "upper1<1.3", "upper2<1.3", "lower-and-upper1>=1.2.3, <1.3", "lower-and-upper2>=1.2.3, <1.3", "lower-and-upper3>=1.2.3, <1.3", "with-extra[extra1]", "with-extra[extra2]>=1.2.3", "with-extra[extra3]>=1.2.3"]
 """,
         trailing=True,
     )
@@ -64,7 +64,7 @@ def output_optional_deps() -> str:
     return strip_and_dedent(
         """
 [project.optional-dependencies]
-  group = ["unbounded", "lower >=1.2.3", "upper <1.3", "lower-and-upper1 >=1.2.3, <1.3"]
+  group = ["unbounded", "lower>=1.2.3", "upper<1.3", "lower-and-upper1>=1.2.3, <1.3"]
 """,
         trailing=True,
     )
@@ -91,7 +91,7 @@ def output_dep_groups() -> str:
     return strip_and_dedent(
         """
 [dependency-groups]
-  group = ["unbounded", "lower >=1.2.3", "upper <1.3", "lower-and-upper1 >=1.2.3, <1.3"]
+  group = ["unbounded", "lower>=1.2.3", "upper<1.3", "lower-and-upper1>=1.2.3, <1.3"]
 """,
         trailing=True,
     )

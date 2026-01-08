@@ -3,18 +3,32 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from utilities.iterables import one
+from packaging.requirements import Requirement
+from pydantic import TypeAdapter
+from utilities.functions import ensure_str
 from utilities.text import repr_str, strip_and_dedent
+from utilities.version import ParseVersionError
+from utilities.version import parse_version as parse_version3
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.pre_commit.update_requirements.classes import (
+    PipListOutdatedOutput,
+    PipListOutput,
+    Versions,
+    parse_version2,
+    parse_version2_or_3,
+)
 from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
     from pathlib import Path
 
     from utilities.types import PathLike
+
+    from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
 
 
 def update_requirements(*paths: PathLike) -> None:
@@ -39,28 +53,65 @@ def update_requirements(*paths: PathLike) -> None:
 
 
 def _format_path(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+    path: PathLike,
+    /,
+    *,
+    versions: dict[str, VersionSet] | None = None,
+    modifications: MutableSet[Path] | None = None,
 ) -> None:
+    assert 0, _get_pyproject_versions(path)
+    versions_use = _get_version_set() if versions is None else versions
     with yield_toml_doc(path, modifications=modifications) as doc:
+        assert 0, versions_use
+        get_pyproject_dependencies(doc)
+        assert 0, _get_version_set()
+        modifications.add(py_typed)
+
+
+def _get_version_set() -> VersionSet:
+    current = _get_pip_list_versions()
+    outdated = _get_pip_list_outdated_versions()
+    out: dict[str, Versions] = {}
+    for key, value in current.items():
+        out[key] = Versions(current=value, latest=outdated.get(key))
+    return out
+
+
+def _get_pyproject_versions(path: PathLike, /) -> dict[str, Version2or3]:
+    out: dict[str, Version2or3] = {}
+    with yield_toml_doc(path) as doc:
         project_deps = get_pyproject_dependencies(doc)
-    if not path.is_file():
-        msg = f"Expected a file; {str(path)!r} is not"
-        raise FileNotFoundError(msg)
-    if path.name != "pyproject.toml":
-        msg = f"Expected 'pyproject.toml'; got {str(path)!r}"
-        raise TypeError(msg)
-    src = path.parent / "src"
-    if not src.exists():
-        return
-    if not src.is_dir():
-        msg = f"Expected a directory; {str(src)!r} is not"
-        raise NotADirectoryError(msg)
-    non_tests = one(p for p in src.iterdir() if p.name != "tests")
-    py_typed = non_tests / "py.typed"
-    if not py_typed.exists():
-        py_typed.touch()
-        if modifications is not None:
-            modifications.add(py_typed)
+        if (deps := project_deps.dependencies) is not None:
+            for dep in deps:
+                req = Requirement(ensure_str(dep))
+                spec = req.specifier
+                assert 0, spec
+            _format_array(deps)
+        # if (opt_depedencies := project_deps.opt_dependencies) is not None:
+        #     for array in opt_depedencies.values():
+        #         _format_array(array)
+        # if (dep_grps := project_deps.dep_groups) is not None:
+        #     for array in dep_grps.values():
+        #         _format_array(array)
+
+        assert 0, path
+    json = logged_run("uv", "pip", "list", "--format", "json", "--strict", return_=True)
+    packages = TypeAdapter(list[PipListOutput]).validate_json(json)
+    return {p.name: parse_version2_or_3(p.version) for p in packages}
+
+
+def _get_pip_list_versions() -> dict[str, Version2or3]:
+    json = logged_run("uv", "pip", "list", "--format", "json", "--strict", return_=True)
+    packages = TypeAdapter(list[PipListOutput]).validate_json(json)
+    return {p.name: parse_version2_or_3(p.version) for p in packages}
+
+
+def _get_pip_list_outdated_versions() -> dict[str, Version2or3]:
+    json = logged_run(
+        "uv", "pip", "list", "--format", "json", "--outdated", "--strict", return_=True
+    )
+    packages = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json)
+    return {p.name: parse_version2_or_3(p.version) for p in packages}
 
 
 __all__ = ["update_requirements"]

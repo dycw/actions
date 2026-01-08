@@ -3,11 +3,10 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any, override
 
-from packaging._tokenizer import ParserSyntaxError
-from packaging.requirements import InvalidRequirement, Requirement, _parse_requirement
 from packaging.specifiers import Specifier, SpecifierSet
 from tomlkit import string
 from utilities.functions import ensure_str
+from utilities.packaging import Requirement
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
@@ -22,7 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
-    from tomlkit.items import Array
+    from tomlkit.items import Array, String
     from utilities.types import PathLike
 
 
@@ -68,44 +67,8 @@ def _format_array(dependencies: Array, /) -> None:
     ensure_contains(dependencies, *formatted)
 
 
-def _format_item(item: Any, /) -> Any:
-    return string(str(_CustomRequirement(ensure_str(item))))
-
-
-class _CustomRequirement(Requirement):
-    @override
-    def __init__(self, requirement_string: str) -> None:
-        super().__init__(requirement_string)
-        try:
-            parsed = _parse_requirement(requirement_string)
-        except ParserSyntaxError as e:
-            raise InvalidRequirement(str(e)) from e
-        self.specifier = _CustomSpecifierSet(parsed.specifier)
-
-    @override
-    def _iter_parts(self, name: str) -> Iterator[str]:
-        yield name
-        if self.extras:
-            formatted_extras = ",".join(sorted(self.extras))
-            yield f"[{formatted_extras}]"
-        if self.specifier:
-            yield f" {self.specifier}"
-        if self.url:
-            yield f"@ {self.url}"
-            if self.marker:
-                yield " "
-        if self.marker:
-            yield f"; {self.marker}"
-
-
-class _CustomSpecifierSet(SpecifierSet):
-    @override
-    def __str__(self) -> str:
-        specs = sorted(self._specs, key=self._key)
-        return ", ".join(map(str, specs))
-
-    def _key(self, spec: Specifier, /) -> int:
-        return [">=", "<"].index(spec.operator)
+def _format_item(item: Any, /) -> String:
+    return string(str(Requirement.new(ensure_str(item))))
 
 
 __all__ = ["format_requirements"]
