@@ -23,7 +23,7 @@
     "pyyaml >=6.0.3, <7",
     "rich >=14.2.0, <15",
     "ruamel-yaml >=0.19.0, <1",
-    "tabulate >=0.6",
+    "tabulate >=0.6.0",
     "tomlkit >=0.13.3, <1",
     "typed-settings >=25.3.0, <26",
     "xdg-base-dirs >=6.0.2, <7",

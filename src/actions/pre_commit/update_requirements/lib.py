@@ -132,7 +132,7 @@ def _get_pip_list_outdated_versions() -> dict[str, Version2or3]:
         "uv", "pip", "list", "--format", "json", "--outdated", "--strict", return_=True
     )
     packages = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json)
-    return {p.name: parse_version2_or_3(p.version) for p in packages}
+    return {p.name: parse_version2_or_3(p.latest_version) for p in packages}
 
 
 def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Requirement:
