@@ -6,13 +6,8 @@ from pytest import mark, param
 from utilities.packaging import Requirement
 from utilities.text import strip_and_dedent
 
-from actions.pre_commit.update_requirements.classes import (
-    Version2,
-    Version3,
-    Versions,
-    VersionSet,
-)
-from actions.pre_commit.update_requirements.lib import _format_path
+from actions.update_requirements.classes import Version2, Version3, Versions, VersionSet
+from actions.update_requirements.lib import _format_path
 from actions.utilities import are_equal_modulo_new_line
 
 if TYPE_CHECKING:
