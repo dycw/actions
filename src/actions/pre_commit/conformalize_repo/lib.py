@@ -809,7 +809,7 @@ def add_pyproject_toml(
         if optional_dependencies__scripts:
             optional_dependencies = get_table(project, "optional-dependencies")
             scripts = get_array(optional_dependencies, "scripts")
-            ensure_contains(scripts, "click >=8.3.1")
+            _ = ensure_contains_partial_str(scripts, "click")
         if python_package_name is not None:
             tool = get_table(doc, "tool")
             uv = get_table(tool, "uv")
