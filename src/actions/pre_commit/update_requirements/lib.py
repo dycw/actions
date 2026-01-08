@@ -60,7 +60,7 @@ def _format_path(
     path: PathLike,
     /,
     *,
-    versions: dict[str, VersionSet] | None = None,
+    versions: VersionSet | None = None,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
     # assert 0, _get_pyproject_versions(path)

@@ -2,12 +2,11 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from functools import total_ordering
 from pathlib import Path
 from typing import Any, Self, override
 
-from attr import field
 from pydantic import BaseModel
 from utilities.version import (
     ParseVersionError,
@@ -93,9 +92,9 @@ class Version2:
 
 def parse_version2_or_3(version: str, /) -> Version2or3:
     try:
-        return parse_version2(version)
-    except ParseVersionError:
         return parse_version3(version)
+    except ParseVersionError:
+        return parse_version2(version)
 
 
 def parse_version2(version: str, /) -> Version2:
