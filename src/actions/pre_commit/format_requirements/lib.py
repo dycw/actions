@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any
 
-from packaging.specifiers import Specifier, SpecifierSet
 from tomlkit import string
 from utilities.functions import ensure_str
 from utilities.packaging import Requirement
@@ -18,7 +17,7 @@ from actions.pre_commit.utilities import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, MutableSet
+    from collections.abc import MutableSet
     from pathlib import Path
 
     from tomlkit.items import Array, String

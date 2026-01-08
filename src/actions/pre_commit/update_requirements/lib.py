@@ -2,15 +2,14 @@ from __future__ import annotations
 
 import sys
 from contextlib import suppress
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, assert_never
 
 from packaging.requirements import Requirement
 from pydantic import TypeAdapter
+from tomlkit import string
 from utilities.functions import ensure_str, max_nullable, min_nullable
 from utilities.packaging import Requirement
 from utilities.text import repr_str, strip_and_dedent
-from utilities.version import ParseVersionError
-from utilities.version import parse_version as parse_version3
 
 from actions import __version__
 from actions.logging import LOGGER
@@ -18,18 +17,23 @@ from actions.pre_commit.update_requirements.classes import (
     PipListOutdatedOutput,
     PipListOutput,
     TwoSidedVersions,
+    Version2,
+    Version3,
     Versions,
-    parse_version2,
     parse_version2_or_3,
 )
-from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
+from actions.pre_commit.utilities import (
+    ensure_contains,
+    get_pyproject_dependencies,
+    yield_toml_doc,
+)
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
-    from tomlkit.items import Array
+    from tomlkit.items import Array, String
     from utilities.types import PathLike
 
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
@@ -63,13 +67,12 @@ def _format_path(
     versions: VersionSet | None = None,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
-    # assert 0, _get_pyproject_versions(path)
     versions_use = _get_version_set(path) if versions is None else versions
+    # assert 0, _get_pyproject_versions(path)
     with yield_toml_doc(path, modifications=modifications) as doc:
-        assert 0, versions_use
-        get_pyproject_dependencies(doc)
-        assert 0, _get_version_set()
-        modifications.add(py_typed)
+        project_deps = get_pyproject_dependencies(doc)
+        if (deps := project_deps.dependencies) is not None:
+            _format_array(deps, versions_use)
 
 
 def _get_version_set(path: PathLike, /) -> VersionSet:
@@ -145,6 +148,54 @@ def _get_pip_list_outdated_versions() -> dict[str, Version2or3]:
     )
     packages = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json)
     return {p.name: parse_version2_or_3(p.version) for p in packages}
+
+
+def _format_array(dependencies: Array, versions: VersionSet, /) -> None:
+    formatted: list[String] = []
+    for item in dependencies:
+        req = Requirement.new(ensure_str(item))
+        ver = versions[req.name]
+        formatted.append(_format_item(req, ver))
+    dependencies.clear()
+    ensure_contains(dependencies, *formatted)
+
+
+def _format_item(requirement: Requirement, versions: Versions, /) -> String:
+    parts: list[str] = []
+    # if (latest := versions.latest) is None:
+    #     if (lower := versions.pyproject_lower) is not None:
+    #         parts.append(f">={lower}")
+    #     if (upper := versions.pyproject_upper) is not None:
+    #         parts.append(f"<{upper}")
+    # else:
+    match versions.pyproject_lower, versions.pyproject_upper, versions.latest:
+        case None, None, None:
+            ...
+        case Version2() | Version3() as lower, None, None:
+            parts.append(f">={lower}")
+        case Version3() as lower, None, Version3() as latest:
+            parts.append(f">={max(lower, latest)}")
+        case Version3() as lower, Version2() as upper, None:
+            parts.extend([f">={lower}", f"<{upper}"])
+        case None, Version2() | Version3() as upper, None:
+            parts.append(f"<{upper}")
+        case None, Version2() as upper, Version3() as latest:
+            bumped = latest.bump_minor()
+            parts.append(f"<{max(upper, Version2(bumped.major, bumped.minor))}")
+        case never:
+            assert_never(never)
+    new = Requirement.new(" ".join([requirement.name, ",".join(parts)]))
+    return string(str(new))
+    is_in = str(latest) in requirement.specifier_set
+    breakpoint()
+    b = 2
+    assert 0, 1
+    return string(str(Requirement.new(ensure_str(item))))
+    return None
+    new = Requirement.new(" ".join([requirement.name, ",".join(parts)]))
+    if (latest := versions.latest) is None:
+        return string(str(new))
+    return None
 
 
 __all__ = ["update_requirements"]
