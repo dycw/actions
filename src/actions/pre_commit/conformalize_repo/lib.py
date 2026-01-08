@@ -1055,13 +1055,13 @@ def check_versions() -> None:
 
 def get_cron_job(*, repo_name: str | None = SETTINGS.repo_name) -> str:
     if repo_name is None:
-        hour = minute = 0
+        minute = hour = 0
     else:
         digest = blake2b(repo_name.encode(), digest_size=8).digest()
         value = int.from_bytes(digest, "big")
         minute = value % 60
         hour = (value // 60) % 24
-    return f"{hour} {minute} * * *"
+    return f"{minute} {hour} * * *"
 
 
 ##
