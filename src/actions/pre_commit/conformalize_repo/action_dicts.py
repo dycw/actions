@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from ruamel.yaml.scalarstring import LiteralScalarString
+from tomlkit import value
+
+from actions.pre_commit.conformalize_repo.settings import SETTINGS
 from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
 from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING
 from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING
@@ -13,17 +17,18 @@ if TYPE_CHECKING:
 
 def run_action_pre_commit_dict(
     *,
-    token: str | None = None,
+    token: str | None = SETTINGS.ci__token,
     submodules: str | None = None,
-    repos: Any | None = None,
-    hooks: Any | None = None,
+    repos: list[str] | None = None,
+    hooks: list[str] | None = None,
     sleep: int = 1,
-    gitea: bool = False,
+    gitea: bool = SETTINGS.ci__gitea,
 ) -> StrDict:
     dict_: StrDict = {}
     _add_token(dict_, token=token)
     _add_item(dict_, "submodules", value=submodules)
-    _add_item(dict_, "repos", value=repos)
+    _add_yaml_str(dict_, "repos", values=repos)
+    _add_yaml_str(dict_, "hooks", values=hooks)
     _add_item(dict_, "hooks", value=hooks)
     dict_["sleep"] = sleep
     return {
@@ -36,12 +41,12 @@ def run_action_pre_commit_dict(
 
 def run_action_publish_dict(
     *,
-    token: str | None = None,
+    token: str | None = SETTINGS.ci__token,
     username: str | None = None,
     password: str | None = None,
     publish_url: str | None = None,
     trusted_publishing: bool = False,
-    native_tls: bool = False,
+    native_tls: bool = SETTINGS.uv__native_tls,
 ) -> StrDict:
     dict_: StrDict = {}
     _add_token(dict_, token=token)
@@ -59,11 +64,11 @@ def run_action_publish_dict(
 
 def run_action_pyright_dict(
     *,
-    token: str | None = None,
+    token: str | None = SETTINGS.ci__token,
     python_version: str | None = None,
     resolution: str | None = None,
     prerelease: str | None = None,
-    native_tls: bool = False,
+    native_tls: bool = SETTINGS.uv__native_tls,
     with_requirements: str | None = None,
 ) -> StrDict:
     dict_: StrDict = {}
@@ -82,12 +87,12 @@ def run_action_pyright_dict(
 
 def run_action_pytest_dict(
     *,
-    token: str | None = None,
+    token: str | None = SETTINGS.ci__token,
     python_version: str | None = None,
     sops_age_key: str | None = None,
     resolution: str | None = None,
     prerelease: str | None = None,
-    native_tls: bool = False,
+    native_tls: bool = SETTINGS.uv__native_tls,
     with_requirements: str | None = None,
 ) -> StrDict:
     dict_: StrDict = {}
@@ -103,7 +108,7 @@ def run_action_pytest_dict(
 
 def run_action_random_sleep_dict(
     *,
-    token: str | None = None,
+    token: str | None = SETTINGS.ci__token,
     min: int = 0,  # noqa: A002
     max: int = 3600,  # noqa: A002
     step: int = 1,
@@ -122,7 +127,7 @@ def run_action_random_sleep_dict(
     }
 
 
-def run_action_ruff_dict(*, token: str | None = None) -> StrDict:
+def run_action_ruff_dict(*, token: str | None = SETTINGS.ci__token) -> StrDict:
     dict_: StrDict = {}
     _add_token(dict_, token=token)
     return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
@@ -130,7 +135,7 @@ def run_action_ruff_dict(*, token: str | None = None) -> StrDict:
 
 def run_action_tag_dict(
     *,
-    token: str | None = None,
+    token: str | None = SETTINGS.ci__token,
     user_name: str | None = None,
     user_email: str | None = None,
     major_minor: bool = False,
@@ -164,7 +169,9 @@ def _add_item(dict_: StrDict, key: str, /, *, value: Any | None = None) -> None:
         dict_[key] = value
 
 
-def _add_native_tls(dict_: StrDict, /, *, native_tls: bool = False) -> None:
+def _add_native_tls(
+    dict_: StrDict, /, *, native_tls: bool = SETTINGS.uv__native_tls
+) -> None:
     _add_boolean(dict_, "native-tls", value=native_tls)
 
 
@@ -182,7 +189,7 @@ def _add_resolution(dict_: StrDict, /, *, resolution: str | None = None) -> None
     _add_item(dict_, "resolution", value=resolution)
 
 
-def _add_token(dict_: StrDict, /, *, token: str | None = None) -> None:
+def _add_token(dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token) -> None:
     _add_item(dict_, "token", value=token)
 
 
@@ -190,6 +197,13 @@ def _add_with_requirements(
     dict_: StrDict, /, *, with_requirements: str | None = None
 ) -> None:
     _add_item(dict_, "with-requirements", value=with_requirements)
+
+
+def _add_yaml_str(
+    dict_: StrDict, key: str, /, *, values: list[str] | None = None
+) -> None:
+    if values is not None:
+        dict_[key] = LiteralScalarString("\n".join(values))
 
 
 def _runner(*, gitea: bool = False) -> str:

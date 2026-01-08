@@ -16,6 +16,7 @@ from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
+from utilities.pathlib import to_path
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
@@ -259,6 +260,7 @@ def conformalize_repo(
     ):
         add_ci_pull_request_yaml(
             gitea=ci__gitea,
+            token=ci__token,
             modifications=modifications,
             pre_commit=ci__pull_request__pre_commit,
             pyright=ci__pull_request__pyright,
@@ -270,13 +272,16 @@ def conformalize_repo(
             repo_name=repo_name,
             ruff=ruff,
             script=script,
+            uv__native_tls=uv__native_tls,
         )
     if ci__push__publish or ci__push__tag:
         add_ci_push_yaml(
             gitea=ci__gitea,
+            token=ci__token,
             modifications=modifications,
             publish=ci__push__publish,
             tag=ci__push__tag,
+            uv__native_tls=uv__native_tls,
         )
     if coverage:
         add_coveragerc_toml(modifications=modifications)
@@ -390,6 +395,7 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 def add_ci_pull_request_yaml(
     *,
     gitea: bool = SETTINGS.ci__gitea,
+    token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     pyright: bool = SETTINGS.ci__pull_request__pyright,
@@ -401,6 +407,7 @@ def add_ci_pull_request_yaml(
     repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.ci__pull_request__ruff,
     script: str | None = SETTINGS.script,
+    uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
     with yield_yaml_dict(path, modifications=modifications) as dict_:
@@ -484,9 +491,11 @@ def add_ci_pull_request_yaml(
 def add_ci_push_yaml(
     *,
     gitea: bool = SETTINGS.ci__gitea,
+    token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
     publish: bool = SETTINGS.ci__push__publish,
     tag: bool = SETTINGS.ci__push__tag,
+    uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
     with yield_yaml_dict(path, modifications=modifications) as dict_:
@@ -504,7 +513,9 @@ def add_ci_push_yaml(
             permissions["id-token"] = "write"
             publish_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(publish_dict, "steps")
-            ensure_contains(steps, run_action_publish_dict())
+            ensure_contains(
+                steps, run_action_publish_dict(token=token, native_tls=uv__native_tls)
+            )
         if tag:
             tag_dict = get_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
