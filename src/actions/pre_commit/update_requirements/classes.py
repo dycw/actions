@@ -19,6 +19,7 @@ from utilities.version import (
 from utilities.version import Version as Version3
 from utilities.version import parse_version as parse_version3
 
+type TwoSidedVersions = tuple[Version2or3 | None, Version2or3 | None]
 type Version2or3 = Version2 | Version3
 type VersionSet = dict[str, Versions]
 
@@ -113,6 +114,7 @@ _ = PipListOutdatedOutput.model_rebuild()
 __all__ = [
     "PipListOutdatedOutput",
     "PipListOutput",
+    "TwoSidedVersions",
     "Version2",
     "Version2or3",
     "Version3",
