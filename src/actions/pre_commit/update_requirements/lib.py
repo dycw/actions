@@ -11,6 +11,7 @@ from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.update_requirements.classes import (
     PipListOutdatedOutput,
+    PipListOutput,
     Version1or2,
     Version2,
     Version3,
@@ -66,11 +67,17 @@ def _format_path(
 
 
 def _get_versions() -> VersionSet:
-    json = logged_run(
+    json1 = logged_run(
+        "uv", "pip", "list", "--format", "json", "--strict", return_=True
+    )
+    models1 = TypeAdapter(list[PipListOutput]).validate_json(json1)
+    versions1 = {p.name: parse_version2_or_3(p.version) for p in models1}
+    json2 = logged_run(
         "uv", "pip", "list", "--format", "json", "--outdated", "--strict", return_=True
     )
-    packages = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json)
-    return {p.name: parse_version2_or_3(p.latest_version) for p in packages}
+    models2 = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json2)
+    versions2 = {p.name: parse_version2_or_3(p.latest_version) for p in models2}
+    return versions1 | versions2
 
 
 def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Requirement:
