@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from pytest import fixture, mark, param
-from pytest_lazy_fixtures import lf
+from pytest import mark, param
 from utilities.text import strip_and_dedent
 
 from actions.pre_commit.format_requirements.lib import _format_path

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 from contextlib import suppress
+from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
@@ -23,11 +24,7 @@ from actions.pre_commit.update_requirements.classes import (
     parse_version1_or_2,
     parse_version2_or_3,
 )
-from actions.pre_commit.utilities import (
-    ensure_contains,
-    get_pyproject_dependencies,
-    yield_toml_doc,
-)
+from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
@@ -70,9 +67,9 @@ def _format_path(
 ) -> None:
     versions_use = _get_version_set(path) if versions is None else versions
     with yield_toml_doc(path, modifications=modifications) as doc:
-        project_deps = get_pyproject_dependencies(doc)
-        if (deps := project_deps.dependencies) is not None:
-            _format_array(deps, versions_use)
+        get_pyproject_dependencies(doc).apply(
+            partial(_format_req, versions=versions_use)
+        )
 
 
 def _get_version_set(path: PathLike, /) -> VersionSet:
@@ -150,19 +147,10 @@ def _get_pip_list_outdated_versions() -> dict[str, Version2or3]:
     return {p.name: parse_version2_or_3(p.version) for p in packages}
 
 
-def _format_array(dependencies: Array, versions: VersionSet, /) -> None:
-    formatted: list[String] = []
-    for item in dependencies:
-        req = Requirement.new(ensure_str(item))
-        ver = versions[req.name]
-        formatted.append(_format_item(req, ver))
-    dependencies.clear()
-    ensure_contains(dependencies, *formatted)
-
-
-def _format_item(requirement: Requirement, versions: Versions, /) -> String:
+def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> String:
     parts: list[str] = []
-    match versions.pyproject_lower, versions.pyproject_upper, versions.latest:
+    versions_i = versions[requirement.name]
+    match versions_i.pyproject_lower, versions_i.pyproject_upper, versions_i.latest:
         case None, None, None:
             ...
         case Version2() | Version3() as lower, None, None:
