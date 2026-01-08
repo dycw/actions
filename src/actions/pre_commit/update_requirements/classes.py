@@ -30,7 +30,7 @@ type VersionSet = dict[str, Version2or3]
 class PipListOutput(BaseModel):
     name: str
     version: str
-    editable_project_location: Path
+    editable_project_location: Path | None = None
 
 
 class PipListOutdatedOutput(BaseModel):
