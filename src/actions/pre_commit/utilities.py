@@ -11,7 +11,7 @@ import tomlkit
 from libcst import Module, parse_module
 from rich.pretty import pretty_repr
 from tomlkit import TOMLDocument, aot, array, document, string, table
-from tomlkit.items import AoT, Array, String, Table
+from tomlkit.items import AoT, Array, Table
 from utilities.functions import ensure_class, ensure_str
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.packaging import Requirement
@@ -172,12 +172,13 @@ class PyProjectDependencies:
                 self._apply_to_array(deps, func)
 
     def _apply_to_array(self, array: Array, func: FuncRequirement, /) -> None:
-        new: list[String] = []
-        for item in array:
-            req = Requirement.new(ensure_str(item))
-            new.append(string(str(func(req))))
+        strs = list(map(ensure_str, array))
+        reqs = list(map(Requirement, strs))
+        results = list(map(func, reqs))
+        new_strs = list(map(str, results))
+        strings = list(map(string, new_strs))
         array.clear()
-        ensure_contains(array, *new)
+        ensure_contains(array, *strings)
 
 
 ##
