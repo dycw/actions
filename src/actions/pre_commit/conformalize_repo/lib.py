@@ -65,6 +65,7 @@ from actions.pre_commit.replace_sequence_strs.constants import (
 )
 from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
+from actions.pre_commit.update_requirements.constants import UPDATE_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.utilities import (
     ensure_aot_contains,
     ensure_contains,
@@ -693,6 +694,7 @@ def add_pre_commit_config_yaml(
             )
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD)
+            _add_pre_commit_config_repo(dict_, ACTIONS_URL, UPDATE_REQUIREMENTS_SUB_CMD)
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
