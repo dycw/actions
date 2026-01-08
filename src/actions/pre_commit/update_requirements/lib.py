@@ -5,6 +5,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
+from utilities.functions import max_nullable
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from utilities.types import PathLike
 
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
+    from actions.types import StrDict
 
 
 def update_requirements(*paths: PathLike) -> None:
@@ -77,7 +79,10 @@ def _get_versions() -> VersionSet:
     )
     models2 = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json2)
     versions2 = {p.name: parse_version2_or_3(p.latest_version) for p in models2}
-    return versions1 | versions2
+    out: StrDict = {}
+    for key in set(versions1) | set(versions2):
+        out[key] = max_nullable([versions1.get(key), versions2.get(key)])
+    return out
 
 
 def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Requirement:
