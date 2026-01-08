@@ -1,10 +1,8 @@
-# ruff: noqa: TC003
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field, replace
 from functools import total_ordering
-from pathlib import Path
 from typing import Any, Self, override
 
 from pydantic import BaseModel
@@ -21,21 +19,7 @@ from utilities.version import parse_version as parse_version3
 type TwoSidedVersions = tuple[Version2or3 | None, Version1or2 | None]
 type Version1or2 = int | Version2
 type Version2or3 = Version2 | Version3
-type VersionSet = dict[str, Versions]
-
-
-@dataclass(order=True, unsafe_hash=True, kw_only=True, slots=True)
-class Versions:
-    pyproject_lower: Version2or3 | None = None
-    pyproject_upper: Version1or2 | None = None
-    current: Version2or3 | None = None
-    latest: Version2or3 | None = None
-
-
-class PipListOutput(BaseModel):
-    name: str
-    version: str
-    editable_project_location: Path | None = None
+type VersionSet = dict[str, Version2or3]
 
 
 class PipListOutdatedOutput(BaseModel):
@@ -116,19 +100,17 @@ def parse_version2(version: str, /) -> Version2:
 _PARSE_VERSION2_PATTERN = re.compile(r"^(\d+)\.(\d+)(?:-(\w+))?")
 
 
-_ = PipListOutput.model_rebuild()
 _ = PipListOutdatedOutput.model_rebuild()
+
 
 __all__ = [
     "PipListOutdatedOutput",
-    "PipListOutput",
     "TwoSidedVersions",
     "Version1or2",
     "Version2",
     "Version2or3",
     "Version3",
     "VersionSet",
-    "Versions",
     "parse_version1_or_2",
     "parse_version2",
     "parse_version2_or_3",

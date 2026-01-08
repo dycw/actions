@@ -24,93 +24,69 @@ class TestFormatPath:
         ("input_", "versions", "output"),
         [
             param("package", Versions(), "package"),
-            param(
-                "package>=1.2", Versions(pyproject_lower=Version2(1, 2)), "package>=1.2"
-            ),
+            param("package>=1.2", Versions(lower=Version2(1, 2)), "package>=1.2"),
             param(
                 "package>=1.2",
-                Versions(pyproject_lower=Version2(1, 2), latest=Version2(1, 2)),
+                Versions(lower=Version2(1, 2), latest=Version2(1, 2)),
                 "package>=1.2",
             ),
             param(
                 "package>=1.2",
-                Versions(pyproject_lower=Version2(1, 2), latest=Version2(1, 3)),
+                Versions(lower=Version2(1, 2), latest=Version2(1, 3)),
                 "package>=1.3",
             ),
             param(
+                "package>=1.2.3", Versions(lower=Version3(1, 2, 3)), "package>=1.2.3"
+            ),
+            param(
                 "package>=1.2.3",
-                Versions(pyproject_lower=Version3(1, 2, 3)),
+                Versions(lower=Version3(1, 2, 3), latest=Version3(1, 2, 3)),
                 "package>=1.2.3",
             ),
             param(
                 "package>=1.2.3",
-                Versions(pyproject_lower=Version3(1, 2, 3), latest=Version3(1, 2, 3)),
-                "package>=1.2.3",
-            ),
-            param(
-                "package>=1.2.3",
-                Versions(pyproject_lower=Version3(1, 2, 3), latest=Version3(1, 2, 4)),
+                Versions(lower=Version3(1, 2, 3), latest=Version3(1, 2, 4)),
                 "package>=1.2.4",
             ),
-            param("package<2", Versions(pyproject_upper=2), "package<2"),
-            param(
-                "package<2",
-                Versions(pyproject_upper=2, latest=Version2(1, 2)),
-                "package<2",
-            ),
-            param(
-                "package<2",
-                Versions(pyproject_upper=2, latest=Version2(2, 3)),
-                "package<3",
-            ),
-            param(
-                "package<1.3", Versions(pyproject_upper=Version2(1, 3)), "package<1.3"
-            ),
+            param("package<2", Versions(upper=2), "package<2"),
+            param("package<2", Versions(upper=2, latest=Version2(1, 2)), "package<2"),
+            param("package<2", Versions(upper=2, latest=Version2(2, 3)), "package<3"),
+            param("package<1.3", Versions(upper=Version2(1, 3)), "package<1.3"),
             param(
                 "package<1.3",
-                Versions(pyproject_upper=Version2(1, 3), latest=Version3(1, 2, 3)),
+                Versions(upper=Version2(1, 3), latest=Version3(1, 2, 3)),
                 "package<1.3",
             ),
             param(
                 "package<1.3",
-                Versions(pyproject_upper=Version2(1, 3), latest=Version3(1, 3, 0)),
+                Versions(upper=Version2(1, 3), latest=Version3(1, 3, 0)),
                 "package<1.4",
             ),
             param(
                 "package>=1.2, <2",
-                Versions(pyproject_lower=Version2(1, 2), pyproject_upper=2),
+                Versions(lower=Version2(1, 2), upper=2),
                 "package>=1.2, <2",
             ),
             param(
                 "package>=1.2, <2",
-                Versions(
-                    pyproject_lower=Version2(1, 2),
-                    pyproject_upper=2,
-                    latest=Version2(1, 2),
-                ),
+                Versions(lower=Version2(1, 2), upper=2, latest=Version2(1, 2)),
                 "package>=1.2, <2",
             ),
             param(
                 "package>=1.2, <2",
-                Versions(
-                    pyproject_lower=Version2(1, 2),
-                    pyproject_upper=2,
-                    latest=Version2(1, 3),
-                ),
+                Versions(lower=Version2(1, 2), upper=2, latest=Version2(1, 3)),
                 "package>=1.3, <2",
             ),
             param(
                 "package>=1.2.3, <1.3",
-                Versions(
-                    pyproject_lower=Version3(1, 2, 3), pyproject_upper=Version2(1, 3)
-                ),
+                Versions(lower=Version3(1, 2, 3), upper=Version2(1, 3)),
                 "package>=1.2.3, <2",
             ),
             param(
                 "package>=1.2.3, <1.3",
                 Versions(
-                    pyproject_lower=Version3(1, 2, 3),
-                    pyproject_upper=Version2(1, 3),
+                    lower=Version3(1, 2, 3),
+                    upper=Version2(1, 3),
                     latest=Version3(1, 2, 3),
                 ),
                 "package>=1.2.3, <2",
@@ -118,34 +94,32 @@ class TestFormatPath:
             param(
                 "package>=1.2.3, <1.3",
                 Versions(
-                    pyproject_lower=Version3(1, 2, 3),
-                    pyproject_upper=Version2(1, 3),
+                    lower=Version3(1, 2, 3),
+                    upper=Version2(1, 3),
                     latest=Version3(1, 2, 4),
                 ),
                 "package>=1.2.4, <2",
             ),
             param(
                 "package>=1.2.3, <2",
-                Versions(pyproject_lower=Version3(1, 2, 3), pyproject_upper=2),
+                Versions(lower=Version3(1, 2, 3), upper=2),
                 "package>=1.2.3, <2",
             ),
             param(
                 "package>=1.2.3, <2",
-                Versions(
-                    pyproject_lower=Version3(1, 2, 3),
-                    pyproject_upper=2,
-                    latest=Version3(1, 2, 3),
-                ),
+                Versions(lower=Version3(1, 2, 3), upper=2, latest=Version3(1, 2, 3)),
                 "package>=1.2.3, <2",
             ),
             param(
                 "package>=1.2.3, <2",
-                Versions(
-                    pyproject_lower=Version3(1, 2, 3),
-                    pyproject_upper=2,
-                    latest=Version3(1, 2, 4),
-                ),
+                Versions(lower=Version3(1, 2, 3), upper=2, latest=Version3(1, 2, 4)),
                 "package>=1.2.4, <2",
+            ),
+            param(
+                "package[extra]>=1.2.3, <1.2",
+                Versions(),
+                "package[extra]>=1.2.3, <1.2",
+                marks=mark.only,
             ),
         ],
     )
