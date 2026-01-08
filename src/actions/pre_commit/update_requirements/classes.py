@@ -1,8 +1,10 @@
+# ruff: noqa: TC003
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field, replace
 from functools import total_ordering
+from pathlib import Path
 from typing import Any, Self, override
 
 from pydantic import BaseModel
@@ -22,11 +24,24 @@ type Version2or3 = Version2 | Version3
 type VersionSet = dict[str, Version2or3]
 
 
+##
+
+
+class PipListOutput(BaseModel):
+    name: str
+    version: str
+    editable_project_location: Path
+
+
 class PipListOutdatedOutput(BaseModel):
     name: str
     version: str
     latest_version: str
     latest_filetype: str
+
+
+_ = PipListOutput.model_rebuild()
+_ = PipListOutdatedOutput.model_rebuild()
 
 
 ##
@@ -100,11 +115,9 @@ def parse_version2(version: str, /) -> Version2:
 _PARSE_VERSION2_PATTERN = re.compile(r"^(\d+)\.(\d+)(?:-(\w+))?")
 
 
-_ = PipListOutdatedOutput.model_rebuild()
-
-
 __all__ = [
     "PipListOutdatedOutput",
+    "PipListOutput",
     "TwoSidedVersions",
     "Version1or2",
     "Version2",
