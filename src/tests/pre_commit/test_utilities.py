@@ -8,8 +8,11 @@ from pytest import mark, param
 from utilities.iterables import one
 
 from actions.pre_commit.utilities import (
+    ensure_contains_partial_dict,
     get_partial_dict,
+    get_partial_str,
     is_partial_dict,
+    is_partial_str,
     yield_immutable_write_context,
     yield_mutable_write_context,
     yield_python_file,
@@ -22,14 +25,59 @@ if TYPE_CHECKING:
     from actions.types import StrDict
 
 
+class TestEnsureContainsPartialDict:
+    def test_main(self) -> None:
+        url = "https://github.com/owner/repo"
+        repos: list[StrDict] = []
+        for _ in range(2):
+            result = ensure_contains_partial_dict(
+                repos,
+                {"repo": url, "rev": "v6.0.0"},
+                extra={"hooks": [{"id": "id1"}, {"id": "id2"}]},
+            )
+            assert result == {
+                "repo": url,
+                "rev": "v6.0.0",
+                "hooks": [{"id": "id1"}, {"id": "id2"}],
+            }
+            expected = [result]
+            assert repos == expected
+
+
+class TestEnsureContainsPartialStr:
+    def test_main(self) -> None:
+        url = "https://github.com/owner/repo"
+        dependencies: list[StrDict] = []
+        for _ in range(2):
+            result = ensure_contains_partial_dict(
+                dependencies,
+                {"repo": url, "rev": "v6.0.0"},
+                extra={"hooks": [{"id": "id1"}, {"id": "id2"}]},
+            )
+            assert result == {
+                "repo": url,
+                "rev": "v6.0.0",
+                "hooks": [{"id": "id1"}, {"id": "id2"}],
+            }
+            expected = [result]
+            assert dependencies == expected
+
+
 class TestGetPartialDict:
     def test_main(self) -> None:
         url = "https://github.com/owner/repo"
-        repos_list = [
+        repos = [
             {"repo": url, "rev": "v6.0.0", "hooks": [{"id": "id1"}, {"id": "id2"}]}
         ]
-        result = get_partial_dict(repos_list, {"repo": url})
-        assert result == one(repos_list)
+        result = get_partial_dict(repos, {"repo": url})
+        assert result == one(repos)
+
+
+class TestGetPartialStr:
+    def test_main(self) -> None:
+        dependencies = ["dycw-utilities[test]>=1.2.3, <2"]
+        result = get_partial_str(dependencies, "dycw-utilities[test]")
+        assert result == one(dependencies)
 
 
 class TestIsPartialDict:
@@ -55,6 +103,22 @@ class TestIsPartialDict:
     )
     def test_main(self, *, obj: Any, dict_: StrDict, expected: bool) -> None:
         assert is_partial_dict(obj, dict_) is expected
+
+
+class TestIsPartialStr:
+    @mark.parametrize(
+        ("obj", "text", "expected"),
+        [
+            param(None, "a", False),
+            param("a", "a", True),
+            param("a", "b", False),
+            param("b", "a", False),
+            param("abc", "a", True),
+            param("a", "abc", False),
+        ],
+    )
+    def test_main(self, *, obj: Any, text: str, expected: bool) -> None:
+        assert is_partial_str(obj, text) is expected
 
 
 class TestYieldImmutableWriteContext:

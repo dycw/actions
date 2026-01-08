@@ -45,7 +45,7 @@ def ensure_contains(array: HasAppend, /, *objs: Any) -> None:
             array.append(obj)
 
 
-def ensure_contains_partial(
+def ensure_contains_partial_dict(
     container: HasAppend, partial: StrDict, /, *, extra: StrDict | None = None
 ) -> StrDict:
     try:
@@ -54,6 +54,17 @@ def ensure_contains_partial(
         dict_ = partial | ({} if extra is None else extra)
         container.append(dict_)
         return dict_
+
+
+def ensure_contains_partial_str(
+    container: HasAppend, partial: str, /, *, new: str | None = None
+) -> str:
+    try:
+        return get_partial_str(container, partial, skip_log=True)
+    except OneEmptyError:
+        out = partial if new is None else new
+        container.append(out)
+        return out
 
 
 def ensure_not_contains(array: Array, /, *objs: Any) -> None:
@@ -131,6 +142,37 @@ def is_partial_dict(obj: Any, dict_: StrDict, /) -> bool:
             else:
                 results[key] = obj_value == dict_value
     return all(results.values())
+
+
+##
+
+
+def get_partial_str(
+    iterable: Iterable[Any], text: str, /, *, skip_log: bool = False
+) -> str:
+    try:
+        return one(i for i in iterable if is_partial_str(i, text))
+    except OneEmptyError:
+        if not skip_log:
+            LOGGER.exception(
+                "Expected %s to contain %s (as a partial)",
+                pretty_repr(iterable),
+                pretty_repr(text),
+            )
+        raise
+    except OneNonUniqueError as error:
+        LOGGER.exception(
+            "Expected %s to contain %s uniquely (as a partial); got %s, %s and perhaps more",
+            pretty_repr(iterable),
+            pretty_repr(text),
+            pretty_repr(error.first),
+            pretty_repr(error.second),
+        )
+        raise
+
+
+def is_partial_str(obj: Any, text: str, /) -> bool:
+    return isinstance(obj, str) and (text in obj)
 
 
 ##
@@ -324,16 +366,18 @@ __all__ = [
     "PyProjectDependencies",
     "ensure_aot_contains",
     "ensure_contains",
-    "ensure_contains_partial",
+    "ensure_contains_partial_dict",
     "ensure_not_contains",
     "get_aot",
     "get_array",
     "get_dict",
     "get_list",
     "get_partial_dict",
+    "get_partial_str",
     "get_pyproject_dependencies",
     "get_table",
     "is_partial_dict",
+    "is_partial_str",
     "yield_immutable_write_context",
     "yield_json_dict",
     "yield_mutable_write_context",

@@ -70,7 +70,7 @@ from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
 from actions.pre_commit.utilities import (
     ensure_aot_contains,
     ensure_contains,
-    ensure_contains_partial,
+    ensure_contains_partial_dict,
     ensure_not_contains,
     get_aot,
     get_array,
@@ -747,11 +747,11 @@ def _add_pre_commit_config_repo(
     args: tuple[Literal["add", "exact"], list[str]] | None = None,
 ) -> None:
     repos_list = get_list(pre_commit_dict, "repos")
-    repo_dict = ensure_contains_partial(
+    repo_dict = ensure_contains_partial_dict(
         repos_list, {"repo": url}, extra={} if url == "local" else {"rev": "master"}
     )
     hooks_list = get_list(repo_dict, "hooks")
-    hook_dict = ensure_contains_partial(hooks_list, {"id": id_})
+    hook_dict = ensure_contains_partial_dict(hooks_list, {"id": id_})
     if name is not None:
         hook_dict["name"] = name
     if entry is not None:
