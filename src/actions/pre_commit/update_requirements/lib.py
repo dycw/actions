@@ -157,17 +157,17 @@ def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Require
         case None, Version2() as upper, Version3() as latest:
             bumped = latest.bump_minor()
             parts.append(f"<{max(upper, Version2(bumped.major, bumped.minor))}")
-        case (Version2() as lower, int() as upper, None) | (
-            Version3() as lower,
-            Version2() as upper,
-            None,
+        case (
+            (Version2() as lower, int() as upper, None)
+            | (Version3() as lower, int() as upper, None)
+            | (Version3() as lower, Version2() as upper, None)
         ):
             bumped = lower.bump_major()
             parts.extend([f">={lower}", f"<{bumped.major}"])
-        case (Version2() as lower, int() as upper, Version2() as latest) | (
-            Version3() as lower,
-            Version2() as upper,
-            Version3() as latest,
+        case (
+            (Version2() as lower, int() as upper, Version2() as latest)
+            | (Version3() as lower, int() as upper, Version3() as latest)
+            | (Version3() as lower, Version2() as upper, Version3() as latest)
         ):
             new_lower = max(lower, latest)
             bumped = new_lower.bump_major()

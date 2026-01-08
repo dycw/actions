@@ -124,6 +124,29 @@ class TestFormatPath:
                 ),
                 "package>=1.2.4, <2",
             ),
+            param(
+                "package>=1.2.3, <2",
+                Versions(pyproject_lower=Version3(1, 2, 3), pyproject_upper=2),
+                "package>=1.2.3, <2",
+            ),
+            param(
+                "package>=1.2.3, <2",
+                Versions(
+                    pyproject_lower=Version3(1, 2, 3),
+                    pyproject_upper=2,
+                    latest=Version3(1, 2, 3),
+                ),
+                "package>=1.2.3, <2",
+            ),
+            param(
+                "package>=1.2.3, <2",
+                Versions(
+                    pyproject_lower=Version3(1, 2, 3),
+                    pyproject_upper=2,
+                    latest=Version3(1, 2, 4),
+                ),
+                "package>=1.2.4, <2",
+            ),
         ],
     )
     def test_main(
