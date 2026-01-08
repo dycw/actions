@@ -33,8 +33,8 @@
   description: Touch 'py.typed'
 - id: update-requirements
   name: update-requirements
-  entry: action pre-commit update-requirements
-  language: python
+  entry: uv tool run --from dycw-actions action pre-commit update-requirements
+  language: system
   types: [toml]
   files: pyproject\.toml
   description: Update a set of requirements
