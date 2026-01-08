@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import sys
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, assert_never
+from typing import TYPE_CHECKING
 
-from packaging.requirements import Requirement
 from pydantic import TypeAdapter
 from tomlkit import string
 from utilities.functions import ensure_str, max_nullable, min_nullable
@@ -17,9 +16,11 @@ from actions.pre_commit.update_requirements.classes import (
     PipListOutdatedOutput,
     PipListOutput,
     TwoSidedVersions,
+    Version1or2,
     Version2,
     Version3,
     Versions,
+    parse_version1_or_2,
     parse_version2_or_3,
 )
 from actions.pre_commit.utilities import (
@@ -68,7 +69,6 @@ def _format_path(
     modifications: MutableSet[Path] | None = None,
 ) -> None:
     versions_use = _get_version_set(path) if versions is None else versions
-    # assert 0, _get_pyproject_versions(path)
     with yield_toml_doc(path, modifications=modifications) as doc:
         project_deps = get_pyproject_dependencies(doc)
         if (deps := project_deps.dependencies) is not None:
@@ -95,7 +95,7 @@ def _get_version_set(path: PathLike, /) -> VersionSet:
 
 
 def _get_pyproject_versions(path: PathLike, /) -> dict[str, TwoSidedVersions]:
-    items: list[tuple[str, Version2or3 | None, Version2or3 | None]] = []
+    items: list[tuple[str, Version2or3 | None, Version1or2 | None]] = []
     with yield_toml_doc(path) as doc:
         project_deps = get_pyproject_dependencies(doc)
         if (deps := project_deps.dependencies) is not None:
@@ -122,7 +122,7 @@ def _get_pyproject_versions(path: PathLike, /) -> dict[str, TwoSidedVersions]:
 
 def _get_pyproject_versions_yield_array(
     array: Array, /
-) -> Iterator[tuple[str, Version2or3 | None, Version2or3 | None]]:
+) -> Iterator[tuple[str, Version2or3 | None, Version1or2 | None]]:
     for item in array:
         req = Requirement.new(ensure_str(item))
         try:
@@ -130,9 +130,9 @@ def _get_pyproject_versions_yield_array(
         except KeyError:
             lower = None
         try:
-            upper = parse_version2_or_3(req["<"])
+            upper = parse_version1_or_2(req["<"])
         except KeyError:
-            upper = None
+            upper = int(req["<"])
         yield req.name, lower, upper
 
 
@@ -162,45 +162,44 @@ def _format_array(dependencies: Array, versions: VersionSet, /) -> None:
 
 def _format_item(requirement: Requirement, versions: Versions, /) -> String:
     parts: list[str] = []
-    # if (latest := versions.latest) is None:
-    #     if (lower := versions.pyproject_lower) is not None:
-    #         parts.append(f">={lower}")
-    #     if (upper := versions.pyproject_upper) is not None:
-    #         parts.append(f"<{upper}")
-    # else:
     match versions.pyproject_lower, versions.pyproject_upper, versions.latest:
         case None, None, None:
             ...
         case Version2() | Version3() as lower, None, None:
             parts.append(f">={lower}")
-        case Version3() as lower, None, Version3() as latest:
+        case (Version2() as lower, None, Version2() as latest) | (
+            Version3() as lower,
+            None,
+            Version3() as latest,
+        ):
             parts.append(f">={max(lower, latest)}")
-        case Version3() as lower, Version2() as upper, None:
-            bumped = lower.bump_major()
-            parts.extend([f">={lower}", f"<{bumped.major}"])
-        case Version3() as lower, Version2() as upper, Version3() as latest:
-            new_lower = max(lower, latest)
-            bumped = new_lower.bump_major()
-            parts.extend([f">={new_lower}", f"<{bumped.major}"])
-        case None, Version2() | Version3() as upper, None:
+        case None, int() | Version2() as upper, None:
             parts.append(f"<{upper}")
+        case None, int() as upper, Version2() as latest:
+            bumped = latest.bump_major()
+            parts.append(f"<{max(upper, bumped.major)}")
         case None, Version2() as upper, Version3() as latest:
             bumped = latest.bump_minor()
             parts.append(f"<{max(upper, Version2(bumped.major, bumped.minor))}")
+        case (Version2() as lower, int() as upper, None) | (
+            Version3() as lower,
+            Version2() as upper,
+            None,
+        ):
+            bumped = lower.bump_major()
+            parts.extend([f">={lower}", f"<{bumped.major}"])
+        case (Version2() as lower, int() as upper, Version2() as latest) | (
+            Version3() as lower,
+            Version2() as upper,
+            Version3() as latest,
+        ):
+            new_lower = max(lower, latest)
+            bumped = new_lower.bump_major()
+            parts.extend([f">={new_lower}", f"<{bumped.major}"])
         case never:
-            assert_never(never)
+            raise NotImplementedError(never)
     new = Requirement.new(" ".join([requirement.name, ",".join(parts)]))
     return string(str(new))
-    is_in = str(latest) in requirement.specifier_set
-    breakpoint()
-    b = 2
-    assert 0, 1
-    return string(str(Requirement.new(ensure_str(item))))
-    return None
-    new = Requirement.new(" ".join([requirement.name, ",".join(parts)]))
-    if (latest := versions.latest) is None:
-        return string(str(new))
-    return None
 
 
 __all__ = ["update_requirements"]

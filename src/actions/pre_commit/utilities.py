@@ -10,10 +10,11 @@ from typing import TYPE_CHECKING, Any, assert_never
 import tomlkit
 from libcst import Module, parse_module
 from rich.pretty import pretty_repr
-from tomlkit import TOMLDocument, aot, array, document, table
-from tomlkit.items import AoT, Array, Table
+from tomlkit import TOMLDocument, aot, array, document, string, table
+from tomlkit.items import AoT, Array, String, Table
 from utilities.functions import ensure_class, ensure_str
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
+from utilities.packaging import Requirement
 from utilities.types import PathLike
 
 from actions.constants import YAML_INSTANCE
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
 
     from utilities.types import PathLike
 
-    from actions.types import HasAppend, HasSetDefault, StrDict
+    from actions.types import FuncRequirement, HasAppend, HasSetDefault, StrDict
 
 
 def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
@@ -159,6 +160,24 @@ class PyProjectDependencies:
     dependencies: Array | None = None
     opt_dependencies: dict[str, Array] | None = None
     dep_groups: dict[str, Array] | None = None
+
+    def apply(self, func: FuncRequirement, /) -> None:
+        if (deps := self.dependencies) is not None:
+            self._apply_to_array(deps, func)
+        if (opt_depedencies := self.opt_dependencies) is not None:
+            for deps in opt_depedencies.values():
+                self._apply_to_array(deps, func)
+        if (dep_grps := self.dep_groups) is not None:
+            for deps in dep_grps.values():
+                self._apply_to_array(deps, func)
+
+    def _apply_to_array(self, array: Array, func: FuncRequirement, /) -> None:
+        new: list[String] = []
+        for item in array:
+            req = Requirement.new(ensure_str(item))
+            new.append(string(str(func(req))))
+        array.clear()
+        ensure_contains(array, *new)
 
 
 ##

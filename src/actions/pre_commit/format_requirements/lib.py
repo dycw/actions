@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 
 from tomlkit import string
 from utilities.functions import ensure_str
-from utilities.packaging import Requirement
 from utilities.text import repr_str, strip_and_dedent
 
 from actions import __version__
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from tomlkit.items import Array, String
+    from utilities.packaging import Requirement
     from utilities.types import PathLike
 
 
@@ -50,24 +50,11 @@ def _format_path(
 ) -> None:
     with yield_toml_doc(path, modifications=modifications) as doc:
         project_deps = get_pyproject_dependencies(doc)
-        if (deps := project_deps.dependencies) is not None:
-            _format_array(deps)
-        if (opt_depedencies := project_deps.opt_dependencies) is not None:
-            for array in opt_depedencies.values():
-                _format_array(array)
-        if (dep_grps := project_deps.dep_groups) is not None:
-            for array in dep_grps.values():
-                _format_array(array)
+        project_deps.apply(_format_req)
 
 
-def _format_array(dependencies: Array, /) -> None:
-    formatted = list(map(_format_item, dependencies))
-    dependencies.clear()
-    ensure_contains(dependencies, *formatted)
-
-
-def _format_item(item: Any, /) -> String:
-    return string(str(Requirement.new(ensure_str(item))))
+def _format_req(requirement: Requirement, /) -> Requirement:
+    return requirement
 
 
 __all__ = ["format_requirements"]
