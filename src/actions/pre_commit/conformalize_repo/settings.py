@@ -12,7 +12,12 @@ class Settings:
         default=False, help="Update CA certficates before each step"
     )
     ci__gitea: bool = option(default=False, help="Set up CI on Gitea")
-    ci__token: str | None = option(default=None, help="Set up CI with this token")
+    ci__token_checkout: str | None = option(
+        default=None, help="Set up CI with this checkout token"
+    )
+    ci__token_github: str | None = option(
+        default=None, help="Set up CI with this GitHub token"
+    )
     ci__pull_request__pre_commit: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' pre-commit"
     )

@@ -18,7 +18,8 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
     conformalize_repo(
         ci__certificates=settings.ci__certificates,
         ci__gitea=settings.ci__gitea,
-        ci__token=settings.ci__token,
+        ci__token_checkout=settings.ci__token_checkout,
+        ci__token_github=settings.ci__token_github,
         ci__pull_request__pre_commit=settings.ci__pull_request__pre_commit,
         ci__pull_request__pyright=settings.ci__pull_request__pyright,
         ci__pull_request__pytest__macos=settings.ci__pull_request__pytest__macos,
