@@ -16,23 +16,22 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         return
     basic_config(obj=LOGGER)
     conformalize_repo(
+        ci__ca_certificates=settings.ci__ca_certificates,
+        ci__gitea=settings.ci__gitea,
+        ci__token=settings.ci__token,
+        ci__pull_request__pre_commit=settings.ci__pull_request__pre_commit,
+        ci__pull_request__pyright=settings.ci__pull_request__pyright,
+        ci__pull_request__pytest__macos=settings.ci__pull_request__pytest__macos,
+        ci__pull_request__pytest__ubuntu=settings.ci__pull_request__pytest__ubuntu,
+        ci__pull_request__pytest__windows=settings.ci__pull_request__pytest__windows,
+        ci__pull_request__pytest__sops_age_key=settings.ci__pull_request__pytest__sops_age_key,
+        ci__pull_request__ruff=settings.ci__pull_request__ruff,
+        ci__push__publish=settings.ci__push__publish,
+        ci__push__tag=settings.ci__push__tag,
         coverage=settings.coverage,
         description=settings.description,
         envrc=settings.envrc,
         envrc__uv=settings.envrc__uv,
-        envrc__uv__native_tls=settings.envrc__uv__native_tls,
-        github__pull_request__pre_commit=settings.github__pull_request__pre_commit,
-        github__pull_request__pre_commit__gitea=settings.github__pull_request__pre_commit__gitea,
-        github__pull_request__pyright=settings.github__pull_request__pyright,
-        github__pull_request__pytest__macos=settings.github__pull_request__pytest__macos,
-        github__pull_request__pytest__ubuntu=settings.github__pull_request__pytest__ubuntu,
-        github__pull_request__pytest__windows=settings.github__pull_request__pytest__windows,
-        github__pull_request__ruff=settings.github__pull_request__ruff,
-        github__push__publish=settings.github__push__publish,
-        github__push__tag=settings.github__push__tag,
-        github__push__tag__major=settings.github__push__tag__major,
-        github__push__tag__major_minor=settings.github__push__tag__major_minor,
-        github__push__tag__latest=settings.github__push__tag__latest,
         gitignore=settings.gitignore,
         package_name=settings.package_name,
         pre_commit__dockerfmt=settings.pre_commit__dockerfmt,
@@ -58,6 +57,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         ruff=settings.ruff,
         run_version_bump=settings.run_version_bump,
         script=settings.script,
+        uv__native_tls=settings.uv__native_tls,
     )
 
 
