@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from requests import get
 from utilities.atomicwrites import writer
-from utilities.subprocess import chmod, run, ssh
+from utilities.subprocess import chmod, ssh
 from utilities.text import strip_and_dedent
 
 from actions import __version__
@@ -19,6 +19,7 @@ from actions.register_gitea_runner.constants import (
     URL_WAIT_FOR_IT,
 )
 from actions.register_gitea_runner.settings import SETTINGS
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from utilities.types import PathLike
@@ -71,6 +72,7 @@ def register_gitea_runner(
         *_docker_exec_generate(user=gitea_container_user, name=gitea_container_name),
         return_=True,
     )
+    LOGGER.info("Got token %r", token)
     _start_runner(
         token,
         runner_certificate=runner_certificate,
@@ -95,10 +97,9 @@ def register_against_local(
 ) -> None:
     """Register against a local instance of Gitea."""
     LOGGER.info("Registering against %s:%d...", gitea_host, gitea_port)
-    token = run(
+    token = logged_run(
         *_docker_exec_generate(user=gitea_container_user, name=gitea_container_name),
         return_=True,
-        logger=LOGGER,
     )
     _start_runner(
         token,
@@ -236,10 +237,8 @@ def _start_runner(
     _write_config(token, capacity=runner_capacity, certificate=runner_certificate)
     _write_entrypoint(host=gitea_host, port=gitea_port)
     _write_wait_for_it()
-    run(
-        *_docker_stop_runner_args(name=runner_container_name), print=True, logger=LOGGER
-    )
-    run(
+    logged_run(*_docker_stop_runner_args(name=runner_container_name), print=True)
+    logged_run(
         *_docker_run_act_runner_args(
             token,
             host=gitea_host,
@@ -249,7 +248,6 @@ def _start_runner(
             container_name=runner_container_name,
         ),
         print=True,
-        logger=LOGGER,
     )
 
 
