@@ -238,9 +238,9 @@ def conformalize_repo(
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
+            gitea=ci__gitea,
             modifications=modifications,
             certificates=ci__certificates,
-            gitea=ci__gitea,
             pre_commit=ci__pull_request__pre_commit,
             pre_commit__submodules=ci__pull_request__pre_commit__submodules,
             pyright=ci__pull_request__pyright,
@@ -265,16 +265,16 @@ def conformalize_repo(
         or ci__push__tag__all
     ):
         add_ci_push_yaml(
-            certificates=ci__certificates,
             gitea=ci__gitea,
-            token=ci__token,
             modifications=modifications,
+            certificates=ci__certificates,
             publish=ci__push__publish,
             publish__username=ci__push__publish__username,
             publish__password=ci__push__publish__password,
             publish__publish_url=ci__push__publish__publish_url,
             tag=ci__push__tag,
             tag__all=ci__push__tag__all,
+            token=ci__token,
             uv__native_tls=uv__native_tls,
         )
     if coverage:
@@ -388,9 +388,9 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 
 def add_ci_pull_request_yaml(
     *,
+    gitea: bool = SETTINGS.ci__gitea,
     modifications: MutableSet[Path] | None = None,
     certificates: bool = SETTINGS.ci__certificates,
-    gitea: bool = SETTINGS.ci__gitea,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     pre_commit__submodules: str
     | None = SETTINGS.ci__pull_request__pre_commit__submodules,
@@ -512,16 +512,16 @@ def add_ci_pull_request_yaml(
 
 def add_ci_push_yaml(
     *,
-    certificates: bool = SETTINGS.ci__certificates,
     gitea: bool = SETTINGS.ci__gitea,
-    token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
+    certificates: bool = SETTINGS.ci__certificates,
     publish: bool = SETTINGS.ci__push__publish,
     publish__username: str | None = SETTINGS.ci__push__publish__username,
     publish__password: Secret[str] | None = SETTINGS.ci__push__publish__password,
     publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
     tag__all: bool = SETTINGS.ci__push__tag__all,
+    token: str | None = SETTINGS.ci__token,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
