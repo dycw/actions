@@ -101,8 +101,8 @@ def conformalize_repo(
     *,
     ci__certificates: bool = SETTINGS.ci__certificates,
     ci__gitea: bool = SETTINGS.ci__gitea,
-    ci__token_checkout: str | None = SETTINGS.ci__token_checkout,
-    ci__token_github: str | None = SETTINGS.ci__token_github,
+    ci__token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    ci__token_github: Secret[str] | None = SETTINGS.ci__token_github,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     ci__pull_request__pre_commit__submodules: str
     | None = SETTINGS.ci__pull_request__pre_commit__submodules,
@@ -409,8 +409,8 @@ def add_ci_pull_request_yaml(
     repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.ci__pull_request__ruff,
     script: str | None = SETTINGS.script,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
@@ -534,8 +534,8 @@ def add_ci_push_yaml(
     publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
     tag__all: bool = SETTINGS.ci__push__tag__all,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
