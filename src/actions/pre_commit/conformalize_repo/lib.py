@@ -120,6 +120,7 @@ def conformalize_repo(
     ci__push__publish__publish_url: Secret[str]
     | None = SETTINGS.ci__push__publish__publish_url,
     ci__push__tag: bool = SETTINGS.ci__push__tag,
+    ci__push__tag__all: bool = SETTINGS.ci__push__tag__all,
     coverage: bool = SETTINGS.coverage,
     description: str | None = SETTINGS.description,
     envrc: bool = SETTINGS.envrc,
@@ -133,7 +134,6 @@ def conformalize_repo(
     pre_commit__shell: bool = SETTINGS.pre_commit__shell,
     pre_commit__taplo: bool = SETTINGS.pre_commit__taplo,
     pre_commit__uv: bool = SETTINGS.pre_commit__uv,
-    pre_commit__uv__script: str | None = SETTINGS.pre_commit__uv__script,
     pyproject: bool = SETTINGS.pyproject,
     pyproject__project__optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
     pyproject__tool__uv__indexes: list[
@@ -164,13 +164,14 @@ def conformalize_repo(
              - ci__pull_request__pytest__macos                    = %s
              - ci__pull_request__pytest__ubuntu                   = %s
              - ci__pull_request__pytest__windows                  = %s
-             - ci__pull_request__pytest__sops_and_age             = %s
+             - ci__pull_request__pytest__sops_age_key             = %s
              - ci__pull_request__ruff                             = %s
              - ci__push__publish                                  = %s
              - ci__push__publish__username                        = %s
              - ci__push__publish__password                        = %s
              - ci__push__publish__publish_url                     = %s
              - ci__push__tag                                      = %s
+             - ci__push__tag__all                                 = %s
              - coverage                                           = %s
              - description                                        = %s
              - envrc                                              = %s
@@ -184,7 +185,6 @@ def conformalize_repo(
              - pre_commit__shell                                  = %s
              - pre_commit__taplo                                  = %s
              - pre_commit__uv                                     = %s
-             - pre_commit__uv__script                             = %s
              - pyproject                                          = %s
              - pyproject__project__optional_dependencies__scripts = %s
              - pyproject__tool__uv__indexes                       = %s
@@ -212,12 +212,14 @@ def conformalize_repo(
         ci__pull_request__pytest__macos,
         ci__pull_request__pytest__ubuntu,
         ci__pull_request__pytest__windows,
+        ci__pull_request__pytest__sops_age_key,
         ci__pull_request__ruff,
         ci__push__publish,
         ci__push__publish__username,
         ci__push__publish__password,
         ci__push__publish__publish_url,
         ci__push__tag,
+        ci__push__tag__all,
         coverage,
         description,
         envrc,
@@ -231,7 +233,6 @@ def conformalize_repo(
         pre_commit__shell,
         pre_commit__taplo,
         pre_commit__uv,
-        pre_commit__uv__script,
         pyproject,
         pyproject__project__optional_dependencies__scripts,
         pyproject__tool__uv__indexes,
@@ -305,6 +306,7 @@ def conformalize_repo(
         or (ci__push__publish__password is not None)
         or (ci__push__publish__publish_url is not None)
         or ci__push__tag
+        or ci__push__tag__all
     ):
         add_ci_push_yaml(
             certificates=ci__ca_certificates,
@@ -316,6 +318,7 @@ def conformalize_repo(
             publish__password=ci__push__publish__password,
             publish__publish_url=ci__push__publish__publish_url,
             tag=ci__push__tag,
+            tag__all=ci__push__tag__all,
             uv__native_tls=uv__native_tls,
         )
     if coverage:
@@ -550,6 +553,7 @@ def add_ci_push_yaml(
     publish__password: Secret[str] | None = SETTINGS.ci__push__publish__password,
     publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
+    tag__all: bool = SETTINGS.ci__push__tag__all,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
@@ -587,7 +591,10 @@ def add_ci_push_yaml(
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("tag"))
             ensure_contains(
-                steps, action_tag_commit_dict(major_minor=True, major=True, latest=True)
+                steps,
+                action_tag_commit_dict(
+                    major_minor=tag__all, major=tag__all, latest=tag__all
+                ),
             )
 
 

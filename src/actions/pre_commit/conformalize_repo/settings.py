@@ -48,6 +48,9 @@ class Settings:
         default=None, help="Set up CI 'push.yaml' publishing with this URL"
     )
     ci__push__tag: bool = option(default=False, help="Set up CI 'push.yaml' tagging")
+    ci__push__tag__all: bool = option(
+        default=False, help="Set up CI 'push.yaml' tagging with all tags"
+    )
     coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")
     description: str | None = option(default=None, help="Repo description")
     envrc: bool = option(default=False, help="Set up '.envrc'")
@@ -74,9 +77,6 @@ class Settings:
     )
     pre_commit__uv: bool = option(
         default=False, help="Set up '.pre-commit-config.yaml' uv"
-    )
-    pre_commit__uv__script: str | None = option(
-        default=None, help="Set up '.pre-commit-config.yaml' uv lock script"
     )
     pyproject: bool = option(default=False, help="Set up 'pyproject.toml'")
     pyproject__project__optional_dependencies__scripts: bool = option(
