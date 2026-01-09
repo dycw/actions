@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 
 def action_publish_package_dict(
     *,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     username: str | None = SETTINGS.ci__push__publish__username,
     password: Secret[str] | None = SETTINGS.ci__push__publish__password,
     publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
@@ -42,8 +42,8 @@ def action_publish_package_dict(
 
 def action_pyright_dict(
     *,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     python_version: str | None = None,
     resolution: str | None = None,
     prerelease: str | None = None,
@@ -65,8 +65,8 @@ def action_pyright_dict(
 
 def action_pytest_dict(
     *,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     python_version: str | None = None,
     sops_age_key: str | None = None,
     resolution: str | None = None,
@@ -90,8 +90,8 @@ def action_pytest_dict(
 
 def action_ruff_dict(
     *,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
 ) -> StrDict:
     out: StrDict = {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest"}
     with_: StrDict = {}
@@ -103,8 +103,8 @@ def action_ruff_dict(
 
 def action_run_hooks_dict(
     *,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     submodules: str | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     repos: list[str] | None = None,
     hooks: list[str] | None = None,
@@ -132,8 +132,8 @@ def action_run_hooks_dict(
 
 def action_tag_commit_dict(
     *,
-    token_checkout: str | None = SETTINGS.ci__token_checkout,
-    token_github: str | None = SETTINGS.ci__token_github,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
     user_name: str | None = None,
     user_email: str | None = None,
     major_minor: bool = False,
@@ -202,13 +202,13 @@ def _add_resolution(dict_: StrDict, /, *, resolution: str | None = None) -> None
 
 
 def _add_token_checkout(
-    dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token_checkout
+    dict_: StrDict, /, *, token: Secret[str] | None = SETTINGS.ci__token_checkout
 ) -> None:
     _add_item(dict_, "token-checkout", value=token)
 
 
 def _add_token_github(
-    dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token_github
+    dict_: StrDict, /, *, token: Secret[str] | None = SETTINGS.ci__token_github
 ) -> None:
     _add_item(dict_, "token-github", value=token)
 

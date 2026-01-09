@@ -12,10 +12,10 @@ class Settings:
         default=False, help="Update CA certficates before each step"
     )
     ci__gitea: bool = option(default=False, help="Set up CI on Gitea")
-    ci__token_checkout: str | None = option(
+    ci__token_checkout: Secret[str] | None = option(
         default=None, help="Set up CI with this checkout token"
     )
-    ci__token_github: str | None = option(
+    ci__token_github: Secret[str] | None = option(
         default=None, help="Set up CI with this GitHub token"
     )
     ci__pull_request__pre_commit: bool = option(
