@@ -249,6 +249,7 @@ def conformalize_repo(
             pytest__macos=ci__pull_request__pytest__macos,
             pytest__ubuntu=ci__pull_request__pytest__ubuntu,
             pytest__windows=ci__pull_request__pytest__windows,
+            pytest__all_versions=ci__pull_request__pytest__all_versions,
             pytest__sops_age_key=ci__pull_request__pytest__sops_age_key,
             pytest__timeout=pytest__timeout,
             python_version=python_version,
