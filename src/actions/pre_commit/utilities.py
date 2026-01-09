@@ -223,7 +223,9 @@ class PyProjectDependencies:
 
 
 def path_throttle_cache(func: Callable[..., Any]) -> Path:
-    return PATH_CACHE / "throttle" / get_func_name(func) / Path.cwd()
+    func_name = get_func_name(func)
+    cwd_name = Path.cwd().name
+    return PATH_CACHE / "throttle" / f"{func_name}--{cwd_name}"
 
 
 ##
