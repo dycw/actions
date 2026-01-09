@@ -238,10 +238,9 @@ def conformalize_repo(
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
+            modifications=modifications,
             certificates=ci__ca_certificates,
             gitea=ci__gitea,
-            token=ci__token,
-            modifications=modifications,
             pre_commit=ci__pull_request__pre_commit,
             pre_commit__submodules=ci__pull_request__pre_commit__submodules,
             pyright=ci__pull_request__pyright,
@@ -254,6 +253,7 @@ def conformalize_repo(
             repo_name=repo_name,
             ruff=ruff,
             script=script,
+            token=ci__token,
             uv__native_tls=uv__native_tls,
         )
     if (
@@ -388,10 +388,9 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 
 def add_ci_pull_request_yaml(
     *,
+    modifications: MutableSet[Path] | None = None,
     certificates: bool = SETTINGS.ci__ca_certificates,
     gitea: bool = SETTINGS.ci__gitea,
-    token: str | None = SETTINGS.ci__token,
-    modifications: MutableSet[Path] | None = None,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     pre_commit__submodules: str
     | None = SETTINGS.ci__pull_request__pre_commit__submodules,
@@ -406,6 +405,7 @@ def add_ci_pull_request_yaml(
     repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.ci__pull_request__ruff,
     script: str | None = SETTINGS.script,
+    token: str | None = SETTINGS.ci__token,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
