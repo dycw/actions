@@ -5,12 +5,11 @@ from typing import TYPE_CHECKING
 
 from utilities.platform import SYSTEM
 from utilities.subprocess import chmod, chown, tee
-from utilities.text import strip_and_dedent
 
-from actions import __version__
 from actions.logging import LOGGER
 from actions.setup_cronjob.constants import PATH_CONFIGS
 from actions.setup_cronjob.settings import SETTINGS
+from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -31,31 +30,18 @@ def setup_cronjob(
     logs_keep: int = SETTINGS.logs_keep,
 ) -> None:
     """Set up a cronjob & logrotate."""
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - name         = %s
-             - prepend_path = %s
-             - schedule     = %s
-             - user         = %s
-             - timeout      = %d
-             - kill_after   = %d
-             - command      = %s
-             - args         = %s
-             - logs_keep    = %d
-        """),
-        setup_cronjob.__name__,
-        __version__,
-        name,
-        prepend_path,
-        schedule,
-        user,
-        timeout,
-        kill_after,
-        command,
-        args,
-        logs_keep,
-    )
+    variables = [
+        f"{name=}",
+        f"{prepend_path=}",
+        f"{schedule=}",
+        f"{user=}",
+        f"{timeout=}",
+        f"{kill_after=}",
+        f"{command=}",
+        f"{args=}",
+        f"{logs_keep=}",
+    ]
+    LOGGER.info(log_func_call(setup_cronjob, *variables))
     if SYSTEM != "linux":
         msg = f"System must be 'linux'; got {SYSTEM!r}"
         raise TypeError(msg)

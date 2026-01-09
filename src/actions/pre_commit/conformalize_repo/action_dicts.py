@@ -116,7 +116,7 @@ def action_ruff_dict(*, token: str | None = SETTINGS.ci__token) -> StrDict:
 def action_run_hooks_dict(
     *,
     token: str | None = SETTINGS.ci__token,
-    submodules: str | None = None,
+    submodules: str | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     repos: list[str] | None = None,
     hooks: list[str] | None = None,
     hooks_exclude: list[str] | None = None,

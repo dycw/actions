@@ -21,7 +21,6 @@ from utilities.text import repr_str, strip_and_dedent
 from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
 
-from actions import __version__
 from actions.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
@@ -88,7 +87,7 @@ from actions.pre_commit.utilities import (
     yield_toml_doc,
     yield_yaml_dict,
 )
-from actions.utilities import logged_run
+from actions.utilities import log_func_call, logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
@@ -104,7 +103,8 @@ def conformalize_repo(
     ci__gitea: bool = SETTINGS.ci__gitea,
     ci__token: str | None = SETTINGS.ci__token,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    ci__pull_request__pre_commit__submodules: bool = SETTINGS.ci__pull_request__pre_commit__submodules,
+    ci__pull_request__pre_commit__submodules: str
+    | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     ci__pull_request__pyright: bool = SETTINGS.ci__pull_request__pyright,
     ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
@@ -152,105 +152,55 @@ def conformalize_repo(
     script: str | None = SETTINGS.script,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - ci__ca_certificates                                = %s
-             - ci__gitea                                          = %s
-             - ci__token                                          = %s
-             - ci__pull_request__pre_commit                       = %s
-             - ci__pull_request__pre_commit__submodules           = %s
-             - ci__pull_request__pyright                          = %s
-             - ci__pull_request__pytest__macos                    = %s
-             - ci__pull_request__pytest__ubuntu                   = %s
-             - ci__pull_request__pytest__windows                  = %s
-             - ci__pull_request__pytest__sops_age_key             = %s
-             - ci__pull_request__ruff                             = %s
-             - ci__push__publish                                  = %s
-             - ci__push__publish__username                        = %s
-             - ci__push__publish__password                        = %s
-             - ci__push__publish__publish_url                     = %s
-             - ci__push__tag                                      = %s
-             - ci__push__tag__all                                 = %s
-             - coverage                                           = %s
-             - description                                        = %s
-             - envrc                                              = %s
-             - envrc__uv                                          = %s
-             - gitignore                                          = %s
-             - package_name                                       = %s
-             - pre_commit__dockerfmt                              = %s
-             - pre_commit__prettier                               = %s
-             - pre_commit__python                                 = %s
-             - pre_commit__ruff                                   = %s
-             - pre_commit__shell                                  = %s
-             - pre_commit__taplo                                  = %s
-             - pre_commit__uv                                     = %s
-             - pyproject                                          = %s
-             - pyproject__project__optional_dependencies__scripts = %s
-             - pyproject__tool__uv__indexes                       = %s
-             - pyright                                            = %s
-             - pytest                                             = %s
-             - pytest__asyncio                                    = %s
-             - pytest__ignore_warnings                            = %s
-             - pytest__timeout                                    = %s
-             - python_package_name                                = %s
-             - python_version                                     = %s
-             - readme                                             = %s
-             - repo_name                                          = %s
-             - ruff                                               = %s
-             - run_version_bump                                   = %s
-             - script                                             = %s
-             - uv__native__tls                                    = %s
-        """),
-        conformalize_repo.__name__,
-        __version__,
-        ci__ca_certificates,
-        ci__gitea,
-        ci__token,
-        ci__pull_request__pre_commit,
-        ci__pull_request__pre_commit__submodules,
-        ci__pull_request__pyright,
-        ci__pull_request__pytest__macos,
-        ci__pull_request__pytest__ubuntu,
-        ci__pull_request__pytest__windows,
-        ci__pull_request__pytest__sops_age_key,
-        ci__pull_request__ruff,
-        ci__push__publish,
-        ci__push__publish__username,
-        ci__push__publish__password,
-        ci__push__publish__publish_url,
-        ci__push__tag,
-        ci__push__tag__all,
-        coverage,
-        description,
-        envrc,
-        envrc__uv,
-        gitignore,
-        package_name,
-        pre_commit__dockerfmt,
-        pre_commit__prettier,
-        pre_commit__python,
-        pre_commit__ruff,
-        pre_commit__shell,
-        pre_commit__taplo,
-        pre_commit__uv,
-        pyproject,
-        pyproject__project__optional_dependencies__scripts,
-        pyproject__tool__uv__indexes,
-        pyright,
-        pytest,
-        pytest__asyncio,
-        pytest__ignore_warnings,
-        pytest__timeout,
-        python_package_name,
-        python_version,
-        readme,
-        repo_name,
-        ruff,
-        run_version_bump,
-        script,
-        uv__native_tls,
-    )
+    variables = [
+        f"{ci__ca_certificates=}",
+        f"{ci__gitea=}",
+        f"{ci__token=}",
+        f"{ci__pull_request__pre_commit=}",
+        f"{ci__pull_request__pre_commit__submodules=}",
+        f"{ci__pull_request__pyright=}",
+        f"{ci__pull_request__pytest__macos=}",
+        f"{ci__pull_request__pytest__ubuntu=}",
+        f"{ci__pull_request__pytest__windows=}",
+        f"{ci__pull_request__pytest__sops_age_key=}",
+        f"{ci__pull_request__ruff=}",
+        f"{ci__push__publish=}",
+        f"{ci__push__publish__username=}",
+        f"{ci__push__publish__password=}",
+        f"{ci__push__publish__publish_url=}",
+        f"{ci__push__tag=}",
+        f"{ci__push__tag__all=}",
+        f"{coverage=}",
+        f"{description=}",
+        f"{envrc=}",
+        f"{envrc__uv=}",
+        f"{gitignore=}",
+        f"{package_name=}",
+        f"{pre_commit__dockerfmt=}",
+        f"{pre_commit__prettier=}",
+        f"{pre_commit__python=}",
+        f"{pre_commit__ruff=}",
+        f"{pre_commit__shell=}",
+        f"{pre_commit__taplo=}",
+        f"{pre_commit__uv=}",
+        f"{pyproject=}",
+        f"{pyproject__project__optional_dependencies__scripts=}",
+        f"{pyproject__tool__uv__indexes=}",
+        f"{pyright=}",
+        f"{pytest=}",
+        f"{pytest__asyncio=}",
+        f"{pytest__ignore_warnings=}",
+        f"{pytest__timeout=}",
+        f"{python_package_name=}",
+        f"{python_version=}",
+        f"{readme=}",
+        f"{repo_name=}",
+        f"{ruff=}",
+        f"{run_version_bump=}",
+        f"{script=}",
+        f"{uv__native_tls=}",
+    ]
+    LOGGER.info(log_func_call(conformalize_repo, *variables))
     modifications: set[Path] = set()
     add_bumpversion_toml(
         modifications=modifications,
@@ -440,7 +390,8 @@ def add_ci_pull_request_yaml(
     token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    pre_commit__submodules: bool = SETTINGS.ci__pull_request__pre_commit__submodules,
+    pre_commit__submodules: str
+    | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     pyright: bool = SETTINGS.ci__pull_request__pyright,
     pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,

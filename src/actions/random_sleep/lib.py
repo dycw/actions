@@ -4,39 +4,25 @@ from math import ceil, floor
 from random import choice
 from time import sleep
 
-from utilities.text import strip_and_dedent
 from utilities.whenever import get_now
 from whenever import TimeDelta, ZonedDateTime
 
-from actions import __version__
 from actions.logging import LOGGER
 from actions.random_sleep.settings import SETTINGS
+from actions.utilities import log_func_call
 
 
 def random_sleep(
     *,
-    min_: int = SETTINGS.min,
-    max_: int = SETTINGS.max,
+    min: int = SETTINGS.min,  # noqa: A002
+    max: int = SETTINGS.max,  # noqa: A002
     step: int = SETTINGS.step,
     log_freq: int = SETTINGS.log_freq,
 ) -> None:
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - min_     = %s
-             - max_     = %s
-             - step     = %s
-             - log_freq = %s
-        """),
-        random_sleep.__name__,
-        __version__,
-        min_,
-        max_,
-        step,
-        log_freq,
-    )
+    variables = [f"{min=}", f"{max=}", f"{step=}", f"{log_freq=}"]
+    LOGGER.info(log_func_call(random_sleep, *variables))
     start = get_now()
-    delta = TimeDelta(seconds=choice(range(min_, max_, step)))
+    delta = TimeDelta(seconds=choice(range(min, max, step)))
     LOGGER.info("Sleeping for %s...", delta)
     end = (start + delta).round(mode="ceil")
     while (now := get_now()) < end:

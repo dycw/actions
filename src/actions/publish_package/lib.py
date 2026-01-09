@@ -3,12 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from utilities.tempfile import TemporaryDirectory
-from utilities.text import strip_and_dedent
 
-from actions import __version__
 from actions.logging import LOGGER
 from actions.publish_package.settings import SETTINGS
-from actions.utilities import logged_run
+from actions.utilities import log_func_call, logged_run
 
 if TYPE_CHECKING:
     from typed_settings import Secret
@@ -22,23 +20,14 @@ def publish_package(
     trusted_publishing: bool = SETTINGS.trusted_publishing,
     native_tls: bool = SETTINGS.native_tls,
 ) -> None:
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - username           = %s
-             - password           = %s
-             - publish_url        = %s
-             - trusted_publishing = %s
-             - native_tls         = %s
-        """),
-        publish_package.__name__,
-        __version__,
-        username,
-        password,
-        publish_url,
-        trusted_publishing,
-        native_tls,
-    )
+    variables = [
+        f"{username=}",
+        f"{password=}",
+        f"{publish_url=}",
+        f"{trusted_publishing=}",
+        f"{native_tls=}",
+    ]
+    LOGGER.info(log_func_call(publish_package, *variables))
     with TemporaryDirectory() as temp:
         logged_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
         logged_run(

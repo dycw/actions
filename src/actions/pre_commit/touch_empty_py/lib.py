@@ -4,13 +4,13 @@ import sys
 from typing import TYPE_CHECKING
 
 from libcst import parse_statement
-from utilities.text import repr_str, strip_and_dedent
+from utilities.text import repr_str
 from utilities.throttle import throttle
 
-from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.constants import THROTTLE_DELTA
 from actions.pre_commit.utilities import path_throttle_cache, yield_python_file
+from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -20,15 +20,7 @@ if TYPE_CHECKING:
 
 
 def _touch_empty_py(*paths: PathLike) -> None:
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - paths = %s
-        """),
-        touch_empty_py.__name__,
-        __version__,
-        paths,
-    )
+    LOGGER.info(log_func_call(touch_empty_py, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, modifications=modifications)
