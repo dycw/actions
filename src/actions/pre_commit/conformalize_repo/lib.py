@@ -105,7 +105,8 @@ def conformalize_repo(
     ci__gitea: bool = SETTINGS.ci__gitea,
     ci__token: str | None = SETTINGS.ci__token,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    ci__pull_request__pre_commit__submodules: bool = SETTINGS.ci__pull_request__pre_commit__submodules,
+    ci__pull_request__pre_commit__submodules: str
+    | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     ci__pull_request__pyright: bool = SETTINGS.ci__pull_request__pyright,
     ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
@@ -154,7 +155,6 @@ def conformalize_repo(
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     variables = [
-        f"{ci__ca_certificates=}",
         f"{ci__ca_certificates=}",
         f"{ci__gitea=}",
         f"{ci__token=}",
@@ -400,7 +400,8 @@ def add_ci_pull_request_yaml(
     token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    pre_commit__submodules: bool = SETTINGS.ci__pull_request__pre_commit__submodules,
+    pre_commit__submodules: str
+    | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     pyright: bool = SETTINGS.ci__pull_request__pyright,
     pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
