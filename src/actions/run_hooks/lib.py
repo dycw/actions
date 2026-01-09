@@ -7,6 +7,7 @@ from re import search
 from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any
 
+from tabulate import tabulate
 from utilities.functions import ensure_class, ensure_str
 from utilities.text import strip_and_dedent
 from whenever import TimeDelta
@@ -15,7 +16,7 @@ from yaml import safe_load
 from actions import __version__
 from actions.logging import LOGGER
 from actions.run_hooks.settings import SETTINGS
-from actions.utilities import logged_run
+from actions.utilities import logged_run, split_f_str_equals
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -28,20 +29,15 @@ def run_hooks(
     hooks_exclude: list[str] | None = SETTINGS.hooks_exclude,
     sleep: int = SETTINGS.sleep,
 ) -> None:
+    variables = [f"{repos=}", f"{hooks=}", f"{hooks_exclude=}", f"{sleep=}"]
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
-             - repos         = %s
-             - hooks         = %s
-             - hooks_exclude = %s
-             - sleep         = %d
+            %s
         """),
         run_hooks.__name__,
         __version__,
-        repos,
-        hooks,
-        hooks_exclude,
-        sleep,
+        tabulate(list(map(split_f_str_equals, variables))),
     )
     results = {
         hook: _run_hook(hook, sleep=sleep)
