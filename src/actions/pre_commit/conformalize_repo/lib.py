@@ -99,7 +99,7 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
-    ci__ca_certificates: bool = SETTINGS.ci__ca_certificates,
+    ci__certificates: bool = SETTINGS.ci__certificates,
     ci__gitea: bool = SETTINGS.ci__gitea,
     ci__token: str | None = SETTINGS.ci__token,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
@@ -154,7 +154,7 @@ def conformalize_repo(
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     variables = [
-        f"{ci__ca_certificates=}",
+        f"{ci__certificates=}",
         f"{ci__gitea=}",
         f"{ci__token=}",
         f"{ci__pull_request__pre_commit=}",
@@ -233,14 +233,14 @@ def conformalize_repo(
         or ci__pull_request__pytest__macos
         or ci__pull_request__pytest__ubuntu
         or ci__pull_request__pytest__windows
+        or ci__pull_request__pytest__all_versions
         or (ci__pull_request__pytest__sops_age_key is not None)
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
-            certificates=ci__ca_certificates,
-            gitea=ci__gitea,
-            token=ci__token,
             modifications=modifications,
+            certificates=ci__certificates,
+            gitea=ci__gitea,
             pre_commit=ci__pull_request__pre_commit,
             pre_commit__submodules=ci__pull_request__pre_commit__submodules,
             pyright=ci__pull_request__pyright,
@@ -253,6 +253,7 @@ def conformalize_repo(
             repo_name=repo_name,
             ruff=ruff,
             script=script,
+            token=ci__token,
             uv__native_tls=uv__native_tls,
         )
     if (
@@ -264,7 +265,7 @@ def conformalize_repo(
         or ci__push__tag__all
     ):
         add_ci_push_yaml(
-            certificates=ci__ca_certificates,
+            certificates=ci__certificates,
             gitea=ci__gitea,
             token=ci__token,
             modifications=modifications,
@@ -387,10 +388,9 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 
 def add_ci_pull_request_yaml(
     *,
-    certificates: bool = SETTINGS.ci__ca_certificates,
-    gitea: bool = SETTINGS.ci__gitea,
-    token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
+    certificates: bool = SETTINGS.ci__certificates,
+    gitea: bool = SETTINGS.ci__gitea,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     pre_commit__submodules: str
     | None = SETTINGS.ci__pull_request__pre_commit__submodules,
@@ -405,6 +405,7 @@ def add_ci_pull_request_yaml(
     repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.ci__pull_request__ruff,
     script: str | None = SETTINGS.script,
+    token: str | None = SETTINGS.ci__token,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
@@ -511,7 +512,7 @@ def add_ci_pull_request_yaml(
 
 def add_ci_push_yaml(
     *,
-    certificates: bool = SETTINGS.ci__ca_certificates,
+    certificates: bool = SETTINGS.ci__certificates,
     gitea: bool = SETTINGS.ci__gitea,
     token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
