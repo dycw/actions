@@ -20,7 +20,6 @@ from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
 from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
-from utilities.whenever import HOUR
 
 from actions import __version__
 from actions.constants import (
@@ -64,6 +63,7 @@ from actions.pre_commit.conformalize_repo.constants import (
     UV_URL,
 )
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
+from actions.pre_commit.constants import THROTTLE_DELTA
 from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
@@ -1210,7 +1210,7 @@ def _run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> 
 
 
 run_pre_commit_update = throttle(
-    delta=12 * HOUR, path=path_throttle_cache(_run_pre_commit_update)
+    delta=THROTTLE_DELTA, path=path_throttle_cache(_run_pre_commit_update)
 )(_run_pre_commit_update)
 
 

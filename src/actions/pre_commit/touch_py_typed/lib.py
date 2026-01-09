@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 from utilities.iterables import one
 from utilities.text import repr_str, strip_and_dedent
 from utilities.throttle import throttle
-from utilities.whenever import HOUR
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.pre_commit.constants import THROTTLE_DELTA
 from actions.pre_commit.utilities import path_throttle_cache
 
 if TYPE_CHECKING:
@@ -40,9 +40,9 @@ def _touch_py_typed(*paths: PathLike) -> None:
         sys.exit(1)
 
 
-touch_py_typed = throttle(delta=12 * HOUR, path=path_throttle_cache(_touch_py_typed))(
-    _touch_py_typed
-)
+touch_py_typed = throttle(
+    delta=THROTTLE_DELTA, path=path_throttle_cache(_touch_py_typed)
+)(_touch_py_typed)
 
 
 def _format_path(
