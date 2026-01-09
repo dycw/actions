@@ -101,7 +101,8 @@ def conformalize_repo(
     *,
     ci__certificates: bool = SETTINGS.ci__certificates,
     ci__gitea: bool = SETTINGS.ci__gitea,
-    ci__token: str | None = SETTINGS.ci__token_checkout,
+    ci__token_checkout: str | None = SETTINGS.ci__token_checkout,
+    ci__token_github: str | None = SETTINGS.ci__token_github,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     ci__pull_request__pre_commit__submodules: str
     | None = SETTINGS.ci__pull_request__pre_commit__submodules,
@@ -156,7 +157,8 @@ def conformalize_repo(
     variables = [
         f"{ci__certificates=}",
         f"{ci__gitea=}",
-        f"{ci__token=}",
+        f"{ci__token_checkout=}",
+        f"{ci__token_github=}",
         f"{ci__pull_request__pre_commit=}",
         f"{ci__pull_request__pre_commit__submodules=}",
         f"{ci__pull_request__pyright=}",
@@ -253,7 +255,8 @@ def conformalize_repo(
             repo_name=repo_name,
             ruff=ruff,
             script=script,
-            token=ci__token,
+            token_checkout=ci__token_checkout,
+            token_github=ci__token_github,
             uv__native_tls=uv__native_tls,
         )
     if (
@@ -274,7 +277,8 @@ def conformalize_repo(
             publish__publish_url=ci__push__publish__publish_url,
             tag=ci__push__tag,
             tag__all=ci__push__tag__all,
-            token=ci__token,
+            token_checkout=ci__token_checkout,
+            token_github=ci__token_github,
             uv__native_tls=uv__native_tls,
         )
     if coverage:
@@ -405,7 +409,8 @@ def add_ci_pull_request_yaml(
     repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.ci__pull_request__ruff,
     script: str | None = SETTINGS.script,
-    token: str | None = SETTINGS.ci__token_checkout,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
@@ -427,7 +432,8 @@ def add_ci_pull_request_yaml(
             ensure_contains(
                 steps,
                 action_run_hooks_dict(
-                    token_checkout=token,
+                    token_checkout=token_checkout,
+                    token_github=token_github,
                     submodules=pre_commit__submodules,
                     repos=["pre-commit/pre-commit-hooks"],
                     gitea=gitea,
@@ -442,7 +448,8 @@ def add_ci_pull_request_yaml(
             ensure_contains(
                 steps,
                 action_pyright_dict(
-                    token_checkout=token,
+                    token_checkout=token_checkout,
+                    token_github=token_github,
                     python_version=python_version,
                     with_requirements=script,
                     native_tls=uv__native_tls,
@@ -469,7 +476,8 @@ def add_ci_pull_request_yaml(
             ensure_contains(
                 steps,
                 action_pytest_dict(
-                    token_checkout=token,
+                    token_checkout=token_checkout,
+                    token_github=token_github,
                     python_version="${{matrix.python-version}}",
                     sops_age_key=pytest__sops_age_key,
                     resolution="${{matrix.resolution}}",
@@ -504,7 +512,12 @@ def add_ci_pull_request_yaml(
             steps = get_list(ruff_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("steps"))
-            ensure_contains(steps, action_ruff_dict(token_checkout=token))
+            ensure_contains(
+                steps,
+                action_ruff_dict(
+                    token_checkout=token_checkout, token_github=token_github
+                ),
+            )
 
 
 ##
@@ -521,7 +534,8 @@ def add_ci_push_yaml(
     publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
     tag__all: bool = SETTINGS.ci__push__tag__all,
-    token: str | None = SETTINGS.ci__token_checkout,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
@@ -545,7 +559,8 @@ def add_ci_push_yaml(
             ensure_contains(
                 steps,
                 action_publish_package_dict(
-                    token_checkout=token,
+                    token_checkout=token_checkout,
+                    token_github=token_github,
                     username=publish__username,
                     password=publish__password,
                     publish_url=publish__publish_url,
