@@ -15,7 +15,6 @@ jobs:
         with:
           repos: |-
             pre-commit/pre-commit-hooks
-          sleep: 1
   pyright:
     runs-on: ubuntu-latest
     steps:
@@ -53,4 +52,3 @@ jobs:
     steps:
       - name: Run 'ruff'
         uses: dycw/action-ruff@latest
-        with: {}

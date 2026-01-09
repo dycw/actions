@@ -12,7 +12,7 @@ from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING
 from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING
 
 if TYPE_CHECKING:
-    from actions.types import StrDict
+    from utilities.types import StrDict
 
 
 def action_publish_package_dict(

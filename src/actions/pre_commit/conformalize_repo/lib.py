@@ -95,9 +95,7 @@ if TYPE_CHECKING:
 
     from tomlkit.items import Table
     from typed_settings import Secret
-    from utilities.types import PathLike
-
-    from actions.types import StrDict
+    from utilities.types import PathLike, StrDict
 
 
 def conformalize_repo(
