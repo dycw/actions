@@ -12,12 +12,12 @@ from libcst import Module, parse_module
 from rich.pretty import pretty_repr
 from tomlkit import TOMLDocument, aot, array, document, string, table
 from tomlkit.items import AoT, Array, Table
-from utilities.functions import ensure_class, ensure_str
+from utilities.functions import ensure_class, ensure_str, get_func_name
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.packaging import Requirement
 from utilities.types import PathLike, StrDict
 
-from actions.constants import YAML_INSTANCE
+from actions.constants import PATH_CACHE, YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
@@ -222,6 +222,13 @@ class PyProjectDependencies:
 ##
 
 
+def path_throttle_cache(func: Callable[..., Any]) -> Path:
+    return PATH_CACHE / "throttle" / get_func_name(func) / Path.cwd()
+
+
+##
+
+
 @dataclass(kw_only=True, slots=True)
 class WriteContext[T]:
     input: T
@@ -376,6 +383,7 @@ __all__ = [
     "get_table",
     "is_partial_dict",
     "is_partial_str",
+    "path_throttle_cache",
     "yield_immutable_write_context",
     "yield_json_dict",
     "yield_mutable_write_context",

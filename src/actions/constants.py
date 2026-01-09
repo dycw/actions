@@ -37,7 +37,6 @@ MAX_PYTHON_VERSION = "3.14"
 
 PATH_ACTIONS = files(anchor="actions")
 PATH_CACHE = xdg_cache_home() / "actions"
-PATH_THROTTLE_CACHE = PATH_CACHE / "throttle"
 
 
 YAML_INSTANCE = YAML()
@@ -60,7 +59,6 @@ __all__ = [
     "MAX_PYTHON_VERSION",
     "PATH_ACTIONS",
     "PATH_CACHE",
-    "PATH_THROTTLE_CACHE",
     "PRE_COMMIT_CONFIG_YAML",
     "PYPROJECT_TOML",
     "PYRIGHTCONFIG_JSON",

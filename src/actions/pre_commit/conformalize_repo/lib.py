@@ -34,7 +34,6 @@ from actions.constants import (
     GITHUB_PUSH_YAML,
     GITIGNORE,
     MAX_PYTHON_VERSION,
-    PATH_THROTTLE_CACHE,
     PRE_COMMIT_CONFIG_YAML,
     PYPROJECT_TOML,
     PYRIGHTCONFIG_JSON,
@@ -83,6 +82,7 @@ from actions.pre_commit.utilities import (
     get_dict,
     get_list,
     get_table,
+    path_throttle_cache,
     yield_json_dict,
     yield_text_file,
     yield_toml_doc,
@@ -1210,7 +1210,7 @@ def _run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> 
 
 
 run_pre_commit_update = throttle(
-    delta=12 * HOUR, path=PATH_THROTTLE_CACHE / _run_pre_commit_update.__name__
+    delta=12 * HOUR, path=path_throttle_cache(_run_pre_commit_update)
 )(_run_pre_commit_update)
 
 
