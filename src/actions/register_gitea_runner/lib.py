@@ -155,6 +155,8 @@ def _docker_run_act_runner_args(
         f"GITEA_RUNNER_REGISTRATION_TOKEN={token}",
         "--name",
         container_name,
+        "--restart",
+        "always",
         "--volume",
         "/var/run/docker.sock:/var/run/docker.sock",
         "--volume",
