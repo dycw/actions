@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from requests import get
 from utilities.atomicwrites import writer
-from utilities.subprocess import chmod, ssh
+from utilities.subprocess import chmod, rm_cmd, ssh, sudo_cmd
 from utilities.text import strip_and_dedent
 
 from actions import __version__
@@ -237,7 +237,8 @@ def _start_runner(
     _write_config(token, capacity=runner_capacity, certificate=runner_certificate)
     _write_entrypoint(host=gitea_host, port=gitea_port)
     _write_wait_for_it()
-    logged_run(*_docker_stop_runner_args(name=runner_container_name), print=True)
+    logged_run(*_docker_stop_runner_args(name=runner_container_name))
+    logged_run(*sudo_cmd(*rm_cmd("data")))
     logged_run(
         *_docker_run_act_runner_args(
             token,
@@ -246,8 +247,7 @@ def _start_runner(
             runner_certificate=runner_certificate,
             instance_name=runner_instance_name,
             container_name=runner_container_name,
-        ),
-        print=True,
+        )
     )
 
 

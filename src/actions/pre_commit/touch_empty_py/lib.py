@@ -9,9 +9,8 @@ from utilities.throttle import throttle
 from utilities.whenever import HOUR
 
 from actions import __version__
-from actions.constants import PATH_THROTTLE_CACHE
 from actions.logging import LOGGER
-from actions.pre_commit.utilities import yield_python_file
+from actions.pre_commit.utilities import path_throttle_cache, yield_python_file
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -41,9 +40,9 @@ def _touch_empty_py(*paths: PathLike) -> None:
         sys.exit(1)
 
 
-touch_empty_py = throttle(
-    delta=12 * HOUR, path=PATH_THROTTLE_CACHE / _touch_empty_py.__name__
-)(_touch_empty_py)
+touch_empty_py = throttle(delta=12 * HOUR, path=path_throttle_cache(_touch_empty_py))(
+    _touch_empty_py
+)
 
 
 def _format_path(
