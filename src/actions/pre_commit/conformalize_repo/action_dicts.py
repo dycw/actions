@@ -7,7 +7,6 @@ from typed_settings import Secret
 
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
 from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
-from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING
 from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING
 from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING
 
@@ -17,7 +16,8 @@ if TYPE_CHECKING:
 
 def action_publish_package_dict(
     *,
-    token: str | None = SETTINGS.ci__token,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     username: str | None = SETTINGS.ci__push__publish__username,
     password: Secret[str] | None = SETTINGS.ci__push__publish__password,
     publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
@@ -29,7 +29,8 @@ def action_publish_package_dict(
         "uses": "dycw/action-publish-package@latest",
     }
     with_: StrDict = {}
-    _add_token(with_, token=token)
+    _add_token_checkout(with_, token=token_checkout)
+    _add_token_github(with_, token=token_github)
     _add_item(with_, "username", value=username)
     _add_item(with_, "password", value=password)
     _add_item(with_, "publish-url", value=publish_url)
@@ -41,7 +42,8 @@ def action_publish_package_dict(
 
 def action_pyright_dict(
     *,
-    token: str | None = SETTINGS.ci__token,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     python_version: str | None = None,
     resolution: str | None = None,
     prerelease: str | None = None,
@@ -50,7 +52,8 @@ def action_pyright_dict(
 ) -> StrDict:
     out: StrDict = {"name": "Run 'pyright'", "uses": "dycw/action-pyright@latest"}
     with_: StrDict = {}
-    _add_token(with_, token=token)
+    _add_token_checkout(with_, token=token_checkout)
+    _add_token_github(with_, token=token_github)
     _add_python_version(with_, python_version=python_version)
     _add_resolution(with_, resolution=resolution)
     _add_prerelease(with_, prerelease=prerelease)
@@ -62,7 +65,8 @@ def action_pyright_dict(
 
 def action_pytest_dict(
     *,
-    token: str | None = SETTINGS.ci__token,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     python_version: str | None = None,
     sops_age_key: str | None = None,
     resolution: str | None = None,
@@ -72,7 +76,8 @@ def action_pytest_dict(
 ) -> StrDict:
     out: StrDict = {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest"}
     with_: StrDict = {}
-    _add_token(with_, token=token)
+    _add_token_checkout(with_, token=token_checkout)
+    _add_token_github(with_, token=token_github)
     _add_python_version(with_, python_version=python_version)
     _add_item(with_, "sops-age-key", value=sops_age_key)
     _add_resolution(with_, resolution=resolution)
@@ -83,39 +88,23 @@ def action_pytest_dict(
     return out
 
 
-def action_random_sleep_dict(
+def action_ruff_dict(
     *,
-    token: str | None = SETTINGS.ci__token,
-    min: int = 0,  # noqa: A002
-    max: int = 3600,  # noqa: A002
-    step: int = 1,
-    log_freq: int = 1,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
 ) -> StrDict:
-    out: StrDict = {
-        "name": RANDOM_SLEEP_DOCSTRING,
-        "uses": "dycw/action-random-sleep@latest",
-    }
-    with_: StrDict = {}
-    _add_token(with_, token=token)
-    with_["min"] = min
-    with_["max"] = max
-    with_["step"] = step
-    with_["log-freq"] = log_freq
-    _add_with_dict(out, with_)
-    return out
-
-
-def action_ruff_dict(*, token: str | None = SETTINGS.ci__token) -> StrDict:
     out: StrDict = {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest"}
     with_: StrDict = {}
-    _add_token(with_, token=token)
+    _add_token_checkout(with_, token=token_checkout)
+    _add_token_github(with_, token=token_github)
     _add_with_dict(out, with_)
     return out
 
 
 def action_run_hooks_dict(
     *,
-    token: str | None = SETTINGS.ci__token,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     submodules: str | None = SETTINGS.ci__pull_request__pre_commit__submodules,
     repos: list[str] | None = None,
     hooks: list[str] | None = None,
@@ -129,7 +118,8 @@ def action_run_hooks_dict(
         "uses": "dycw/action-run-hooks@latest",
     }
     with_: StrDict = {}
-    _add_token(with_, token=token)
+    _add_token_checkout(with_, token=token_checkout)
+    _add_token_github(with_, token=token_github)
     _add_item(with_, "submodules", value=submodules)
     _add_yaml_str(with_, "repos", values=repos)
     _add_yaml_str(with_, "hooks", values=hooks)
@@ -142,7 +132,8 @@ def action_run_hooks_dict(
 
 def action_tag_commit_dict(
     *,
-    token: str | None = SETTINGS.ci__token,
+    token_checkout: str | None = SETTINGS.ci__token_checkout,
+    token_github: str | None = SETTINGS.ci__token_github,
     user_name: str | None = None,
     user_email: str | None = None,
     major_minor: bool = False,
@@ -154,7 +145,8 @@ def action_tag_commit_dict(
         "uses": "dycw/action-tag-commit@latest",
     }
     with_: StrDict = {}
-    _add_token(with_, token=token)
+    _add_token_checkout(with_, token=token_checkout)
+    _add_token_github(with_, token=token_github)
     _add_item(with_, "user-name", value=user_name)
     _add_item(with_, "user-email", value=user_email)
     _add_boolean(with_, "major-minor", value=major_minor)
@@ -209,8 +201,16 @@ def _add_resolution(dict_: StrDict, /, *, resolution: str | None = None) -> None
     _add_item(dict_, "resolution", value=resolution)
 
 
-def _add_token(dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token) -> None:
-    _add_item(dict_, "token", value=token)
+def _add_token_checkout(
+    dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token_checkout
+) -> None:
+    _add_item(dict_, "token-checkout", value=token)
+
+
+def _add_token_github(
+    dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token_github
+) -> None:
+    _add_item(dict_, "token-github", value=token)
 
 
 def _add_with_dict(dict_: StrDict, with_: StrDict, /) -> None:
@@ -239,7 +239,6 @@ __all__ = [
     "action_publish_package_dict",
     "action_pyright_dict",
     "action_pytest_dict",
-    "action_random_sleep_dict",
     "action_ruff_dict",
     "action_run_hooks_dict",
     "action_tag_commit_dict",
