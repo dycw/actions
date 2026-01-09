@@ -233,6 +233,7 @@ def conformalize_repo(
         or ci__pull_request__pytest__macos
         or ci__pull_request__pytest__ubuntu
         or ci__pull_request__pytest__windows
+        or ci__pull_request__pytest__all_versions
         or (ci__pull_request__pytest__sops_age_key is not None)
         or ci__pull_request__ruff
     ):
