@@ -31,6 +31,9 @@ class Settings:
     ci__pull_request__pytest__windows: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' pytest with Windows"
     )
+    ci__pull_request__pytest__all_versions: bool = option(
+        default=False, help="Set up CI 'pull-request.yaml' pytest with all versions"
+    )
     ci__pull_request__pytest__sops_age_key: str | None = option(
         default=None,
         help="Set up CI 'pull-request.yaml' pytest with this 'age' key for 'sops'",
