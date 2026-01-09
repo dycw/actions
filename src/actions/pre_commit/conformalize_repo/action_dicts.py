@@ -24,18 +24,19 @@ def action_publish_package_dict(
     trusted_publishing: bool = False,
     native_tls: bool = SETTINGS.uv__native_tls,
 ) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_item(dict_, "username", value=username)
-    _add_item(dict_, "password", value=password)
-    _add_item(dict_, "publish-url", value=publish_url)
-    _add_boolean(dict_, "trusted-publishing", value=trusted_publishing)
-    _add_native_tls(dict_, native_tls=native_tls)
-    return {
+    out: StrDict = {
         "name": PUBLISH_PACKAGE_DOCSTRING,
         "uses": "dycw/action-publish-package@latest",
-        "with": dict_,
     }
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    _add_item(with_, "username", value=username)
+    _add_item(with_, "password", value=password)
+    _add_item(with_, "publish-url", value=publish_url)
+    _add_boolean(with_, "trusted-publishing", value=trusted_publishing)
+    _add_native_tls(with_, native_tls=native_tls)
+    _add_with_dict(out, with_)
+    return out
 
 
 def action_pyright_dict(
@@ -47,18 +48,16 @@ def action_pyright_dict(
     native_tls: bool = SETTINGS.uv__native_tls,
     with_requirements: str | None = None,
 ) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_python_version(dict_, python_version=python_version)
-    _add_resolution(dict_, resolution=resolution)
-    _add_prerelease(dict_, prerelease=prerelease)
-    _add_native_tls(dict_, native_tls=native_tls)
-    _add_with_requirements(dict_, with_requirements=with_requirements)
-    return {
-        "name": "Run 'pyright'",
-        "uses": "dycw/action-pyright@latest",
-        "with": dict_,
-    }
+    out: StrDict = {"name": "Run 'pyright'", "uses": "dycw/action-pyright@latest"}
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    _add_python_version(with_, python_version=python_version)
+    _add_resolution(with_, resolution=resolution)
+    _add_prerelease(with_, prerelease=prerelease)
+    _add_native_tls(with_, native_tls=native_tls)
+    _add_with_requirements(with_, with_requirements=with_requirements)
+    _add_with_dict(out, with_)
+    return out
 
 
 def action_pytest_dict(
@@ -71,15 +70,17 @@ def action_pytest_dict(
     native_tls: bool = SETTINGS.uv__native_tls,
     with_requirements: str | None = None,
 ) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_python_version(dict_, python_version=python_version)
-    _add_item(dict_, "sops-age-key", value=sops_age_key)
-    _add_resolution(dict_, resolution=resolution)
-    _add_prerelease(dict_, prerelease=prerelease)
-    _add_native_tls(dict_, native_tls=native_tls)
-    _add_with_requirements(dict_, with_requirements=with_requirements)
-    return {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest", "with": dict_}
+    out: StrDict = {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest"}
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    _add_python_version(with_, python_version=python_version)
+    _add_item(with_, "sops-age-key", value=sops_age_key)
+    _add_resolution(with_, resolution=resolution)
+    _add_prerelease(with_, prerelease=prerelease)
+    _add_native_tls(with_, native_tls=native_tls)
+    _add_with_requirements(with_, with_requirements=with_requirements)
+    _add_with_dict(out, with_)
+    return out
 
 
 def action_random_sleep_dict(
@@ -90,23 +91,26 @@ def action_random_sleep_dict(
     step: int = 1,
     log_freq: int = 1,
 ) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    dict_["min"] = min
-    dict_["max"] = max
-    dict_["step"] = step
-    dict_["log-freq"] = log_freq
-    return {
+    out: StrDict = {
         "name": RANDOM_SLEEP_DOCSTRING,
         "uses": "dycw/action-random-sleep@latest",
-        "with": dict_,
     }
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    with_["min"] = min
+    with_["max"] = max
+    with_["step"] = step
+    with_["log-freq"] = log_freq
+    _add_with_dict(out, with_)
+    return out
 
 
 def action_ruff_dict(*, token: str | None = SETTINGS.ci__token) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
+    out: StrDict = {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest"}
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    _add_with_dict(out, with_)
+    return out
 
 
 def action_run_hooks_dict(
@@ -116,23 +120,24 @@ def action_run_hooks_dict(
     repos: list[str] | None = None,
     hooks: list[str] | None = None,
     hooks_exclude: list[str] | None = None,
-    sleep: int = 1,
+    sleep: int | None = None,
     gitea: bool = SETTINGS.ci__gitea,
 ) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_item(dict_, "submodules", value=submodules)
-    _add_yaml_str(dict_, "repos", values=repos)
-    _add_yaml_str(dict_, "hooks", values=hooks)
-    _add_yaml_str(dict_, "hooks-exclude", values=hooks_exclude)
-    _add_item(dict_, "hooks", value=hooks)
-    dict_["sleep"] = sleep
-    return {
+    out: StrDict = {
         "if": f"{_runner(gitea=gitea)}.event_name == 'pull_request'",
         "name": RUN_HOOKS_DOCSTRING,
         "uses": "dycw/action-run-hooks@latest",
-        "with": dict_,
     }
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    _add_item(with_, "submodules", value=submodules)
+    _add_yaml_str(with_, "repos", values=repos)
+    _add_yaml_str(with_, "hooks", values=hooks)
+    _add_yaml_str(with_, "hooks-exclude", values=hooks_exclude)
+    _add_item(with_, "hooks", value=hooks)
+    _add_item(with_, "sleep", value=sleep)
+    _add_with_dict(out, with_)
+    return out
 
 
 def action_tag_commit_dict(
@@ -144,18 +149,19 @@ def action_tag_commit_dict(
     major: bool = False,
     latest: bool = False,
 ) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_item(dict_, "user-name", value=user_name)
-    _add_item(dict_, "user-email", value=user_email)
-    _add_boolean(dict_, "major-minor", value=major_minor)
-    _add_boolean(dict_, "major", value=major)
-    _add_boolean(dict_, "latest", value=latest)
-    return {
+    out: StrDict = {
         "name": TAG_COMMIT_DOCSTRING,
         "uses": "dycw/action-tag-commit@latest",
-        "with": dict_,
     }
+    with_: StrDict = {}
+    _add_token(with_, token=token)
+    _add_item(with_, "user-name", value=user_name)
+    _add_item(with_, "user-email", value=user_email)
+    _add_boolean(with_, "major-minor", value=major_minor)
+    _add_boolean(with_, "major", value=major)
+    _add_boolean(with_, "latest", value=latest)
+    _add_with_dict(out, with_)
+    return out
 
 
 def update_ca_certificates_dict(desc: str, /) -> StrDict:
@@ -205,6 +211,11 @@ def _add_resolution(dict_: StrDict, /, *, resolution: str | None = None) -> None
 
 def _add_token(dict_: StrDict, /, *, token: str | None = SETTINGS.ci__token) -> None:
     _add_item(dict_, "token", value=token)
+
+
+def _add_with_dict(dict_: StrDict, with_: StrDict, /) -> None:
+    if len(with_) >= 1:
+        dict_["with"] = with_
 
 
 def _add_with_requirements(
