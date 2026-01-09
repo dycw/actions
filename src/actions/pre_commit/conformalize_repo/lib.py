@@ -24,6 +24,7 @@ from utilities.whenever import HOUR
 
 from actions import __version__
 from actions.constants import (
+    ACTIONS_URL,
     BUMPVERSION_TOML,
     COVERAGERC_TOML,
     ENVRC,
@@ -52,7 +53,6 @@ from actions.pre_commit.conformalize_repo.action_dicts import (
     run_action_tag_dict,
 )
 from actions.pre_commit.conformalize_repo.constants import (
-    ACTIONS_URL,
     CONFORMALIZE_REPO_SUB_CMD,
     DOCKERFMT_URL,
     PATH_CONFIGS,
