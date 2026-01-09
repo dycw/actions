@@ -109,6 +109,7 @@ def conformalize_repo(
     ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
     ci__pull_request__pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
+    ci__pull_request__pytest__all_versions: bool = SETTINGS.ci__pull_request__pytest__all_versions,
     ci__pull_request__pytest__sops_age_key: str
     | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
@@ -162,6 +163,7 @@ def conformalize_repo(
         f"{ci__pull_request__pytest__macos=}",
         f"{ci__pull_request__pytest__ubuntu=}",
         f"{ci__pull_request__pytest__windows=}",
+        f"{ci__pull_request__pytest__all_versions=}",
         f"{ci__pull_request__pytest__sops_age_key=}",
         f"{ci__pull_request__ruff=}",
         f"{ci__push__publish=}",
@@ -396,6 +398,7 @@ def add_ci_pull_request_yaml(
     pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
     pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
+    pytest__all_versions: bool = SETTINGS.ci__pull_request__pytest__all_versions,
     pytest__sops_age_key: str | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     pytest__timeout: int | None = SETTINGS.pytest__timeout,
     python_version: str = SETTINGS.python_version,
@@ -449,6 +452,7 @@ def add_ci_pull_request_yaml(
             or pytest__ubuntu
             or pytest__windows
             or (pytest__sops_age_key is not None)
+            or pytest__all_versions
             or pytest__timeout
         ):
             pytest_dict = get_dict(jobs, "pytest")
@@ -483,7 +487,12 @@ def add_ci_pull_request_yaml(
             if pytest__windows:
                 ensure_contains(os, "windows-latest")
             python_version_dict = get_list(matrix, "python-version")
-            ensure_contains(python_version_dict, *yield_python_versions(python_version))
+            if pytest__all_versions:
+                ensure_contains(
+                    python_version_dict, *yield_python_versions(python_version)
+                )
+            else:
+                ensure_contains(python_version_dict, python_version)
             resolution = get_list(matrix, "resolution")
             ensure_contains(resolution, "highest", "lowest-direct")
             if pytest__timeout is not None:
