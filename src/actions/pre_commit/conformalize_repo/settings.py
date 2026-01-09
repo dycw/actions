@@ -12,10 +12,10 @@ class Settings:
         default=False, help="Update CA certficates before each step"
     )
     ci__gitea: bool = option(default=False, help="Set up CI on Gitea")
-    ci__token_checkout: Secret[str] | None = option(
+    ci__token_checkout: Secret[str] | None = secret(
         default=None, help="Set up CI with this checkout token"
     )
-    ci__token_github: Secret[str] | None = option(
+    ci__token_github: Secret[str] | None = secret(
         default=None, help="Set up CI with this GitHub token"
     )
     ci__pull_request__pre_commit: bool = option(
@@ -39,7 +39,7 @@ class Settings:
     ci__pull_request__pytest__all_versions: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' pytest with all versions"
     )
-    ci__pull_request__pytest__sops_age_key: str | None = option(
+    ci__pull_request__pytest__sops_age_key: Secret[str] | None = secret(
         default=None,
         help="Set up CI 'pull-request.yaml' pytest with this 'age' key for 'sops'",
     )

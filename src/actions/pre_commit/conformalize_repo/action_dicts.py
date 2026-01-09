@@ -68,7 +68,7 @@ def action_pytest_dict(
     token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
     token_github: Secret[str] | None = SETTINGS.ci__token_github,
     python_version: str | None = None,
-    sops_age_key: str | None = None,
+    sops_age_key: Secret[str] | None = None,
     resolution: str | None = None,
     prerelease: str | None = None,
     native_tls: bool = SETTINGS.uv__native_tls,

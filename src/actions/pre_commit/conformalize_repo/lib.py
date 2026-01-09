@@ -111,7 +111,7 @@ def conformalize_repo(
     ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
     ci__pull_request__pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
     ci__pull_request__pytest__all_versions: bool = SETTINGS.ci__pull_request__pytest__all_versions,
-    ci__pull_request__pytest__sops_age_key: str
+    ci__pull_request__pytest__sops_age_key: Secret[str]
     | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
     ci__push__publish: bool = SETTINGS.ci__push__publish,
@@ -403,7 +403,8 @@ def add_ci_pull_request_yaml(
     pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
     pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
     pytest__all_versions: bool = SETTINGS.ci__pull_request__pytest__all_versions,
-    pytest__sops_age_key: str | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
+    pytest__sops_age_key: Secret[str]
+    | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     pytest__timeout: int | None = SETTINGS.pytest__timeout,
     python_version: str = SETTINGS.python_version,
     repo_name: str | None = SETTINGS.repo_name,
