@@ -99,7 +99,7 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
-    ci__ca_certificates: bool = SETTINGS.ci__ca_certificates,
+    ci__certificates: bool = SETTINGS.ci__certificates,
     ci__gitea: bool = SETTINGS.ci__gitea,
     ci__token: str | None = SETTINGS.ci__token,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
@@ -154,7 +154,7 @@ def conformalize_repo(
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     variables = [
-        f"{ci__ca_certificates=}",
+        f"{ci__certificates=}",
         f"{ci__gitea=}",
         f"{ci__token=}",
         f"{ci__pull_request__pre_commit=}",
@@ -239,7 +239,7 @@ def conformalize_repo(
     ):
         add_ci_pull_request_yaml(
             modifications=modifications,
-            certificates=ci__ca_certificates,
+            certificates=ci__certificates,
             gitea=ci__gitea,
             pre_commit=ci__pull_request__pre_commit,
             pre_commit__submodules=ci__pull_request__pre_commit__submodules,
@@ -265,7 +265,7 @@ def conformalize_repo(
         or ci__push__tag__all
     ):
         add_ci_push_yaml(
-            certificates=ci__ca_certificates,
+            certificates=ci__certificates,
             gitea=ci__gitea,
             token=ci__token,
             modifications=modifications,
@@ -389,7 +389,7 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 def add_ci_pull_request_yaml(
     *,
     modifications: MutableSet[Path] | None = None,
-    certificates: bool = SETTINGS.ci__ca_certificates,
+    certificates: bool = SETTINGS.ci__certificates,
     gitea: bool = SETTINGS.ci__gitea,
     pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
     pre_commit__submodules: str
@@ -512,7 +512,7 @@ def add_ci_pull_request_yaml(
 
 def add_ci_push_yaml(
     *,
-    certificates: bool = SETTINGS.ci__ca_certificates,
+    certificates: bool = SETTINGS.ci__certificates,
     gitea: bool = SETTINGS.ci__gitea,
     token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,

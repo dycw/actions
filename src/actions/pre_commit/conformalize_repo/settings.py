@@ -8,7 +8,7 @@ from actions.utilities import LOADER
 
 @settings
 class Settings:
-    ci__ca_certificates: bool = option(
+    ci__certificates: bool = option(
         default=False, help="Update CA certficates before each step"
     )
     ci__gitea: bool = option(default=False, help="Set up CI on Gitea")

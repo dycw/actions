@@ -16,7 +16,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         return
     basic_config(obj=LOGGER)
     conformalize_repo(
-        ci__ca_certificates=settings.ci__ca_certificates,
+        ci__certificates=settings.ci__certificates,
         ci__gitea=settings.ci__gitea,
         ci__token=settings.ci__token,
         ci__pull_request__pre_commit=settings.ci__pull_request__pre_commit,
