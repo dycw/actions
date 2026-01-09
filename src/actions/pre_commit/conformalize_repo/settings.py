@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typed_settings import load_settings, option, settings
+from typed_settings import Secret, load_settings, option, secret, settings
 
 from actions.pre_commit.conformalize_repo.constants import RUN_VERSION_BUMP
 from actions.utilities import LOADER
@@ -8,6 +8,9 @@ from actions.utilities import LOADER
 
 @settings
 class Settings:
+    ci__ca_certificates: bool = option(
+        default=False, help="Update CA certficates before each step"
+    )
     ci__gitea: bool = option(default=False, help="Set up CI on Gitea")
     ci__token: str | None = option(default=None, help="Set up CI with this token")
     ci__pull_request__pre_commit: bool = option(
@@ -34,6 +37,15 @@ class Settings:
     )
     ci__push__publish: bool = option(
         default=False, help="Set up CI 'push.yaml' publishing"
+    )
+    ci__push__publish__username: str | None = option(
+        default=None, help="Set up CI 'push.yaml' publishing with this username"
+    )
+    ci__push__publish__password: Secret[str] | None = secret(
+        default=None, help="Set up CI 'push.yaml' publishing with this password"
+    )
+    ci__push__publish__publish_url: Secret[str] | None = secret(
+        default=None, help="Set up CI 'push.yaml' publishing with this URL"
     )
     ci__push__tag: bool = option(default=False, help="Set up CI 'push.yaml' tagging")
     coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")

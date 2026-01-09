@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.scalarstring import LiteralScalarString
+from typed_settings import Secret
 
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
 from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
@@ -14,7 +15,101 @@ if TYPE_CHECKING:
     from actions.types import StrDict
 
 
-def run_action_pre_commit_dict(
+def action_publish_package_dict(
+    *,
+    token: str | None = SETTINGS.ci__token,
+    username: str | None = SETTINGS.ci__push__publish__username,
+    password: Secret[str] | None = SETTINGS.ci__push__publish__password,
+    publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
+    trusted_publishing: bool = False,
+    native_tls: bool = SETTINGS.uv__native_tls,
+) -> StrDict:
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    _add_item(dict_, "username", value=username)
+    _add_item(dict_, "password", value=password)
+    _add_item(dict_, "publish-url", value=publish_url)
+    _add_boolean(dict_, "trusted-publishing", value=trusted_publishing)
+    _add_native_tls(dict_, native_tls=native_tls)
+    return {
+        "name": PUBLISH_PACKAGE_DOCSTRING,
+        "uses": "dycw/action-publish-package@latest",
+        "with": dict_,
+    }
+
+
+def action_pyright_dict(
+    *,
+    token: str | None = SETTINGS.ci__token,
+    python_version: str | None = None,
+    resolution: str | None = None,
+    prerelease: str | None = None,
+    native_tls: bool = SETTINGS.uv__native_tls,
+    with_requirements: str | None = None,
+) -> StrDict:
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    _add_python_version(dict_, python_version=python_version)
+    _add_resolution(dict_, resolution=resolution)
+    _add_prerelease(dict_, prerelease=prerelease)
+    _add_native_tls(dict_, native_tls=native_tls)
+    _add_with_requirements(dict_, with_requirements=with_requirements)
+    return {
+        "name": "Run 'pyright'",
+        "uses": "dycw/action-pyright@latest",
+        "with": dict_,
+    }
+
+
+def action_pytest_dict(
+    *,
+    token: str | None = SETTINGS.ci__token,
+    python_version: str | None = None,
+    sops_age_key: str | None = None,
+    resolution: str | None = None,
+    prerelease: str | None = None,
+    native_tls: bool = SETTINGS.uv__native_tls,
+    with_requirements: str | None = None,
+) -> StrDict:
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    _add_python_version(dict_, python_version=python_version)
+    _add_item(dict_, "sops-age-key", value=sops_age_key)
+    _add_resolution(dict_, resolution=resolution)
+    _add_prerelease(dict_, prerelease=prerelease)
+    _add_native_tls(dict_, native_tls=native_tls)
+    _add_with_requirements(dict_, with_requirements=with_requirements)
+    return {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest", "with": dict_}
+
+
+def action_random_sleep_dict(
+    *,
+    token: str | None = SETTINGS.ci__token,
+    min: int = 0,  # noqa: A002
+    max: int = 3600,  # noqa: A002
+    step: int = 1,
+    log_freq: int = 1,
+) -> StrDict:
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    dict_["min"] = min
+    dict_["max"] = max
+    dict_["step"] = step
+    dict_["log-freq"] = log_freq
+    return {
+        "name": RANDOM_SLEEP_DOCSTRING,
+        "uses": "dycw/action-random-sleep@latest",
+        "with": dict_,
+    }
+
+
+def action_ruff_dict(*, token: str | None = SETTINGS.ci__token) -> StrDict:
+    dict_: StrDict = {}
+    _add_token(dict_, token=token)
+    return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
+
+
+def action_run_hooks_dict(
     *,
     token: str | None = SETTINGS.ci__token,
     submodules: str | None = None,
@@ -40,101 +135,7 @@ def run_action_pre_commit_dict(
     }
 
 
-def run_action_publish_dict(
-    *,
-    token: str | None = SETTINGS.ci__token,
-    username: str | None = None,
-    password: str | None = None,
-    publish_url: str | None = None,
-    trusted_publishing: bool = False,
-    native_tls: bool = SETTINGS.uv__native_tls,
-) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_item(dict_, "username", value=username)
-    _add_item(dict_, "password", value=password)
-    _add_item(dict_, "publish-url", value=publish_url)
-    _add_boolean(dict_, "trusted-publishing", value=trusted_publishing)
-    _add_native_tls(dict_, native_tls=native_tls)
-    return {
-        "name": PUBLISH_PACKAGE_DOCSTRING,
-        "uses": "dycw/action-publish-package@latest",
-        "with": dict_,
-    }
-
-
-def run_action_pyright_dict(
-    *,
-    token: str | None = SETTINGS.ci__token,
-    python_version: str | None = None,
-    resolution: str | None = None,
-    prerelease: str | None = None,
-    native_tls: bool = SETTINGS.uv__native_tls,
-    with_requirements: str | None = None,
-) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_python_version(dict_, python_version=python_version)
-    _add_resolution(dict_, resolution=resolution)
-    _add_prerelease(dict_, prerelease=prerelease)
-    _add_native_tls(dict_, native_tls=native_tls)
-    _add_with_requirements(dict_, with_requirements=with_requirements)
-    return {
-        "name": "Run 'pyright'",
-        "uses": "dycw/action-pyright@latest",
-        "with": dict_,
-    }
-
-
-def run_action_pytest_dict(
-    *,
-    token: str | None = SETTINGS.ci__token,
-    python_version: str | None = None,
-    sops_age_key: str | None = None,
-    resolution: str | None = None,
-    prerelease: str | None = None,
-    native_tls: bool = SETTINGS.uv__native_tls,
-    with_requirements: str | None = None,
-) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    _add_python_version(dict_, python_version=python_version)
-    _add_item(dict_, "sops-age-key", value=sops_age_key)
-    _add_resolution(dict_, resolution=resolution)
-    _add_prerelease(dict_, prerelease=prerelease)
-    _add_native_tls(dict_, native_tls=native_tls)
-    _add_with_requirements(dict_, with_requirements=with_requirements)
-    return {"name": "Run 'pytest'", "uses": "dycw/action-pytest@latest", "with": dict_}
-
-
-def run_action_random_sleep_dict(
-    *,
-    token: str | None = SETTINGS.ci__token,
-    min: int = 0,  # noqa: A002
-    max: int = 3600,  # noqa: A002
-    step: int = 1,
-    log_freq: int = 1,
-) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    dict_["min"] = min
-    dict_["max"] = max
-    dict_["step"] = step
-    dict_["log-freq"] = log_freq
-    return {
-        "name": RANDOM_SLEEP_DOCSTRING,
-        "uses": "dycw/action-random-sleep@latest",
-        "with": dict_,
-    }
-
-
-def run_action_ruff_dict(*, token: str | None = SETTINGS.ci__token) -> StrDict:
-    dict_: StrDict = {}
-    _add_token(dict_, token=token)
-    return {"name": "Run 'ruff'", "uses": "dycw/action-ruff@latest", "with": dict_}
-
-
-def run_action_tag_dict(
+def action_tag_commit_dict(
     *,
     token: str | None = SETTINGS.ci__token,
     user_name: str | None = None,
@@ -157,6 +158,13 @@ def run_action_tag_dict(
     }
 
 
+def update_ca_certificates_dict(desc: str, /) -> StrDict:
+    return {
+        "name": f"Update CA certificates ({desc})",
+        "run": "sudo update-ca-certificates",
+    }
+
+
 ##
 
 
@@ -166,8 +174,13 @@ def _add_boolean(dict_: StrDict, key: str, /, *, value: bool = False) -> None:
 
 
 def _add_item(dict_: StrDict, key: str, /, *, value: Any | None = None) -> None:
-    if value is not None:
-        dict_[key] = value
+    match value:
+        case None:
+            ...
+        case Secret():
+            _add_item(dict_, key, value=value.get_secret_value())
+        case _:
+            dict_[key] = value
 
 
 def _add_native_tls(
@@ -212,11 +225,12 @@ def _runner(*, gitea: bool = False) -> str:
 
 
 __all__ = [
-    "run_action_pre_commit_dict",
-    "run_action_publish_dict",
-    "run_action_pyright_dict",
-    "run_action_pytest_dict",
-    "run_action_random_sleep_dict",
-    "run_action_ruff_dict",
-    "run_action_tag_dict",
+    "action_publish_package_dict",
+    "action_pyright_dict",
+    "action_pytest_dict",
+    "action_random_sleep_dict",
+    "action_ruff_dict",
+    "action_run_hooks_dict",
+    "action_tag_commit_dict",
+    "update_ca_certificates_dict",
 ]

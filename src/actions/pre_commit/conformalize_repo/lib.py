@@ -45,12 +45,13 @@ from actions.constants import (
 )
 from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.action_dicts import (
-    run_action_pre_commit_dict,
-    run_action_publish_dict,
-    run_action_pyright_dict,
-    run_action_pytest_dict,
-    run_action_ruff_dict,
-    run_action_tag_dict,
+    action_publish_package_dict,
+    action_pyright_dict,
+    action_pytest_dict,
+    action_ruff_dict,
+    action_run_hooks_dict,
+    action_tag_commit_dict,
+    update_ca_certificates_dict,
 )
 from actions.pre_commit.conformalize_repo.constants import (
     CONFORMALIZE_REPO_SUB_CMD,
@@ -93,6 +94,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
 
     from tomlkit.items import Table
+    from typed_settings import Secret
     from utilities.types import PathLike
 
     from actions.types import StrDict
@@ -100,6 +102,7 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
+    ci__ca_certificates: bool = SETTINGS.ci__ca_certificates,
     ci__gitea: bool = SETTINGS.ci__gitea,
     ci__token: str | None = SETTINGS.ci__token,
     ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
@@ -111,6 +114,11 @@ def conformalize_repo(
     | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
     ci__push__publish: bool = SETTINGS.ci__push__publish,
+    ci__push__publish__username: str | None = SETTINGS.ci__push__publish__username,
+    ci__push__publish__password: Secret[str]
+    | None = SETTINGS.ci__push__publish__password,
+    ci__push__publish__publish_url: Secret[str]
+    | None = SETTINGS.ci__push__publish__publish_url,
     ci__push__tag: bool = SETTINGS.ci__push__tag,
     coverage: bool = SETTINGS.coverage,
     description: str | None = SETTINGS.description,
@@ -148,7 +156,9 @@ def conformalize_repo(
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
+             - ci__ca_certificates                                = %s
              - ci__gitea                                          = %s
+             - ci__token                                          = %s
              - ci__pull_request__pre_commit                       = %s
              - ci__pull_request__pyright                          = %s
              - ci__pull_request__pytest__macos                    = %s
@@ -157,6 +167,9 @@ def conformalize_repo(
              - ci__pull_request__pytest__sops_and_age             = %s
              - ci__pull_request__ruff                             = %s
              - ci__push__publish                                  = %s
+             - ci__push__publish__username                        = %s
+             - ci__push__publish__password                        = %s
+             - ci__push__publish__publish_url                     = %s
              - ci__push__tag                                      = %s
              - coverage                                           = %s
              - description                                        = %s
@@ -191,7 +204,9 @@ def conformalize_repo(
         """),
         conformalize_repo.__name__,
         __version__,
+        ci__ca_certificates,
         ci__gitea,
+        ci__token,
         ci__pull_request__pre_commit,
         ci__pull_request__pyright,
         ci__pull_request__pytest__macos,
@@ -199,6 +214,9 @@ def conformalize_repo(
         ci__pull_request__pytest__windows,
         ci__pull_request__ruff,
         ci__push__publish,
+        ci__push__publish__username,
+        ci__push__publish__password,
+        ci__push__publish__publish_url,
         ci__push__tag,
         coverage,
         description,
@@ -264,6 +282,7 @@ def conformalize_repo(
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
+            certificates=ci__ca_certificates,
             gitea=ci__gitea,
             token=ci__token,
             modifications=modifications,
@@ -280,12 +299,22 @@ def conformalize_repo(
             script=script,
             uv__native_tls=uv__native_tls,
         )
-    if ci__push__publish or ci__push__tag:
+    if (
+        ci__push__publish
+        or (ci__push__publish__username is not None)
+        or (ci__push__publish__password is not None)
+        or (ci__push__publish__publish_url is not None)
+        or ci__push__tag
+    ):
         add_ci_push_yaml(
+            certificates=ci__ca_certificates,
             gitea=ci__gitea,
             token=ci__token,
             modifications=modifications,
             publish=ci__push__publish,
+            publish__username=ci__push__publish__username,
+            publish__password=ci__push__publish__password,
+            publish__publish_url=ci__push__publish__publish_url,
             tag=ci__push__tag,
             uv__native_tls=uv__native_tls,
         )
@@ -400,6 +429,7 @@ def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
 
 def add_ci_pull_request_yaml(
     *,
+    certificates: bool = SETTINGS.ci__ca_certificates,
     gitea: bool = SETTINGS.ci__gitea,
     token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
@@ -430,9 +460,11 @@ def add_ci_pull_request_yaml(
             pre_commit_dict = get_dict(jobs, "pre-commit")
             pre_commit_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(pre_commit_dict, "steps")
+            if certificates:
+                ensure_contains(steps, update_ca_certificates_dict("pre-commit"))
             ensure_contains(
                 steps,
-                run_action_pre_commit_dict(
+                action_run_hooks_dict(
                     token=token, repos=["pre-commit/pre-commit-hooks"], gitea=gitea
                 ),
             )
@@ -440,9 +472,11 @@ def add_ci_pull_request_yaml(
             pyright_dict = get_dict(jobs, "pyright")
             pyright_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(pyright_dict, "steps")
+            if certificates:
+                ensure_contains(steps, update_ca_certificates_dict("pyright"))
             ensure_contains(
                 steps,
-                run_action_pyright_dict(
+                action_pyright_dict(
                     token=token,
                     python_version=python_version,
                     with_requirements=script,
@@ -464,9 +498,11 @@ def add_ci_pull_request_yaml(
             )
             pytest_dict["runs-on"] = "${{matrix.os}}"
             steps = get_list(pytest_dict, "steps")
+            if certificates:
+                ensure_contains(steps, update_ca_certificates_dict("pytest"))
             ensure_contains(
                 steps,
-                run_action_pytest_dict(
+                action_pytest_dict(
                     token=token,
                     python_version="${{matrix.python-version}}",
                     sops_age_key=pytest__sops_age_key,
@@ -495,7 +531,9 @@ def add_ci_pull_request_yaml(
             ruff_dict = get_dict(jobs, "ruff")
             ruff_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(ruff_dict, "steps")
-            ensure_contains(steps, run_action_ruff_dict(token=token))
+            if certificates:
+                ensure_contains(steps, update_ca_certificates_dict("steps"))
+            ensure_contains(steps, action_ruff_dict(token=token))
 
 
 ##
@@ -503,10 +541,14 @@ def add_ci_pull_request_yaml(
 
 def add_ci_push_yaml(
     *,
+    certificates: bool = SETTINGS.ci__ca_certificates,
     gitea: bool = SETTINGS.ci__gitea,
     token: str | None = SETTINGS.ci__token,
     modifications: MutableSet[Path] | None = None,
     publish: bool = SETTINGS.ci__push__publish,
+    publish__username: str | None = SETTINGS.ci__push__publish__username,
+    publish__password: Secret[str] | None = SETTINGS.ci__push__publish__password,
+    publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
@@ -526,15 +568,26 @@ def add_ci_push_yaml(
             permissions["id-token"] = "write"
             publish_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(publish_dict, "steps")
+            if certificates:
+                ensure_contains(steps, update_ca_certificates_dict("publish"))
             ensure_contains(
-                steps, run_action_publish_dict(token=token, native_tls=uv__native_tls)
+                steps,
+                action_publish_package_dict(
+                    token=token,
+                    username=publish__username,
+                    password=publish__password,
+                    publish_url=publish__publish_url,
+                    native_tls=uv__native_tls,
+                ),
             )
         if tag:
             tag_dict = get_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(tag_dict, "steps")
+            if certificates:
+                ensure_contains(steps, update_ca_certificates_dict("tag"))
             ensure_contains(
-                steps, run_action_tag_dict(major_minor=True, major=True, latest=True)
+                steps, action_tag_commit_dict(major_minor=True, major=True, latest=True)
             )
 
 
