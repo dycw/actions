@@ -10,7 +10,7 @@ from typed_settings import EnvLoader, Secret
 from utilities.atomicwrites import writer
 from utilities.functions import get_func_name
 from utilities.subprocess import run
-from utilities.text import split_str, strip_and_dedent
+from utilities.text import split_str
 
 from actions import __version__
 from actions.constants import YAML_INSTANCE
@@ -93,12 +93,9 @@ def log_func_call(func: Callable[..., Any], /, *variables: str) -> str:
         list(map(split_f_str_equals, variables)), tablefmt="rounded_outline"
     )
     indented = indent(table, "  ")
-    return strip_and_dedent(
-        f"""
-        Running {name!r} (version {__version__}) with settings:
-        {indented}
-        """
-    )
+    return f"""
+Running {name!r} (version {__version__}) with settings:
+{indented}"""
 
 
 @overload

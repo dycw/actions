@@ -10,11 +10,11 @@ from libcst.matchers import Subscript as MSubscript
 from libcst.matchers import SubscriptElement as MSubscriptElement
 from libcst.matchers import matches
 from libcst.metadata import MetadataWrapper
-from utilities.text import repr_str, strip_and_dedent
+from utilities.text import repr_str
 
-from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.utilities import yield_python_file
+from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -24,15 +24,7 @@ if TYPE_CHECKING:
 
 
 def replace_sequence_strs(*paths: PathLike) -> None:
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - paths = %s
-        """),
-        replace_sequence_strs.__name__,
-        __version__,
-        paths,
-    )
+    LOGGER.info(log_func_call(replace_sequence_strs, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, modifications=modifications)

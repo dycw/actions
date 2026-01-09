@@ -14,15 +14,15 @@ from actions.utilities import log_func_call
 
 def random_sleep(
     *,
-    min_: int = SETTINGS.min,
-    max_: int = SETTINGS.max,
+    min: int = SETTINGS.min,  # noqa: A002
+    max: int = SETTINGS.max,  # noqa: A002
     step: int = SETTINGS.step,
     log_freq: int = SETTINGS.log_freq,
 ) -> None:
-    variables = [f"{min_=}", f"{max_=}", f"{step=}", f"{log_freq=}"]
+    variables = [f"{min=}", f"{max=}", f"{step=}", f"{log_freq=}"]
     LOGGER.info(log_func_call(random_sleep, *variables))
     start = get_now()
-    delta = TimeDelta(seconds=choice(range(min_, max_, step)))
+    delta = TimeDelta(seconds=choice(range(min, max, step)))
     LOGGER.info("Sleeping for %s...", delta)
     end = (start + delta).round(mode="ceil")
     while (now := get_now()) < end:

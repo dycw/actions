@@ -8,9 +8,7 @@ from typing import TYPE_CHECKING
 from requests import get
 from utilities.atomicwrites import writer
 from utilities.subprocess import chmod, rm_cmd, ssh, sudo_cmd
-from utilities.text import strip_and_dedent
 
-from actions import __version__
 from actions.logging import LOGGER
 from actions.register_gitea_runner.constants import (
     PATH_CACHE,
@@ -19,7 +17,7 @@ from actions.register_gitea_runner.constants import (
     URL_WAIT_FOR_IT,
 )
 from actions.register_gitea_runner.settings import SETTINGS
-from actions.utilities import logged_run
+from actions.utilities import log_func_call, logged_run
 
 if TYPE_CHECKING:
     from utilities.types import PathLike
@@ -39,33 +37,19 @@ def register_gitea_runner(
     runner_instance_name: str = SETTINGS.runner_instance_name,
 ) -> None:
     """Register against a remote instance of Gitea."""
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - ssh_user              = %s
-             - ssh_host              = %s
-             - gitea_container_user  = %s
-             - gitea_container_name  = %s
-             - runner_certificate    = %s
-             - runner_capacity       = %d
-             - runner_container_name = %s
-             - gitea_host            = %s
-             - gitea_port            = %d
-             - runner_instance_name  = %s
-        """),
-        register_gitea_runner.__name__,
-        __version__,
-        ssh_user,
-        ssh_host,
-        gitea_container_user,
-        gitea_container_name,
-        runner_certificate,
-        runner_capacity,
-        runner_container_name,
-        gitea_host,
-        gitea_port,
-        runner_instance_name,
-    )
+    variables = [
+        f"{ssh_user=}",
+        f"{ssh_host=}",
+        f"{gitea_container_user=}",
+        f"{gitea_container_name=}",
+        f"{runner_certificate=}",
+        f"{runner_capacity=}",
+        f"{runner_container_name=}",
+        f"{gitea_host=}",
+        f"{gitea_port=}",
+        f"{runner_instance_name=}",
+    ]
+    LOGGER.info(log_func_call(register_gitea_runner, *variables))
     token = ssh(
         ssh_user,
         ssh_host,

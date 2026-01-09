@@ -16,8 +16,8 @@ def random_sleep_sub_cmd(settings: Settings, /) -> None:
         return
     basic_config(obj=LOGGER)
     random_sleep(
-        min_=settings.min,
-        max_=settings.max,
+        min=settings.min,
+        max=settings.max,
         step=settings.step,
         log_freq=settings.log_freq,
     )
