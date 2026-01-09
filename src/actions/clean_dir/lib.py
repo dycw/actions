@@ -4,11 +4,9 @@ from pathlib import Path
 from shutil import rmtree
 from typing import TYPE_CHECKING
 
-from utilities.text import strip_and_dedent
-
-from actions import __version__
 from actions.clean_dir.settings import SETTINGS
 from actions.logging import LOGGER
+from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -18,15 +16,7 @@ if TYPE_CHECKING:
 
 def clean_dir(*, dir_: PathLike = SETTINGS.dir) -> None:
     """Clean a directory."""
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-             - dir = %s
-        """),
-        clean_dir.__name__,
-        __version__,
-        dir_,
-    )
+    LOGGER.info(log_func_call(clean_dir, f"{dir_=}"))
     dir_ = Path(dir_)
     if not dir_.is_dir():
         msg = f"{str(dir_)!r} is a not a directory"

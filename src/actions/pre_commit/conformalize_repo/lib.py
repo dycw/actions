@@ -12,7 +12,6 @@ from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Literal, assert_never
 
 import tomlkit
-from tabulate import tabulate
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
@@ -22,7 +21,6 @@ from utilities.text import repr_str, strip_and_dedent
 from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
 
-from actions import __version__
 from actions.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
@@ -89,7 +87,7 @@ from actions.pre_commit.utilities import (
     yield_toml_doc,
     yield_yaml_dict,
 )
-from actions.utilities import logged_run, split_f_str_equals
+from actions.utilities import log_func_call, logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
@@ -202,15 +200,7 @@ def conformalize_repo(
         f"{script=}",
         f"{uv__native_tls=}",
     ]
-    LOGGER.info(
-        strip_and_dedent("""
-            Running '%s' (version %s) with settings:
-            %s
-        """),
-        conformalize_repo.__name__,
-        __version__,
-        tabulate(list(map(split_f_str_equals, variables))),
-    )
+    LOGGER.info(log_func_call(conformalize_repo, *variables))
     modifications: set[Path] = set()
     add_bumpversion_toml(
         modifications=modifications,
