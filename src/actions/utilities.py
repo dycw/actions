@@ -94,7 +94,7 @@ def log_func_call(func: Callable[..., Any], /, *variables: str) -> str:
     )
     indented = indent(table, "  ")
     return f"""
-Running {name!r} (version {__version__}) with settings:
+Running {name!r} (version {__version__}) with:
 {indented}"""
 
 
