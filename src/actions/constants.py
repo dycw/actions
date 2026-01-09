@@ -21,7 +21,6 @@ PYPROJECT_TOML = Path("pyproject.toml")
 PYRIGHTCONFIG_JSON = Path("pyrightconfig.json")
 PYTEST_TOML = Path("pytest.toml")
 README_MD = Path("README.md")
-REPO_ROOT = get_repo_root()
 RUFF_TOML = Path("ruff.toml")
 
 
