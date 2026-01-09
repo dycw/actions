@@ -548,10 +548,11 @@ def add_ci_push_yaml(
         jobs = get_dict(dict_, "jobs")
         if publish:
             publish_dict = get_dict(jobs, "publish")
-            environment = get_dict(publish_dict, "environment")
-            environment["name"] = "pypi"
-            permissions = get_dict(publish_dict, "permissions")
-            permissions["id-token"] = "write"
+            if not gitea:
+                environment = get_dict(publish_dict, "environment")
+                environment["name"] = "pypi"
+                permissions = get_dict(publish_dict, "permissions")
+                permissions["id-token"] = "write"
             publish_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(publish_dict, "steps")
             if certificates:
