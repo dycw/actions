@@ -222,81 +222,6 @@ class PyProjectDependencies:
 ##
 
 
-@contextmanager
-def yield_json_dict(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[StrDict]:
-    with yield_mutable_write_context(
-        path, json.loads, dict, json.dumps, modifications=modifications
-    ) as dict_:
-        yield dict_
-
-
-##
-
-
-@contextmanager
-def yield_python_file(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[WriteContext[Module]]:
-    with yield_immutable_write_context(
-        path,
-        parse_module,
-        lambda: Module(body=[]),
-        lambda module: module.code,
-        modifications=modifications,
-    ) as context:
-        yield context
-
-
-##
-
-
-@contextmanager
-def yield_text_file(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[WriteContext[str]]:
-    with yield_immutable_write_context(
-        path, str, lambda: "", str, modifications=modifications
-    ) as context:
-        yield context
-
-
-##
-
-
-@contextmanager
-def yield_toml_doc(
-    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
-) -> Iterator[TOMLDocument]:
-    with yield_mutable_write_context(
-        path, tomlkit.parse, document, tomlkit.dumps, modifications=modifications
-    ) as doc:
-        yield doc
-
-
-##
-
-
-@contextmanager
-def yield_mutable_write_context[T](
-    path: PathLike,
-    loads: Callable[[str], T],
-    get_default: Callable[[], T],
-    dumps: Callable[[T], str],
-    /,
-    *,
-    modifications: MutableSet[Path] | None = None,
-) -> Iterator[T]:
-    with yield_immutable_write_context(
-        path, loads, get_default, dumps, modifications=modifications
-    ) as context:
-        yield context.output
-
-
-##
-
-
 @dataclass(kw_only=True, slots=True)
 class WriteContext[T]:
     input: T
@@ -349,6 +274,81 @@ def yield_immutable_write_context[T](
 
 
 @contextmanager
+def yield_json_dict(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> Iterator[StrDict]:
+    with yield_mutable_write_context(
+        path, json.loads, dict, json.dumps, modifications=modifications
+    ) as dict_:
+        yield dict_
+
+
+##
+
+
+@contextmanager
+def yield_mutable_write_context[T](
+    path: PathLike,
+    loads: Callable[[str], T],
+    get_default: Callable[[], T],
+    dumps: Callable[[T], str],
+    /,
+    *,
+    modifications: MutableSet[Path] | None = None,
+) -> Iterator[T]:
+    with yield_immutable_write_context(
+        path, loads, get_default, dumps, modifications=modifications
+    ) as context:
+        yield context.output
+
+
+##
+
+
+@contextmanager
+def yield_python_file(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> Iterator[WriteContext[Module]]:
+    with yield_immutable_write_context(
+        path,
+        parse_module,
+        lambda: Module(body=[]),
+        lambda module: module.code,
+        modifications=modifications,
+    ) as context:
+        yield context
+
+
+##
+
+
+@contextmanager
+def yield_text_file(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> Iterator[WriteContext[str]]:
+    with yield_immutable_write_context(
+        path, str, lambda: "", str, modifications=modifications
+    ) as context:
+        yield context
+
+
+##
+
+
+@contextmanager
+def yield_toml_doc(
+    path: PathLike, /, *, modifications: MutableSet[Path] | None = None
+) -> Iterator[TOMLDocument]:
+    with yield_mutable_write_context(
+        path, tomlkit.parse, document, tomlkit.dumps, modifications=modifications
+    ) as doc:
+        yield doc
+
+
+##
+
+
+@contextmanager
 def yield_yaml_dict(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[StrDict]:
@@ -360,6 +360,7 @@ def yield_yaml_dict(
 
 __all__ = [
     "PyProjectDependencies",
+    "WriteContext",
     "ensure_aot_contains",
     "ensure_contains",
     "ensure_contains_partial_dict",

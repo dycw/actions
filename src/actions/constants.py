@@ -4,7 +4,6 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 from utilities.importlib import files
-from utilities.pathlib import get_repo_root
 from xdg_base_dirs import xdg_cache_home
 
 ACTIONS_URL = "https://github.com/dycw/actions"
@@ -38,7 +37,7 @@ MAX_PYTHON_VERSION = "3.14"
 
 PATH_ACTIONS = files(anchor="actions")
 PATH_CACHE = xdg_cache_home() / "actions"
-PATH_THROTTLE_CACHE = PATH_CACHE / "throttle" / get_repo_root().name
+PATH_THROTTLE_CACHE = PATH_CACHE / "throttle"
 
 
 YAML_INSTANCE = YAML()
