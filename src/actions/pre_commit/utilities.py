@@ -15,19 +15,18 @@ from tomlkit.items import AoT, Array, Table
 from utilities.functions import ensure_class, ensure_str
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.packaging import Requirement
-from utilities.types import PathLike
+from utilities.types import PathLike, StrDict
 
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
-from actions.types import StrDict
 from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
 
-    from utilities.types import PathLike
+    from utilities.types import PathLike, StrDict
 
-    from actions.types import FuncRequirement, HasAppend, HasSetDefault, StrDict
+    from actions.types import FuncRequirement, HasAppend, HasSetDefault
 
 
 def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:

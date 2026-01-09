@@ -27,10 +27,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from utilities.packaging import Requirement
-    from utilities.types import PathLike
+    from utilities.types import PathLike, StrDict
 
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
-    from actions.types import StrDict
 
 
 def update_requirements(*paths: PathLike) -> None:

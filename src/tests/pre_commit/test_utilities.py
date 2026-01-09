@@ -23,7 +23,7 @@ from actions.pre_commit.utilities import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from actions.types import StrDict
+    from utilities.types import StrDict
 
 
 class TestEnsureContainsPartialDict:
