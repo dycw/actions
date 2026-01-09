@@ -23,6 +23,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         ci__pull_request__pytest__macos=settings.ci__pull_request__pytest__macos,
         ci__pull_request__pytest__ubuntu=settings.ci__pull_request__pytest__ubuntu,
         ci__pull_request__pytest__windows=settings.ci__pull_request__pytest__windows,
+        ci__pull_request__pytest__sops_age_key=settings.ci__pull_request__pytest__sops_age_key,
         ci__pull_request__ruff=settings.ci__pull_request__ruff,
         ci__push__publish=settings.ci__push__publish,
         ci__push__tag=settings.ci__push__tag,

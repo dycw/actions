@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
 from re import search
 
-from utilities.pathlib import get_repo_root
 from utilities.pytest import IS_CI
 
+from actions.constants import REPO_ROOT
 from actions.pre_commit.constants import PATH_PRE_COMMIT
 
-ACTIONS_URL = "https://github.com/dycw/actions"
 DOCKERFMT_URL = "https://github.com/reteps/dockerfmt"
 PRE_COMMIT_HOOKS_URL = "https://github.com/pre-commit/pre-commit-hooks"
 RUFF_URL = "https://github.com/astral-sh/ruff-pre-commit"
@@ -18,68 +16,23 @@ TAPLO_URL = "https://github.com/compwa/taplo-pre-commit"
 UV_URL = "https://github.com/astral-sh/uv-pre-commit"
 
 
-BUMPVERSION_TOML = Path(".bumpversion.toml")
-COVERAGERC_TOML = Path(".coveragerc.toml")
-ENVRC = Path(".envrc")
-GITEA = Path(".gitea")
-GITHUB = Path(".github")
-GITIGNORE = Path(".gitignore")
-PRE_COMMIT_CONFIG_YAML = Path(".pre-commit-config.yaml")
-PYPROJECT_TOML = Path("pyproject.toml")
-PYRIGHTCONFIG_JSON = Path("pyrightconfig.json")
-PYTEST_TOML = Path("pytest.toml")
-README_MD = Path("README.md")
-REPO_ROOT = get_repo_root()
-RUFF_TOML = Path("ruff.toml")
-
-
 CONFORMALIZE_REPO_DOCSTRING = "Conformalize a repo"
 CONFORMALIZE_REPO_SUB_CMD = "conformalize-repo"
 
 
-MAX_PYTHON_VERSION = "3.14"
+PATH_CONFIGS = PATH_PRE_COMMIT / "conformalize_repo/configs"
 
 
 RUN_VERSION_BUMP = (search("template", str(REPO_ROOT)) is None) and not IS_CI
 
 
-GITHUB_WORKFLOWS, GITEA_WORKFLOWS = [g / "workflows" for g in [GITHUB, GITEA]]
-GITHUB_PULL_REQUEST_YAML, GITEA_PULL_REQUEST_YAML = [
-    w / "pull-request.yaml" for w in [GITHUB_WORKFLOWS, GITEA_WORKFLOWS]
-]
-GITHUB_PUSH_YAML, GITEA_PUSH_YAML = [
-    w / "push.yaml" for w in [GITHUB_WORKFLOWS, GITEA_WORKFLOWS]
-]
-PATH_CONFIGS = PATH_PRE_COMMIT / "conformalize_repo/configs"
-
-
 __all__ = [
-    "ACTIONS_URL",
-    "BUMPVERSION_TOML",
     "CONFORMALIZE_REPO_DOCSTRING",
     "CONFORMALIZE_REPO_SUB_CMD",
-    "COVERAGERC_TOML",
     "DOCKERFMT_URL",
-    "ENVRC",
-    "GITEA",
-    "GITEA_PUSH_YAML",
-    "GITEA_WORKFLOWS",
-    "GITHUB",
-    "GITHUB_PULL_REQUEST_YAML",
-    "GITHUB_PUSH_YAML",
-    "GITHUB_WORKFLOWS",
-    "GITHUB_WORKFLOWS",
-    "GITIGNORE",
-    "MAX_PYTHON_VERSION",
     "PATH_CONFIGS",
-    "PRE_COMMIT_CONFIG_YAML",
     "PRE_COMMIT_HOOKS_URL",
-    "PYPROJECT_TOML",
-    "PYRIGHTCONFIG_JSON",
-    "PYTEST_TOML",
-    "README_MD",
     "REPO_ROOT",
-    "RUFF_TOML",
     "RUFF_URL",
     "RUN_VERSION_BUMP",
     "SHELLCHECK_URL",

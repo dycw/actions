@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from contextlib import suppress
 from pathlib import Path
 from re import search
 from subprocess import CalledProcessError
@@ -24,24 +25,27 @@ def run_hooks(
     *,
     repos: list[str] | None = SETTINGS.repos,
     hooks: list[str] | None = SETTINGS.hooks,
+    hooks_exclude: list[str] | None = SETTINGS.hooks_exclude,
     sleep: int = SETTINGS.sleep,
 ) -> None:
     LOGGER.info(
         strip_and_dedent("""
             Running '%s' (version %s) with settings:
-             - repos = %s
-             - hooks = %s
-             - sleep = %d
+             - repos         = %s
+             - hooks         = %s
+             - hooks_exclude = %s
+             - sleep         = %d
         """),
         run_hooks.__name__,
         __version__,
         repos,
         hooks,
+        hooks_exclude,
         sleep,
     )
     results = {
         hook: _run_hook(hook, sleep=sleep)
-        for hook in _yield_hooks(repos=repos, hooks=hooks)
+        for hook in _yield_hooks(repos=repos, hooks=hooks, hooks_exclude=hooks_exclude)
     }
     failed = {hook: result for hook, result in results.items() if not result}
     if len(failed) >= 1:
@@ -53,6 +57,7 @@ def _yield_hooks(
     *,
     repos: list[str] | None = SETTINGS.repos,
     hooks: list[str] | None = SETTINGS.hooks,
+    hooks_exclude: list[str] | None = SETTINGS.hooks_exclude,
 ) -> Iterator[str]:
     dict_ = safe_load(Path(".pre-commit-config.yaml").read_text())
     repos_list = ensure_class(dict_["repos"], list)
@@ -65,6 +70,10 @@ def _yield_hooks(
             for hook in _yield_repo_hooks(repo):
                 if any(search(hook_i, hook) for hook_i in hooks):
                     results.add(hook)
+    if hooks_exclude is not None:
+        for hook in hooks_exclude:
+            with suppress(KeyError):
+                results.remove(hook)
     yield from sorted(results)
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pytest import mark, param
 
+from actions.constants import ACTIONS_URL
 from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
 from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.replace_sequence_strs.constants import (
@@ -19,7 +20,7 @@ class TestYieldHooks:
         [
             param([], []),
             param(
-                ["dycw/actions"],
+                [ACTIONS_URL],
                 [
                     CONFORMALIZE_REPO_SUB_CMD,
                     FORMAT_REQUIREMENTS_SUB_CMD,
@@ -49,4 +50,17 @@ class TestYieldHooks:
     )
     def test_hooks(self, *, hooks: list[str], expected: list[str]) -> None:
         result = list(_yield_hooks(hooks=hooks))
+        assert result == expected
+
+    def test_hooks_exclude(self) -> None:
+        result = list(
+            _yield_hooks(repos=[ACTIONS_URL], hooks_exclude=[CONFORMALIZE_REPO_SUB_CMD])
+        )
+        expected = [
+            FORMAT_REQUIREMENTS_SUB_CMD,
+            REPLACE_SEQUENCE_STRS_SUB_CMD,
+            TOUCH_EMPTY_PY_SUB_CMD,
+            TOUCH_PY_TYPED_SUB_CMD,
+            UPDATE_REQUIREMENTS_SUB_CMD,
+        ]
         assert result == expected

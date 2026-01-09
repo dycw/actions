@@ -15,6 +15,9 @@ class Settings:
     hooks: list[str] | None = option(
         default=None, converter=convert_list_strs, help="The hooks to be run"
     )
+    hooks_exclude: list[str] | None = option(
+        default=None, converter=convert_list_strs, help="The hooks not to be run"
+    )
     sleep: int = option(default=1, help="Sleep in between runs")
 
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ruamel.yaml.scalarstring import LiteralScalarString
-from tomlkit import value
 
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
 from actions.publish_package.constants import PUBLISH_PACKAGE_DOCSTRING
@@ -21,6 +20,7 @@ def run_action_pre_commit_dict(
     submodules: str | None = None,
     repos: list[str] | None = None,
     hooks: list[str] | None = None,
+    hooks_exclude: list[str] | None = None,
     sleep: int = 1,
     gitea: bool = SETTINGS.ci__gitea,
 ) -> StrDict:
@@ -29,6 +29,7 @@ def run_action_pre_commit_dict(
     _add_item(dict_, "submodules", value=submodules)
     _add_yaml_str(dict_, "repos", values=repos)
     _add_yaml_str(dict_, "hooks", values=hooks)
+    _add_yaml_str(dict_, "hooks-exclude", values=hooks_exclude)
     _add_item(dict_, "hooks", value=hooks)
     dict_["sleep"] = sleep
     return {

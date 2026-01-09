@@ -12,11 +12,9 @@ from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Literal, assert_never
 
 import tomlkit
-from ruamel.yaml.scalarstring import LiteralScalarString
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
 from utilities.inflect import counted_noun
-from utilities.pathlib import to_path
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
@@ -25,7 +23,25 @@ from utilities.version import ParseVersionError, Version, parse_version
 from utilities.whenever import HOUR
 
 from actions import __version__
-from actions.constants import PATH_THROTTLE_CACHE, YAML_INSTANCE
+from actions.constants import (
+    BUMPVERSION_TOML,
+    COVERAGERC_TOML,
+    ENVRC,
+    GITEA_PULL_REQUEST_YAML,
+    GITEA_PUSH_YAML,
+    GITHUB_PULL_REQUEST_YAML,
+    GITHUB_PUSH_YAML,
+    GITIGNORE,
+    MAX_PYTHON_VERSION,
+    PATH_THROTTLE_CACHE,
+    PRE_COMMIT_CONFIG_YAML,
+    PYPROJECT_TOML,
+    PYRIGHTCONFIG_JSON,
+    PYTEST_TOML,
+    README_MD,
+    RUFF_TOML,
+    YAML_INSTANCE,
+)
 from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.action_dicts import (
     run_action_pre_commit_dict,
@@ -37,25 +53,10 @@ from actions.pre_commit.conformalize_repo.action_dicts import (
 )
 from actions.pre_commit.conformalize_repo.constants import (
     ACTIONS_URL,
-    BUMPVERSION_TOML,
     CONFORMALIZE_REPO_SUB_CMD,
-    COVERAGERC_TOML,
     DOCKERFMT_URL,
-    ENVRC,
-    GITEA_PULL_REQUEST_YAML,
-    GITEA_PUSH_YAML,
-    GITHUB_PULL_REQUEST_YAML,
-    GITHUB_PUSH_YAML,
-    GITIGNORE,
-    MAX_PYTHON_VERSION,
     PATH_CONFIGS,
-    PRE_COMMIT_CONFIG_YAML,
     PRE_COMMIT_HOOKS_URL,
-    PYPROJECT_TOML,
-    PYRIGHTCONFIG_JSON,
-    PYTEST_TOML,
-    README_MD,
-    RUFF_TOML,
     RUFF_URL,
     SHELLCHECK_URL,
     SHFMT_URL,
@@ -106,6 +107,8 @@ def conformalize_repo(
     ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
     ci__pull_request__pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
+    ci__pull_request__pytest__sops_age_key: str
+    | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
     ci__push__publish: bool = SETTINGS.ci__push__publish,
     ci__push__tag: bool = SETTINGS.ci__push__tag,
@@ -151,6 +154,7 @@ def conformalize_repo(
              - ci__pull_request__pytest__macos                    = %s
              - ci__pull_request__pytest__ubuntu                   = %s
              - ci__pull_request__pytest__windows                  = %s
+             - ci__pull_request__pytest__sops_and_age             = %s
              - ci__pull_request__ruff                             = %s
              - ci__push__publish                                  = %s
              - ci__push__tag                                      = %s
@@ -253,9 +257,10 @@ def conformalize_repo(
     if (
         ci__pull_request__pre_commit
         or ci__pull_request__pyright
-        or ci__pull_request__pytest__windows
         or ci__pull_request__pytest__macos
         or ci__pull_request__pytest__ubuntu
+        or ci__pull_request__pytest__windows
+        or (ci__pull_request__pytest__sops_age_key is not None)
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
@@ -264,9 +269,10 @@ def conformalize_repo(
             modifications=modifications,
             pre_commit=ci__pull_request__pre_commit,
             pyright=ci__pull_request__pyright,
-            pytest__windows=ci__pull_request__pytest__windows,
             pytest__macos=ci__pull_request__pytest__macos,
             pytest__ubuntu=ci__pull_request__pytest__ubuntu,
+            pytest__windows=ci__pull_request__pytest__windows,
+            pytest__sops_age_key=ci__pull_request__pytest__sops_age_key,
             pytest__timeout=pytest__timeout,
             python_version=python_version,
             repo_name=repo_name,
@@ -402,6 +408,7 @@ def add_ci_pull_request_yaml(
     pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
     pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
     pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
+    pytest__sops_age_key: str | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     pytest__timeout: int | None = SETTINGS.pytest__timeout,
     python_version: str = SETTINGS.python_version,
     repo_name: str | None = SETTINGS.repo_name,
@@ -426,13 +433,7 @@ def add_ci_pull_request_yaml(
             ensure_contains(
                 steps,
                 run_action_pre_commit_dict(
-                    repos=LiteralScalarString(
-                        strip_and_dedent("""
-                            dycw/actions
-                            pre-commit/pre-commit-hooks
-                        """)
-                    ),
-                    gitea=pre_commit__gitea,
+                    token=token, repos=["pre-commit/pre-commit-hooks"], gitea=gitea
                 ),
             )
         if pyright:
@@ -442,10 +443,19 @@ def add_ci_pull_request_yaml(
             ensure_contains(
                 steps,
                 run_action_pyright_dict(
-                    python_version=python_version, with_requirements=script
+                    token=token,
+                    python_version=python_version,
+                    with_requirements=script,
+                    native_tls=uv__native_tls,
                 ),
             )
-        if pytest__macos or pytest__ubuntu or pytest__windows:
+        if (
+            pytest__macos
+            or pytest__ubuntu
+            or pytest__windows
+            or (pytest__sops_age_key is not None)
+            or pytest__timeout
+        ):
             pytest_dict = get_dict(jobs, "pytest")
             env = get_dict(pytest_dict, "env")
             env["CI"] = "1"
@@ -457,8 +467,11 @@ def add_ci_pull_request_yaml(
             ensure_contains(
                 steps,
                 run_action_pytest_dict(
+                    token=token,
                     python_version="${{matrix.python-version}}",
+                    sops_age_key=pytest__sops_age_key,
                     resolution="${{matrix.resolution}}",
+                    native_tls=uv__native_tls,
                     with_requirements=script,
                 ),
             )
@@ -482,7 +495,7 @@ def add_ci_pull_request_yaml(
             ruff_dict = get_dict(jobs, "ruff")
             ruff_dict["runs-on"] = "ubuntu-latest"
             steps = get_list(ruff_dict, "steps")
-            ensure_contains(steps, run_action_ruff_dict())
+            ensure_contains(steps, run_action_ruff_dict(token=token))
 
 
 ##
