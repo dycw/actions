@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal, assert_never, overload
 from typed_settings import EnvLoader, Secret
 from utilities.atomicwrites import writer
 from utilities.subprocess import run
+from utilities.text import split_str
 
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
@@ -131,6 +132,11 @@ def logged_run(
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
 
+def split_f_str_equals(text: str, /) -> tuple[str, str]:
+    """Split an `f`-string with `=`."""
+    return split_str(text, separator="=", n=2)
+
+
 def write_text(
     path: PathLike, text: str, /, *, modifications: MutableSet[Path] | None = None
 ) -> None:
@@ -159,6 +165,7 @@ __all__ = [
     "copy_text",
     "ensure_new_line",
     "logged_run",
+    "split_f_str_equals",
     "write_text",
     "yaml_dump",
 ]
