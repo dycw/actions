@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
-from utilities.pytest import IS_CI
 
+from actions.pre_commit.conformalize_repo.constants import RUN_VERSION_BUMP
 from actions.utilities import LOADER
 
 
@@ -113,7 +113,7 @@ class Settings:
     readme: bool = option(default=False, help="Set up 'README.md'")
     repo_name: str | None = option(default=None, help="Repo name")
     ruff: bool = option(default=False, help="Set up 'ruff.toml'")
-    run_version_bump: bool = option(default=not IS_CI, help="Run version bump")
+    run_version_bump: bool = option(default=RUN_VERSION_BUMP, help="Run version bump")
     uv__native_tls: bool = option(default=False, help="Setup 'uv' with native TLS")
     script: str | None = option(
         default=None, help="Set up a script instead of a package"
