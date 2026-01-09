@@ -16,6 +16,9 @@ class Settings:
     ci__pull_request__pre_commit: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' pre-commit"
     )
+    ci__pull_request__pre_commit__submodules: bool = option(
+        default=False, help="Set up CI 'pull-request.yaml' pre-commit with submodules"
+    )
     ci__pull_request__pyright: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' pyright"
     )
