@@ -634,7 +634,7 @@ def add_envrc(
                 native_tls=uv__native_tls, python_version=python_version, script=script
             )
             if search(escape(uv_text), context.output, flags=MULTILINE) is None:
-                context.output += f"\n\n{echo}"
+                context.output += f"\n\n{uv_text}"
 
 
 def _add_envrc_uv_text(
