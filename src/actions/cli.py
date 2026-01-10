@@ -54,6 +54,11 @@ from actions.setup_cronjob.constants import (
     SETUP_CRONJOB_DOCSTRING,
     SETUP_CRONJOB_SUB_CMD,
 )
+from actions.setup_ssh_config.cli import setup_ssh_config_sub_cmd
+from actions.setup_ssh_config.constants import (
+    SETUP_SSH_CONFIG_DOCSTRING,
+    SETUP_SSH_CONFIG_SUB_CMD,
+)
 from actions.tag_commit.cli import tag_commit_sub_cmd
 from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CMD
 
@@ -82,6 +87,9 @@ _ = _main.command(
 _ = _main.command(
     name=SETUP_CRONJOB_SUB_CMD, help=SETUP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
 )(setup_cronjob_sub_cmd)
+_ = _main.command(
+    name=SETUP_SSH_CONFIG_SUB_CMD, help=SETUP_SSH_CONFIG_DOCSTRING, **CONTEXT_SETTINGS
+)(setup_ssh_config_sub_cmd)
 _ = _main.command(
     name=TAG_COMMIT_SUB_CMD, help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS
 )(tag_commit_sub_cmd)
