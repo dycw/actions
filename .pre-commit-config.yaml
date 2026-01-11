@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.10.8
+    rev: 0.10.9
     hooks:
       - id: conformalize-repo
         args:
