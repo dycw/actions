@@ -5,6 +5,8 @@ from utilities.click import CONTEXT_SETTINGS
 
 from actions.clean_dir.cli import clean_dir_sub_cmd
 from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
+from actions.git_clone_with.cli import git_clone_with_sub_cmd
+from actions.git_clone_with.constants
 from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
 from actions.pre_commit.conformalize_repo.constants import (
     CONFORMALIZE_REPO_DOCSTRING,
