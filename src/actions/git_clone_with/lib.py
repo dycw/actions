@@ -49,7 +49,7 @@ def git_clone_with(
 def _setup_ssh_config_for_key(path: PathLike, /) -> None:
     path = Path(path)
     stem = path.stem
-    path_key = _get_path(path.name)
+    path_key = _get_deploy_key(path.name)
     text = strip_and_dedent(f"""
         Host {stem}
             HostName github.com
@@ -63,12 +63,12 @@ def _setup_ssh_config_for_key(path: PathLike, /) -> None:
 
 def _setup_deploy_key(path: PathLike, /) -> None:
     path = Path(path)
-    dest = _get_path(path.name)
+    dest = _get_deploy_key(path.name)
     dest.parent.mkdir(parents=True, exist_ok=True)
     _ = copy(path, dest)
 
 
-def _get_path(name: str, /) -> Path:
+def _get_deploy_key(name: str, /) -> Path:
     return SSH / "deploy-keys" / name
 
 
