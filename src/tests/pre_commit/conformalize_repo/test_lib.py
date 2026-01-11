@@ -17,6 +17,7 @@ class TestAddEnvrcUvText:
             export UV_MANAGED_PYTHON='true'
             export UV_PRERELEASE='disallow'
             export UV_PYTHON='3.14'
+            export UV_VENV_CLEAR=1
             if ! command -v uv >/dev/null 2>&1; then
             \techo_date "ERROR: 'uv' not found" && exit 1
             fi
