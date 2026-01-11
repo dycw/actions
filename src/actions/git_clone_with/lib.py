@@ -11,7 +11,7 @@ from utilities.text import strip_and_dedent
 from actions.constants import SSH
 from actions.git_clone_with.settings import SETTINGS
 from actions.logging import LOGGER
-from actions.setup_ssh_config.lib import setup_ssh_config
+from actions.setup_ssh_config.lib import get_ssh_config, setup_ssh_config
 from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
@@ -57,7 +57,7 @@ def _setup_ssh_config_for_key(path: PathLike, /) -> None:
             IdentityFile {path_key}
             IdentitiesOnly yes
     """)
-    with writer(SSH / "config.d" / f"{stem}.conf", overwrite=True) as temp:
+    with writer(get_ssh_config(stem), overwrite=True) as temp:
         _ = temp.write_text(text)
 
 
