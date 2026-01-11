@@ -656,13 +656,13 @@ def _add_envrc_uv_text(
             export UV_PRERELEASE='disallow'
             export UV_PYTHON='{python_version}'
             if ! command -v uv >/dev/null 2>&1; then
-                echo_date "ERROR: 'uv' not found" && exit 1
+            \techo_date "ERROR: 'uv' not found" && exit 1
             fi
             activate='.venv/bin/activate'
             if [ -f $activate ]; then
-                . $activate
+            \t. $activate
             else
-                uv venv
+            \tuv venv
             fi
         """)
     )

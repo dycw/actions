@@ -18,13 +18,13 @@ class TestAddEnvrcUvText:
             export UV_PRERELEASE='disallow'
             export UV_PYTHON='3.14'
             if ! command -v uv >/dev/null 2>&1; then
-                echo_date "ERROR: 'uv' not found" && exit 1
+            \techo_date "ERROR: 'uv' not found" && exit 1
             fi
             activate='.venv/bin/activate'
             if [ -f $activate ]; then
-                . $activate
+            \t. $activate
             else
-                uv venv
+            \tuv venv
             fi
             uv sync --all-extras --all-groups --active --locked
         """)
