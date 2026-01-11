@@ -17,7 +17,7 @@ def setup_ssh_config() -> None:
     path = get_ssh_config("*")
     with writer(SSH / "config", overwrite=True) as temp:
         _ = temp.write_text(f"Include {path}")
-    (SSH / "config.d").mkdir(parents=True, exist_ok=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
 
 
 def get_ssh_config(stem: str, /) -> Path:
