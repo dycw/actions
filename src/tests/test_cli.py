@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pytest import mark, param
 from utilities.pathlib import get_repo_root
 from utilities.pytest import throttle_test
@@ -7,6 +9,7 @@ from utilities.subprocess import run
 from utilities.whenever import MINUTE
 
 from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
+from actions.git_clone_with.constants import GIT_CLONE_WITH_SUB_CMD
 from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
 from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.replace_sequence_strs.constants import (
@@ -21,6 +24,9 @@ from actions.run_hooks.constants import RUN_HOOKS_SUB_CMD
 from actions.setup_cronjob.constants import SETUP_CRONJOB_SUB_CMD
 from actions.setup_ssh_config.constants import SETUP_SSH_CONFIG_SUB_CMD
 from actions.tag_commit.constants import TAG_COMMIT_SUB_CMD
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestCLI:
@@ -45,3 +51,15 @@ class TestCLI:
     @throttle_test(delta=MINUTE)
     def test_main(self, *, args: list[str]) -> None:
         run("action", *args, cwd=get_repo_root())
+
+    def test_git_clone_with(self, *, tmp_path: Path) -> None:
+        key = tmp_path / "key.txt"
+        key.touch()
+        run(
+            "action",
+            GIT_CLONE_WITH_SUB_CMD,
+            str(key),
+            "owner",
+            "repo",
+            cwd=get_repo_root(),
+        )

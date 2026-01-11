@@ -4,9 +4,12 @@ from click import group
 from utilities.click import CONTEXT_SETTINGS
 
 from actions.clean_dir.cli import clean_dir_sub_cmd
-from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
+from actions.clean_dir.constants import CLEAN_DIR_DOCSTRING, CLEAN_DIR_SUB_CMD
 from actions.git_clone_with.cli import git_clone_with_sub_cmd
-from actions.git_clone_with.constants
+from actions.git_clone_with.constants import (
+    GIT_CLONE_WITH_DOCSTRING,
+    GIT_CLONE_WITH_SUB_CMD,
+)
 from actions.pre_commit.conformalize_repo.cli import conformalize_repo_sub_cmd
 from actions.pre_commit.conformalize_repo.constants import (
     CONFORMALIZE_REPO_DOCSTRING,
@@ -69,9 +72,12 @@ from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CM
 def _main() -> None: ...
 
 
-_ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_SUB_CMD, **CONTEXT_SETTINGS)(
+_ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
     clean_dir_sub_cmd
 )
+_ = _main.command(
+    name=GIT_CLONE_WITH_SUB_CMD, help=GIT_CLONE_WITH_DOCSTRING, **CONTEXT_SETTINGS
+)(git_clone_with_sub_cmd)
 _ = _main.command(
     name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)

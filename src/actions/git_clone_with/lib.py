@@ -21,13 +21,20 @@ def git_clone_with(
     path_key: PathLike,
     owner: str,
     repo: str,
-    path_clone: PathLike,
     /,
     *,
+    path_clone: PathLike = SETTINGS.path_clone,
     sudo: bool = SETTINGS.sudo,
     branch: str | None = SETTINGS.branch,
 ) -> None:
-    variables = [f"{path_key=}"]
+    variables = [
+        f"{path_key=}",
+        f"{owner=}",
+        f"{repo=}",
+        f"{path_clone=}",
+        f"{sudo=}",
+        f"{branch=}",
+    ]
     LOGGER.info(log_func_call(git_clone_with, *variables))
     path_key = Path(path_key)
     setup_ssh_config()
