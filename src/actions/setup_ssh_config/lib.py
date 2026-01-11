@@ -9,7 +9,7 @@ from actions.utilities import log_func_call
 
 def setup_ssh_config() -> None:
     LOGGER.info(log_func_call(setup_ssh_config))
-    with writer(SSH / "config") as temp:
+    with writer(SSH / "config", overwrite=True) as temp:
         _ = temp.write_text(f"Include {SSH}/config.d/*.conf")
     (SSH / "config.d").mkdir(parents=True, exist_ok=True)
 
