@@ -51,7 +51,8 @@ class TestCLI:
     def test_main(self, *, args: list[str]) -> None:
         run("action", *args)
 
+    @throttle_test(delta=MINUTE)
     def test_git_clone_with(self, *, tmp_path: Path) -> None:
         key = tmp_path / "key.txt"
         key.touch()
-        run("action", GIT_CLONE_WITH_SUB_CMD, key.name, "owner", "repo", cwd=tmp_path)
+        run("action", GIT_CLONE_WITH_SUB_CMD, str(key), "owner", "repo", cwd=tmp_path)
