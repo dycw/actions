@@ -8,6 +8,7 @@ from utilities.atomicwrites import writer
 from utilities.subprocess import git_clone
 from utilities.text import strip_and_dedent
 
+from actions.constants import SSH
 from actions.git_clone_with.settings import SETTINGS
 from actions.logging import LOGGER
 from actions.setup_ssh_config.lib import setup_ssh_config
@@ -48,23 +49,27 @@ def git_clone_with(
 def _setup_ssh_config_for_key(path: PathLike, /) -> None:
     path = Path(path)
     stem = path.stem
-    dest = Path.home() / f".ssh/config.d/{stem}.conf"
-    dest.parent.mkdir(parents=True, exist_ok=True)
+    path_key = _get_path(path.name)
     text = strip_and_dedent(f"""
         Host {stem}
             HostName github.com
             User git
-            IdentityFile ~/.ssh/{path.name}
+            IdentityFile {path_key}
             IdentitiesOnly yes
     """)
-    with writer(dest, overwrite=True) as temp:
+    with writer(SSH / "config.d" / f"{stem}.conf", overwrite=True) as temp:
         _ = temp.write_text(text)
 
 
 def _setup_deploy_key(path: PathLike, /) -> None:
-    dest = Path.home() / ".ssh" / Path(path).name
+    path = Path(path)
+    dest = _get_path(path.name)
     dest.parent.mkdir(parents=True, exist_ok=True)
     _ = copy(path, dest)
+
+
+def _get_path(name: str, /) -> Path:
+    return SSH / "deploy-keys" / name
 
 
 __all__ = ["git_clone_with"]

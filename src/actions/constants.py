@@ -20,6 +20,7 @@ PYPROJECT_TOML = Path("pyproject.toml")
 PYRIGHTCONFIG_JSON = Path("pyrightconfig.json")
 PYTEST_TOML = Path("pytest.toml")
 README_MD = Path("README.md")
+SSH = Path.home() / ".ssh"
 RUFF_TOML = Path("ruff.toml")
 
 
@@ -65,5 +66,6 @@ __all__ = [
     "PYTEST_TOML",
     "README_MD",
     "RUFF_TOML",
+    "SSH",
     "YAML_INSTANCE",
 ]
