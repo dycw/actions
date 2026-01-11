@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 @argument("repo", type=str)
 @click_options(Settings, [LOADER], show_envvars_in_help=True)
 def git_clone_with_sub_cmd(
-    path_key: PathLike, owner: str, repo: str, settings: Settings, /
+    settings: Settings, /, *, path_key: PathLike, owner: str, repo: str
 ) -> None:
     if is_pytest():
         return

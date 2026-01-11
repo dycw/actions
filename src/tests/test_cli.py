@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from pytest import mark, param
-from utilities.pathlib import get_repo_root
 from utilities.pytest import throttle_test
 from utilities.subprocess import run
 from utilities.whenever import MINUTE
@@ -50,7 +49,7 @@ class TestCLI:
     )
     @throttle_test(delta=MINUTE)
     def test_main(self, *, args: list[str]) -> None:
-        run("action", *args, cwd=get_repo_root())
+        run("action", *args)
 
     def test_git_clone_with(self, *, tmp_path: Path) -> None:
         key = tmp_path / "key.txt"
