@@ -490,14 +490,7 @@ def add_ci_pull_request_yaml(
                     native_tls=uv__native_tls,
                 ),
             )
-        if (
-            pytest__macos
-            or pytest__ubuntu
-            or pytest__windows
-            or (pytest__sops_age_key is not None)
-            or pytest__all_versions
-            or pytest__timeout
-        ):
+        if pytest__macos or pytest__ubuntu or pytest__windows:
             pytest_dict = get_dict(jobs, "pytest")
             env = get_dict(pytest_dict, "env")
             env["CI"] = "1"
@@ -593,12 +586,7 @@ def add_ci_push_yaml(
         branches = get_list(push, "branches")
         ensure_contains(branches, "master")
         jobs = get_dict(dict_, "jobs")
-        if (
-            publish__primary
-            or (publish__primary__username is not None)
-            or (publish__primary__password is not None)
-            or (publish__primary__publish_url is not None)
-        ):
+        if publish__primary:
             _add_ci_push_yaml_publish_dict(
                 jobs,
                 publish__primary__job_name,
@@ -611,12 +599,7 @@ def add_ci_push_yaml(
                 publish_url=publish__primary__publish_url,
                 uv__native_tls=uv__native_tls,
             )
-        if (
-            publish__secondary
-            or (publish__secondary__username is not None)
-            or (publish__secondary__password is not None)
-            or (publish__secondary__publish_url is not None)
-        ):
+        if publish__secondary:
             _add_ci_push_yaml_publish_dict(
                 jobs,
                 publish__secondary__job_name,
