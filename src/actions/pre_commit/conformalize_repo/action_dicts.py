@@ -18,9 +18,9 @@ def action_publish_package_dict(
     *,
     token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
     token_github: Secret[str] | None = SETTINGS.ci__token_github,
-    username: str | None = SETTINGS.ci__push__publish__username,
-    password: Secret[str] | None = SETTINGS.ci__push__publish__password,
-    publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
+    username: str | None = SETTINGS.ci__push__publish__primary__username,
+    password: Secret[str] | None = SETTINGS.ci__push__publish__primary__password,
+    publish_url: Secret[str] | None = SETTINGS.ci__push__publish__primary__publish_url,
     trusted_publishing: bool = False,
     native_tls: bool = SETTINGS.uv__native_tls,
 ) -> StrDict:

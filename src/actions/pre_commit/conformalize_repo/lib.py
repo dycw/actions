@@ -117,12 +117,16 @@ def conformalize_repo(
     ci__pull_request__pytest__sops_age_key: Secret[str]
     | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
-    ci__push__publish: bool = SETTINGS.ci__push__publish,
-    ci__push__publish__username: str | None = SETTINGS.ci__push__publish__username,
-    ci__push__publish__password: Secret[str]
-    | None = SETTINGS.ci__push__publish__password,
-    ci__push__publish__publish_url: Secret[str]
-    | None = SETTINGS.ci__push__publish__publish_url,
+    ci__push__publish__primary: bool = SETTINGS.ci__push__publish__primary,
+    ci__push__publish__primary__job_name: str = SETTINGS.ci__push__publish__primary__job_name,
+    ci__push__publish__primary__username: str
+    | None = SETTINGS.ci__push__publish__primary__username,
+    ci__push__publish__primary__password: Secret[str]
+    | None = SETTINGS.ci__push__publish__primary__password,
+    ci__push__publish__primary__publish_url: Secret[str]
+    | None = SETTINGS.ci__push__publish__primary__publish_url,
+    ci__push__publish__secondary: bool = SETTINGS.ci__push__publish__secondary,
+    ci__push__publish__secondary__job_name: str = SETTINGS.ci__push__publish__secondary__job_name,
     ci__push__publish__secondary__username: str
     | None = SETTINGS.ci__push__publish__secondary__username,
     ci__push__publish__secondary__password: Secret[str]
@@ -180,10 +184,13 @@ def conformalize_repo(
             f"{ci__pull_request__pytest__all_versions=}",
             f"{ci__pull_request__pytest__sops_age_key=}",
             f"{ci__pull_request__ruff=}",
-            f"{ci__push__publish=}",
-            f"{ci__push__publish__username=}",
-            f"{ci__push__publish__password=}",
-            f"{ci__push__publish__publish_url=}",
+            f"{ci__push__publish__primary=}",
+            f"{ci__push__publish__primary__job_name=}",
+            f"{ci__push__publish__primary__username=}",
+            f"{ci__push__publish__primary__password=}",
+            f"{ci__push__publish__primary__publish_url=}",
+            f"{ci__push__publish__secondary=}",
+            f"{ci__push__publish__secondary__job_name=}",
             f"{ci__push__publish__secondary__username=}",
             f"{ci__push__publish__secondary__password=}",
             f"{ci__push__publish__secondary__publish_url=}",
@@ -276,10 +283,11 @@ def conformalize_repo(
             uv__native_tls=uv__native_tls,
         )
     if (
-        ci__push__publish
-        or (ci__push__publish__username is not None)
-        or (ci__push__publish__password is not None)
-        or (ci__push__publish__publish_url is not None)
+        ci__push__publish__primary
+        or (ci__push__publish__primary__username is not None)
+        or (ci__push__publish__primary__password is not None)
+        or (ci__push__publish__primary__publish_url is not None)
+        or ci__push__publish__secondary
         or (ci__push__publish__secondary__username is not None)
         or (ci__push__publish__secondary__password is not None)
         or (ci__push__publish__secondary__publish_url is not None)
@@ -290,10 +298,13 @@ def conformalize_repo(
             gitea=ci__gitea,
             modifications=modifications,
             certificates=ci__certificates,
-            publish=ci__push__publish,
-            publish__username=ci__push__publish__username,
-            publish__password=ci__push__publish__password,
-            publish__publish_url=ci__push__publish__publish_url,
+            publish__primary=ci__push__publish__primary,
+            publish__primary__job_name=ci__push__publish__primary__job_name,
+            publish__primary__username=ci__push__publish__primary__username,
+            publish__primary__password=ci__push__publish__primary__password,
+            publish__primary__publish_url=ci__push__publish__primary__publish_url,
+            publish__secondary=ci__push__publish__secondary,
+            publish__secondary__job_name=ci__push__publish__secondary__job_name,
             publish__secondary__username=ci__push__publish__secondary__username,
             publish__secondary__password=ci__push__publish__secondary__password,
             publish__secondary__publish_url=ci__push__publish__secondary__publish_url,
@@ -552,10 +563,16 @@ def add_ci_push_yaml(
     gitea: bool = SETTINGS.ci__gitea,
     modifications: MutableSet[Path] | None = None,
     certificates: bool = SETTINGS.ci__certificates,
-    publish: bool = SETTINGS.ci__push__publish,
-    publish__username: str | None = SETTINGS.ci__push__publish__username,
-    publish__password: Secret[str] | None = SETTINGS.ci__push__publish__password,
-    publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
+    publish__primary: bool = SETTINGS.ci__push__publish__primary,
+    publish__primary__job_name: str = SETTINGS.ci__push__publish__primary__job_name,
+    publish__primary__username: str
+    | None = SETTINGS.ci__push__publish__primary__username,
+    publish__primary__password: Secret[str]
+    | None = SETTINGS.ci__push__publish__primary__password,
+    publish__primary__publish_url: Secret[str]
+    | None = SETTINGS.ci__push__publish__primary__publish_url,
+    publish__secondary: bool = SETTINGS.ci__push__publish__secondary,
+    publish__secondary__job_name: str = SETTINGS.ci__push__publish__secondary__job_name,
     publish__secondary__username: str
     | None = SETTINGS.ci__push__publish__secondary__username,
     publish__secondary__password: Secret[str]
@@ -577,51 +594,41 @@ def add_ci_push_yaml(
         ensure_contains(branches, "master")
         jobs = get_dict(dict_, "jobs")
         if (
-            publish
-            or (publish__username is not None)
-            or (publish__password is not None)
-            or (publish__publish_url is not None)
+            publish__primary
+            or (publish__primary__username is not None)
+            or (publish__primary__password is not None)
+            or (publish__primary__publish_url is not None)
+        ):
+            _add_ci_push_yaml_publish_dict(
+                jobs,
+                publish__primary__job_name,
+                gitea=gitea,
+                certificates=certificates,
+                token_checkout=token_checkout,
+                token_github=token_github,
+                username=publish__primary__username,
+                password=publish__primary__password,
+                publish_url=publish__primary__publish_url,
+                uv__native_tls=uv__native_tls,
+            )
+        if (
+            publish__secondary
             or (publish__secondary__username is not None)
             or (publish__secondary__password is not None)
             or (publish__secondary__publish_url is not None)
         ):
-            publish_dict = get_dict(jobs, "publish")
-            if not gitea:
-                environment = get_dict(publish_dict, "environment")
-                environment["name"] = "pypi"
-                permissions = get_dict(publish_dict, "permissions")
-                permissions["id-token"] = "write"
-            publish_dict["runs-on"] = "ubuntu-latest"
-            steps = get_list(publish_dict, "steps")
-            if certificates:
-                ensure_contains(steps, update_ca_certificates_dict("publish"))
-            ensure_contains(
-                steps,
-                action_publish_package_dict(
-                    token_checkout=token_checkout,
-                    token_github=token_github,
-                    username=publish__username,
-                    password=publish__password,
-                    publish_url=publish__publish_url,
-                    native_tls=uv__native_tls,
-                ),
+            _add_ci_push_yaml_publish_dict(
+                jobs,
+                publish__secondary__job_name,
+                gitea=gitea,
+                certificates=certificates,
+                token_checkout=token_checkout,
+                token_github=token_github,
+                username=publish__secondary__username,
+                password=publish__secondary__password,
+                publish_url=publish__secondary__publish_url,
+                uv__native_tls=uv__native_tls,
             )
-            if (
-                (publish__secondary__username is not None)
-                or (publish__secondary__password is not None)
-                or (publish__secondary__publish_url is not None)
-            ):
-                ensure_contains(
-                    steps,
-                    action_publish_package_dict(
-                        token_checkout=token_checkout,
-                        token_github=token_github,
-                        username=publish__secondary__username,
-                        password=publish__secondary__password,
-                        publish_url=publish__secondary__publish_url,
-                        native_tls=uv__native_tls,
-                    ),
-                )
         if tag:
             tag_dict = get_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
@@ -634,6 +641,43 @@ def add_ci_push_yaml(
                     major_minor=tag__all, major=tag__all, latest=tag__all
                 ),
             )
+
+
+def _add_ci_push_yaml_publish_dict(
+    jobs: StrDict,
+    job_name: str,
+    /,
+    *,
+    gitea: bool = SETTINGS.ci__gitea,
+    certificates: bool = SETTINGS.ci__certificates,
+    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
+    token_github: Secret[str] | None = SETTINGS.ci__token_github,
+    username: str | None = None,
+    password: Secret[str] | None = None,
+    publish_url: Secret[str] | None = None,
+    uv__native_tls: bool = SETTINGS.uv__native_tls,
+) -> None:
+    publish_dict = get_dict(jobs, f"publish-{job_name}")
+    if not gitea:
+        environment = get_dict(publish_dict, "environment")
+        environment["name"] = "pypi"
+        permissions = get_dict(publish_dict, "permissions")
+        permissions["id-token"] = "write"
+    publish_dict["runs-on"] = "ubuntu-latest"
+    steps = get_list(publish_dict, "steps")
+    if certificates:
+        ensure_contains(steps, update_ca_certificates_dict("publish"))
+    ensure_contains(
+        steps,
+        action_publish_package_dict(
+            token_checkout=token_checkout,
+            token_github=token_github,
+            username=username,
+            password=password,
+            publish_url=publish_url,
+            native_tls=uv__native_tls,
+        ),
+    )
 
 
 ##
