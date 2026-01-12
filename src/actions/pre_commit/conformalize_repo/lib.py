@@ -123,6 +123,12 @@ def conformalize_repo(
     | None = SETTINGS.ci__push__publish__password,
     ci__push__publish__publish_url: Secret[str]
     | None = SETTINGS.ci__push__publish__publish_url,
+    ci__push__publish__secondary__username: str
+    | None = SETTINGS.ci__push__publish__secondary__username,
+    ci__push__publish__secondary__password: Secret[str]
+    | None = SETTINGS.ci__push__publish__secondary__password,
+    ci__push__publish__secondary__publish_url: Secret[str]
+    | None = SETTINGS.ci__push__publish__secondary__publish_url,
     ci__push__tag: bool = SETTINGS.ci__push__tag,
     ci__push__tag__all: bool = SETTINGS.ci__push__tag__all,
     coverage: bool = SETTINGS.coverage,
@@ -178,6 +184,9 @@ def conformalize_repo(
             f"{ci__push__publish__username=}",
             f"{ci__push__publish__password=}",
             f"{ci__push__publish__publish_url=}",
+            f"{ci__push__publish__secondary__username=}",
+            f"{ci__push__publish__secondary__password=}",
+            f"{ci__push__publish__secondary__publish_url=}",
             f"{ci__push__tag=}",
             f"{ci__push__tag__all=}",
             f"{coverage=}",
@@ -271,6 +280,9 @@ def conformalize_repo(
         or (ci__push__publish__username is not None)
         or (ci__push__publish__password is not None)
         or (ci__push__publish__publish_url is not None)
+        or (ci__push__publish__secondary__username is not None)
+        or (ci__push__publish__secondary__password is not None)
+        or (ci__push__publish__secondary__publish_url is not None)
         or ci__push__tag
         or ci__push__tag__all
     ):
@@ -282,6 +294,9 @@ def conformalize_repo(
             publish__username=ci__push__publish__username,
             publish__password=ci__push__publish__password,
             publish__publish_url=ci__push__publish__publish_url,
+            publish__secondary__username=ci__push__publish__secondary__username,
+            publish__secondary__password=ci__push__publish__secondary__password,
+            publish__secondary__publish_url=ci__push__publish__secondary__publish_url,
             tag=ci__push__tag,
             tag__all=ci__push__tag__all,
             token_checkout=ci__token_checkout,
@@ -541,6 +556,12 @@ def add_ci_push_yaml(
     publish__username: str | None = SETTINGS.ci__push__publish__username,
     publish__password: Secret[str] | None = SETTINGS.ci__push__publish__password,
     publish__publish_url: Secret[str] | None = SETTINGS.ci__push__publish__publish_url,
+    publish__secondary__username: str
+    | None = SETTINGS.ci__push__publish__secondary__username,
+    publish__secondary__password: Secret[str]
+    | None = SETTINGS.ci__push__publish__secondary__password,
+    publish__secondary__publish_url: Secret[str]
+    | None = SETTINGS.ci__push__publish__secondary__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
     tag__all: bool = SETTINGS.ci__push__tag__all,
     token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
@@ -555,7 +576,15 @@ def add_ci_push_yaml(
         branches = get_list(push, "branches")
         ensure_contains(branches, "master")
         jobs = get_dict(dict_, "jobs")
-        if publish:
+        if (
+            publish
+            or (publish__username is not None)
+            or (publish__password is not None)
+            or (publish__publish_url is not None)
+            or (publish__secondary__username is not None)
+            or (publish__secondary__password is not None)
+            or (publish__secondary__publish_url is not None)
+        ):
             publish_dict = get_dict(jobs, "publish")
             if not gitea:
                 environment = get_dict(publish_dict, "environment")
@@ -577,6 +606,22 @@ def add_ci_push_yaml(
                     native_tls=uv__native_tls,
                 ),
             )
+            if (
+                (publish__secondary__username is not None)
+                or (publish__secondary__password is not None)
+                or (publish__secondary__publish_url is not None)
+            ):
+                ensure_contains(
+                    steps,
+                    action_publish_package_dict(
+                        token_checkout=token_checkout,
+                        token_github=token_github,
+                        username=publish__secondary__username,
+                        password=publish__secondary__password,
+                        publish_url=publish__secondary__publish_url,
+                        native_tls=uv__native_tls,
+                    ),
+                )
         if tag:
             tag_dict = get_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
