@@ -657,7 +657,8 @@ def _add_ci_push_yaml_publish_dict(
     publish_url: Secret[str] | None = None,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
-    publish_dict = get_dict(jobs, f"publish-{job_name}")
+    publish_name = f"publish-{job_name}"
+    publish_dict = get_dict(jobs, publish_name)
     if not gitea:
         environment = get_dict(publish_dict, "environment")
         environment["name"] = "pypi"
@@ -666,7 +667,7 @@ def _add_ci_push_yaml_publish_dict(
     publish_dict["runs-on"] = "ubuntu-latest"
     steps = get_list(publish_dict, "steps")
     if certificates:
-        ensure_contains(steps, update_ca_certificates_dict("publish"))
+        ensure_contains(steps, update_ca_certificates_dict(publish_name))
     ensure_contains(
         steps,
         action_publish_package_dict(
