@@ -2,22 +2,18 @@ from __future__ import annotations
 
 from io import StringIO
 from pathlib import Path
-from textwrap import indent
 from typing import TYPE_CHECKING, Any, Literal, assert_never, overload
 
-from tabulate import tabulate
 from typed_settings import EnvLoader, Secret
 from utilities.atomicwrites import writer
-from utilities.functions import get_func_name
 from utilities.subprocess import run
 from utilities.text import split_str
 
-from actions import __version__
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, MutableSet
+    from collections.abc import MutableSet
 
     from utilities.types import PathLike, StrStrMapping
 
@@ -85,17 +81,6 @@ def copy_text(
 
 def ensure_new_line(text: str, /) -> str:
     return text.strip("\n") + "\n"
-
-
-def log_func_call(func: Callable[..., Any], /, *variables: str) -> str:
-    name = get_func_name(func)
-    table = tabulate(
-        list(map(split_f_str_equals, variables)), tablefmt="rounded_outline"
-    )
-    indented = indent(table, "  ")
-    return f"""
-Running {name!r} (version {__version__}) with:
-{indented}"""
 
 
 @overload

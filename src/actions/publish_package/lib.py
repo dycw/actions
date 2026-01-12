@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from utilities.functions import get_func_name
+from utilities.tabulate import func_param_desc
 from utilities.tempfile import TemporaryDirectory
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.publish_package.settings import SETTINGS
-from actions.utilities import log_func_call, logged_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from typed_settings import Secret
@@ -20,14 +23,17 @@ def publish_package(
     trusted_publishing: bool = SETTINGS.trusted_publishing,
     native_tls: bool = SETTINGS.native_tls,
 ) -> None:
-    variables = [
-        f"{username=}",
-        f"{password=}",
-        f"{publish_url=}",
-        f"{trusted_publishing=}",
-        f"{native_tls=}",
-    ]
-    LOGGER.info(log_func_call(publish_package, *variables))
+    LOGGER.info(
+        func_param_desc(
+            publish_package,
+            __version__,
+            f"{username=}",
+            f"{password=}",
+            f"{publish_url=}",
+            f"{trusted_publishing=}",
+            f"{native_tls=}",
+        )
+    )
     with TemporaryDirectory() as temp:
         logged_run("uv", "build", "--out-dir", str(temp), "--wheel", "--clear")
         logged_run(
@@ -40,6 +46,7 @@ def publish_package(
             *(["--native-tls"] if native_tls else []),
             f"{temp}/*",
         )
+    LOGGER.info("Finished running %r", get_func_name(publish_package))
 
 
 __all__ = ["publish_package"]

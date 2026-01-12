@@ -7,8 +7,11 @@ from typing import TYPE_CHECKING
 
 from requests import get
 from utilities.atomicwrites import writer
+from utilities.functions import get_func_name
 from utilities.subprocess import chmod, rm_cmd, ssh, sudo_cmd
+from utilities.tabulate import func_param_desc
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.register_gitea_runner.constants import (
     PATH_CACHE,
@@ -17,7 +20,7 @@ from actions.register_gitea_runner.constants import (
     URL_WAIT_FOR_IT,
 )
 from actions.register_gitea_runner.settings import SETTINGS
-from actions.utilities import log_func_call, logged_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from utilities.types import PathLike
@@ -37,19 +40,22 @@ def register_gitea_runner(
     runner_instance_name: str = SETTINGS.runner_instance_name,
 ) -> None:
     """Register against a remote instance of Gitea."""
-    variables = [
-        f"{ssh_user=}",
-        f"{ssh_host=}",
-        f"{gitea_container_user=}",
-        f"{gitea_container_name=}",
-        f"{runner_certificate=}",
-        f"{runner_capacity=}",
-        f"{runner_container_name=}",
-        f"{gitea_host=}",
-        f"{gitea_port=}",
-        f"{runner_instance_name=}",
-    ]
-    LOGGER.info(log_func_call(register_gitea_runner, *variables))
+    LOGGER.info(
+        func_param_desc(
+            register_gitea_runner,
+            __version__,
+            f"{ssh_user=}",
+            f"{ssh_host=}",
+            f"{gitea_container_user=}",
+            f"{gitea_container_name=}",
+            f"{runner_certificate=}",
+            f"{runner_capacity=}",
+            f"{runner_container_name=}",
+            f"{gitea_host=}",
+            f"{gitea_port=}",
+            f"{runner_instance_name=}",
+        )
+    )
     token = ssh(
         ssh_user,
         ssh_host,
@@ -66,6 +72,7 @@ def register_gitea_runner(
         gitea_port=gitea_port,
         runner_instance_name=runner_instance_name,
     )
+    LOGGER.info("Finished running %r", get_func_name(register_gitea_runner))
 
 
 def register_against_local(

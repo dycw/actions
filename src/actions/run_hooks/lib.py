@@ -7,13 +7,15 @@ from re import search
 from subprocess import CalledProcessError
 from typing import TYPE_CHECKING, Any
 
-from utilities.functions import ensure_class, ensure_str
+from utilities.functions import ensure_class, ensure_str, get_func_name
+from utilities.tabulate import func_param_desc
 from whenever import TimeDelta
 from yaml import safe_load
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.run_hooks.settings import SETTINGS
-from actions.utilities import log_func_call, logged_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -26,8 +28,16 @@ def run_hooks(
     hooks_exclude: list[str] | None = SETTINGS.hooks_exclude,
     sleep: int = SETTINGS.sleep,
 ) -> None:
-    variables = [f"{repos=}", f"{hooks=}", f"{hooks_exclude=}", f"{sleep=}"]
-    LOGGER.info(log_func_call(run_hooks, *variables))
+    LOGGER.info(
+        func_param_desc(
+            run_hooks,
+            __version__,
+            f"{repos=}",
+            f"{hooks=}",
+            f"{hooks_exclude=}",
+            f"{sleep=}",
+        )
+    )
     results = {
         hook: _run_hook(hook, sleep=sleep)
         for hook in _yield_hooks(repos=repos, hooks=hooks, hooks_exclude=hooks_exclude)
@@ -36,6 +46,7 @@ def run_hooks(
     if len(failed) >= 1:
         msg = f"Failed hook(s): {', '.join(failed)}"
         raise RuntimeError(msg)
+    LOGGER.info("Finished running %r", get_func_name(run_hooks))
 
 
 def _yield_hooks(

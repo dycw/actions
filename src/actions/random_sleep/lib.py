@@ -4,12 +4,14 @@ from math import ceil, floor
 from random import choice
 from time import sleep
 
+from utilities.functions import get_func_name
+from utilities.tabulate import func_param_desc
 from utilities.whenever import get_now
 from whenever import TimeDelta, ZonedDateTime
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.random_sleep.settings import SETTINGS
-from actions.utilities import log_func_call
 
 
 def random_sleep(
@@ -19,15 +21,18 @@ def random_sleep(
     step: int = SETTINGS.step,
     log_freq: int = SETTINGS.log_freq,
 ) -> None:
-    variables = [f"{min=}", f"{max=}", f"{step=}", f"{log_freq=}"]
-    LOGGER.info(log_func_call(random_sleep, *variables))
+    LOGGER.info(
+        func_param_desc(
+            random_sleep, __version__, f"{min=}", f"{max=}", f"{step=}", f"{log_freq=}"
+        )
+    )
     start = get_now()
     delta = TimeDelta(seconds=choice(range(min, max, step)))
     LOGGER.info("Sleeping for %s...", delta)
     end = (start + delta).round(mode="ceil")
     while (now := get_now()) < end:
         _intermediate(start, now, end, log_freq=log_freq)
-    LOGGER.info("Finished sleeping for %s", delta)
+    LOGGER.info("Finished running %r", get_func_name(random_sleep))
 
 
 def _intermediate(

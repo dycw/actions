@@ -4,14 +4,16 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from utilities.functions import get_func_name
 from utilities.iterables import one
+from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 from utilities.throttle import throttle
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.constants import THROTTLE_DELTA
 from actions.pre_commit.utilities import path_throttle_cache
-from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 
 
 def _touch_py_typed(*paths: PathLike) -> None:
-    LOGGER.info(log_func_call(touch_py_typed, f"{paths=}"))
+    LOGGER.info(func_param_desc(touch_py_typed, __version__, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, modifications=modifications)
@@ -30,6 +32,7 @@ def _touch_py_typed(*paths: PathLike) -> None:
             ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
+    LOGGER.info("Finished running %r", get_func_name(touch_py_typed))
 
 
 touch_py_typed = throttle(
