@@ -58,7 +58,7 @@ class Settings:
     ci__push__publish__primary__password: Secret[str] | None = secret(
         default=None, help="Set up CI 'push.yaml' publishing #1 with this password"
     )
-    ci__push__publish__primary__publish_url: Secret[str] | None = secret(
+    ci__push__publish__primary__publish_url: str | None = option(
         default=None, help="Set up CI 'push.yaml' publishing #1 with this URL"
     )
     ci__push__publish__secondary: bool = option(
@@ -73,7 +73,7 @@ class Settings:
     ci__push__publish__secondary__password: Secret[str] | None = secret(
         default=None, help="Set up CI 'push.yaml' publishing #2 with this password"
     )
-    ci__push__publish__secondary__publish_url: Secret[str] | None = secret(
+    ci__push__publish__secondary__publish_url: str | None = option(
         default=None, help="Set up CI 'push.yaml' publishing #2 with this URL"
     )
     ci__push__tag: bool = option(default=False, help="Set up CI 'push.yaml' tagging")

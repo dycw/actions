@@ -123,7 +123,7 @@ def conformalize_repo(
     | None = SETTINGS.ci__push__publish__primary__username,
     ci__push__publish__primary__password: Secret[str]
     | None = SETTINGS.ci__push__publish__primary__password,
-    ci__push__publish__primary__publish_url: Secret[str]
+    ci__push__publish__primary__publish_url: str
     | None = SETTINGS.ci__push__publish__primary__publish_url,
     ci__push__publish__secondary: bool = SETTINGS.ci__push__publish__secondary,
     ci__push__publish__secondary__job_name: str = SETTINGS.ci__push__publish__secondary__job_name,
@@ -131,7 +131,7 @@ def conformalize_repo(
     | None = SETTINGS.ci__push__publish__secondary__username,
     ci__push__publish__secondary__password: Secret[str]
     | None = SETTINGS.ci__push__publish__secondary__password,
-    ci__push__publish__secondary__publish_url: Secret[str]
+    ci__push__publish__secondary__publish_url: str
     | None = SETTINGS.ci__push__publish__secondary__publish_url,
     ci__push__tag: bool = SETTINGS.ci__push__tag,
     ci__push__tag__all: bool = SETTINGS.ci__push__tag__all,
@@ -569,7 +569,7 @@ def add_ci_push_yaml(
     | None = SETTINGS.ci__push__publish__primary__username,
     publish__primary__password: Secret[str]
     | None = SETTINGS.ci__push__publish__primary__password,
-    publish__primary__publish_url: Secret[str]
+    publish__primary__publish_url: str
     | None = SETTINGS.ci__push__publish__primary__publish_url,
     publish__secondary: bool = SETTINGS.ci__push__publish__secondary,
     publish__secondary__job_name: str = SETTINGS.ci__push__publish__secondary__job_name,
@@ -577,7 +577,7 @@ def add_ci_push_yaml(
     | None = SETTINGS.ci__push__publish__secondary__username,
     publish__secondary__password: Secret[str]
     | None = SETTINGS.ci__push__publish__secondary__password,
-    publish__secondary__publish_url: Secret[str]
+    publish__secondary__publish_url: str
     | None = SETTINGS.ci__push__publish__secondary__publish_url,
     tag: bool = SETTINGS.ci__push__tag,
     tag__all: bool = SETTINGS.ci__push__tag__all,
@@ -654,7 +654,7 @@ def _add_ci_push_yaml_publish_dict(
     token_github: Secret[str] | None = SETTINGS.ci__token_github,
     username: str | None = None,
     password: Secret[str] | None = None,
-    publish_url: Secret[str] | None = None,
+    publish_url: str | None = None,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     publish_name = f"publish-{job_name}"
