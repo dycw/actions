@@ -46,17 +46,26 @@ class Settings:
     ci__pull_request__ruff: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' ruff"
     )
-    ci__push__publish: bool = option(
-        default=False, help="Set up CI 'push.yaml' publishing"
+    ci__push__publish__primary: bool = option(
+        default=False, help="Set up CI 'push.yaml' publishing #1"
     )
-    ci__push__publish__username: str | None = option(
-        default=None, help="Set up CI 'push.yaml' publishing with this username"
+    ci__push__publish__primary__job_name: str = option(
+        default="pypi", help="Set up CI 'push.yaml' publishing #1 with this job name"
     )
-    ci__push__publish__password: Secret[str] | None = secret(
-        default=None, help="Set up CI 'push.yaml' publishing with this password"
+    ci__push__publish__primary__username: str | None = option(
+        default=None, help="Set up CI 'push.yaml' publishing #1 with this username"
     )
-    ci__push__publish__publish_url: Secret[str] | None = secret(
-        default=None, help="Set up CI 'push.yaml' publishing with this URL"
+    ci__push__publish__primary__password: Secret[str] | None = secret(
+        default=None, help="Set up CI 'push.yaml' publishing #1 with this password"
+    )
+    ci__push__publish__primary__publish_url: Secret[str] | None = secret(
+        default=None, help="Set up CI 'push.yaml' publishing #1 with this URL"
+    )
+    ci__push__publish__secondary: bool = option(
+        default=False, help="Set up CI 'push.yaml' publishing #2"
+    )
+    ci__push__publish__secondary__job_name: str = option(
+        default="pypi2", help="Set up CI 'push.yaml' publishing #2 with this job name"
     )
     ci__push__publish__secondary__username: str | None = option(
         default=None, help="Set up CI 'push.yaml' publishing #2 with this username"
