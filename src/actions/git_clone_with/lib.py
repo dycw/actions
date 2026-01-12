@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from shutil import copy
 from typing import TYPE_CHECKING
 
 from utilities.atomicwrites import writer
-from utilities.subprocess import git_clone
+from utilities.subprocess import cp, git_clone
 from utilities.text import strip_and_dedent
 
 from actions.constants import SSH
@@ -63,9 +62,7 @@ def _setup_ssh_config_for_key(path: PathLike, /) -> None:
 
 def _setup_deploy_key(path: PathLike, /) -> None:
     path = Path(path)
-    dest = _get_deploy_key(path.name)
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    _ = copy(path, dest)
+    cp(path, _get_deploy_key(path.name), perms="u=rw,g=,o=")
 
 
 def _get_deploy_key(name: str, /) -> Path:
