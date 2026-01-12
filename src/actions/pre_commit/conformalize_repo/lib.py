@@ -437,7 +437,7 @@ def add_ci_pull_request_yaml(
                     token_checkout=token_checkout,
                     token_github=token_github,
                     submodules=pre_commit__submodules,
-                    repos=["pre-commit/pre-commit-hooks"],
+                    repos=["dycw/actions", "pre-commit/pre-commit-hooks"],
                     gitea=gitea,
                 ),
             )
