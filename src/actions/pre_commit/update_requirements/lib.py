@@ -5,9 +5,11 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
-from utilities.functions import max_nullable
+from utilities.functions import get_func_name, max_nullable
+from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.update_requirements.classes import (
     PipListOutdatedOutput,
@@ -19,7 +21,7 @@ from actions.pre_commit.update_requirements.classes import (
     parse_version2_or_3,
 )
 from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
-from actions.utilities import log_func_call, logged_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
 
 
 def update_requirements(*paths: PathLike) -> None:
-    LOGGER.info(log_func_call(update_requirements, f"{paths=}"))
+    LOGGER.info(func_param_desc(update_requirements, __version__, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, modifications=modifications)
@@ -42,6 +44,7 @@ def update_requirements(*paths: PathLike) -> None:
             ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
+    LOGGER.info("Finished running %r", get_func_name(update_requirements))
 
 
 def _format_path(

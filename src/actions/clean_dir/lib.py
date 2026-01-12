@@ -4,9 +4,12 @@ from pathlib import Path
 from shutil import rmtree
 from typing import TYPE_CHECKING
 
+from utilities.functions import get_func_name
+from utilities.tabulate import func_param_desc
+
+from actions import __version__
 from actions.clean_dir.settings import SETTINGS
 from actions.logging import LOGGER
-from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -16,7 +19,7 @@ if TYPE_CHECKING:
 
 def clean_dir(*, dir_: PathLike = SETTINGS.dir) -> None:
     """Clean a directory."""
-    LOGGER.info(log_func_call(clean_dir, f"{dir_=}"))
+    LOGGER.info(func_param_desc(clean_dir, __version__, f"{dir_=}"))
     dir_ = Path(dir_)
     if not dir_.is_dir():
         msg = f"{str(dir_)!r} is a not a directory"
@@ -31,8 +34,8 @@ def clean_dir(*, dir_: PathLike = SETTINGS.dir) -> None:
             for d in dirs:
                 rmtree(d, ignore_errors=True)
         else:
-            LOGGER.info("Finished cleaning %r", str(dir_))
-            return
+            break
+    LOGGER.info("Finished running %r", get_func_name(clean_dir))
 
 
 def _yield_dirs(*, dir_: PathLike = SETTINGS.dir) -> Iterator[Path]:

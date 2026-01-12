@@ -3,11 +3,14 @@ from __future__ import annotations
 from contextlib import suppress
 from subprocess import CalledProcessError
 
+from utilities.functions import get_func_name
+from utilities.tabulate import func_param_desc
 from utilities.version import parse_version
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.tag_commit.settings import SETTINGS
-from actions.utilities import log_func_call, logged_run
+from actions.utilities import logged_run
 
 
 def tag_commit(
@@ -18,14 +21,17 @@ def tag_commit(
     major: bool = SETTINGS.major,
     latest: bool = SETTINGS.latest,
 ) -> None:
-    variables = [
-        f"{user_name=}",
-        f"{user_email=}",
-        f"{major_minor=}",
-        f"{major=}",
-        f"{latest=}",
-    ]
-    LOGGER.info(log_func_call(tag_commit, *variables))
+    LOGGER.info(
+        func_param_desc(
+            tag_commit,
+            __version__,
+            f"{user_name=}",
+            f"{user_email=}",
+            f"{major_minor=}",
+            f"{major=}",
+            f"{latest=}",
+        )
+    )
     logged_run("git", "config", "--global", "user.name", user_name)
     logged_run("git", "config", "--global", "user.email", user_email)
     version = parse_version(
@@ -38,6 +44,7 @@ def tag_commit(
         _tag(str(version.major))
     if latest:
         _tag("latest")
+    LOGGER.info("Finished running %r", get_func_name(tag_commit))
 
 
 def _tag(version: str, /) -> None:

@@ -3,11 +3,13 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
+from utilities.functions import get_func_name
+from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
-from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import MutableSet
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 
 def format_requirements(*paths: PathLike) -> None:
-    LOGGER.info(log_func_call(format_requirements, f"{paths=}"))
+    LOGGER.info(func_param_desc(format_requirements, __version__, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, modifications=modifications)
@@ -28,6 +30,7 @@ def format_requirements(*paths: PathLike) -> None:
             ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
+    LOGGER.info("Finished running %r", get_func_name(format_requirements))
 
 
 def _format_path(

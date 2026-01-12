@@ -14,13 +14,16 @@ from typing import TYPE_CHECKING, Literal, assert_never
 import tomlkit
 from tomlkit import TOMLDocument, table
 from tomlkit.exceptions import NonExistentKey
+from utilities.functions import get_func_name
 from utilities.inflect import counted_noun
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
+from utilities.tabulate import func_param_desc
 from utilities.text import repr_str, strip_and_dedent
 from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
 
+from actions import __version__
 from actions.constants import (
     ACTIONS_URL,
     BUMPVERSION_TOML,
@@ -87,7 +90,7 @@ from actions.pre_commit.utilities import (
     yield_toml_doc,
     yield_yaml_dict,
 )
-from actions.utilities import log_func_call, logged_run
+from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
@@ -154,57 +157,60 @@ def conformalize_repo(
     script: str | None = SETTINGS.script,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
-    variables = [
-        f"{ci__certificates=}",
-        f"{ci__gitea=}",
-        f"{ci__token_checkout=}",
-        f"{ci__token_github=}",
-        f"{ci__pull_request__pre_commit=}",
-        f"{ci__pull_request__pre_commit__submodules=}",
-        f"{ci__pull_request__pyright=}",
-        f"{ci__pull_request__pytest__macos=}",
-        f"{ci__pull_request__pytest__ubuntu=}",
-        f"{ci__pull_request__pytest__windows=}",
-        f"{ci__pull_request__pytest__all_versions=}",
-        f"{ci__pull_request__pytest__sops_age_key=}",
-        f"{ci__pull_request__ruff=}",
-        f"{ci__push__publish=}",
-        f"{ci__push__publish__username=}",
-        f"{ci__push__publish__password=}",
-        f"{ci__push__publish__publish_url=}",
-        f"{ci__push__tag=}",
-        f"{ci__push__tag__all=}",
-        f"{coverage=}",
-        f"{description=}",
-        f"{envrc=}",
-        f"{envrc__uv=}",
-        f"{gitignore=}",
-        f"{package_name=}",
-        f"{pre_commit__dockerfmt=}",
-        f"{pre_commit__prettier=}",
-        f"{pre_commit__python=}",
-        f"{pre_commit__ruff=}",
-        f"{pre_commit__shell=}",
-        f"{pre_commit__taplo=}",
-        f"{pre_commit__uv=}",
-        f"{pyproject=}",
-        f"{pyproject__project__optional_dependencies__scripts=}",
-        f"{pyproject__tool__uv__indexes=}",
-        f"{pyright=}",
-        f"{pytest=}",
-        f"{pytest__asyncio=}",
-        f"{pytest__ignore_warnings=}",
-        f"{pytest__timeout=}",
-        f"{python_package_name=}",
-        f"{python_version=}",
-        f"{readme=}",
-        f"{repo_name=}",
-        f"{ruff=}",
-        f"{run_version_bump=}",
-        f"{script=}",
-        f"{uv__native_tls=}",
-    ]
-    LOGGER.info(log_func_call(conformalize_repo, *variables))
+    LOGGER.info(
+        func_param_desc(
+            conformalize_repo,
+            __version__,
+            f"{ci__certificates=}",
+            f"{ci__gitea=}",
+            f"{ci__token_checkout=}",
+            f"{ci__token_github=}",
+            f"{ci__pull_request__pre_commit=}",
+            f"{ci__pull_request__pre_commit__submodules=}",
+            f"{ci__pull_request__pyright=}",
+            f"{ci__pull_request__pytest__macos=}",
+            f"{ci__pull_request__pytest__ubuntu=}",
+            f"{ci__pull_request__pytest__windows=}",
+            f"{ci__pull_request__pytest__all_versions=}",
+            f"{ci__pull_request__pytest__sops_age_key=}",
+            f"{ci__pull_request__ruff=}",
+            f"{ci__push__publish=}",
+            f"{ci__push__publish__username=}",
+            f"{ci__push__publish__password=}",
+            f"{ci__push__publish__publish_url=}",
+            f"{ci__push__tag=}",
+            f"{ci__push__tag__all=}",
+            f"{coverage=}",
+            f"{description=}",
+            f"{envrc=}",
+            f"{envrc__uv=}",
+            f"{gitignore=}",
+            f"{package_name=}",
+            f"{pre_commit__dockerfmt=}",
+            f"{pre_commit__prettier=}",
+            f"{pre_commit__python=}",
+            f"{pre_commit__ruff=}",
+            f"{pre_commit__shell=}",
+            f"{pre_commit__taplo=}",
+            f"{pre_commit__uv=}",
+            f"{pyproject=}",
+            f"{pyproject__project__optional_dependencies__scripts=}",
+            f"{pyproject__tool__uv__indexes=}",
+            f"{pyright=}",
+            f"{pytest=}",
+            f"{pytest__asyncio=}",
+            f"{pytest__ignore_warnings=}",
+            f"{pytest__timeout=}",
+            f"{python_package_name=}",
+            f"{python_version=}",
+            f"{readme=}",
+            f"{repo_name=}",
+            f"{ruff=}",
+            f"{run_version_bump=}",
+            f"{script=}",
+            f"{uv__native_tls=}",
+        )
+    )
     modifications: set[Path] = set()
     add_bumpversion_toml(
         modifications=modifications,
@@ -344,6 +350,7 @@ def conformalize_repo(
             ", ".join(map(repr_str, sorted(modifications))),
         )
         sys.exit(1)
+    LOGGER.info("Finished running %r", get_func_name(conformalize_repo))
 
 
 ##

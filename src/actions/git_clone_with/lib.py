@@ -4,14 +4,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from utilities.atomicwrites import writer
+from utilities.functions import get_func_name
 from utilities.subprocess import cp, git_clone
+from utilities.tabulate import func_param_desc
 from utilities.text import strip_and_dedent
 
+from actions import __version__
 from actions.constants import SSH
 from actions.git_clone_with.settings import SETTINGS
 from actions.logging import LOGGER
 from actions.setup_ssh_config.lib import get_ssh_config, setup_ssh_config
-from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from utilities.types import PathLike
@@ -27,15 +29,18 @@ def git_clone_with(
     sudo: bool = SETTINGS.sudo,
     branch: str | None = SETTINGS.branch,
 ) -> None:
-    variables = [
-        f"{path_key=}",
-        f"{owner=}",
-        f"{repo=}",
-        f"{path_clone=}",
-        f"{sudo=}",
-        f"{branch=}",
-    ]
-    LOGGER.info(log_func_call(git_clone_with, *variables))
+    LOGGER.info(
+        func_param_desc(
+            git_clone_with,
+            __version__,
+            f"{path_key=}",
+            f"{owner=}",
+            f"{repo=}",
+            f"{path_clone=}",
+            f"{sudo=}",
+            f"{branch=}",
+        )
+    )
     path_key = Path(path_key)
     setup_ssh_config()
     _setup_ssh_config_for_key(path_key)
@@ -43,6 +48,7 @@ def git_clone_with(
     git_clone(
         f"git@{path_key.stem}:{owner}/{repo}", path_clone, sudo=sudo, branch=branch
     )
+    LOGGER.info("Finished running %r", get_func_name(git_clone_with))
 
 
 def _setup_ssh_config_for_key(path: PathLike, /) -> None:

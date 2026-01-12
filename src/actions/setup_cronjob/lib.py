@@ -3,13 +3,15 @@ from __future__ import annotations
 from string import Template
 from typing import TYPE_CHECKING
 
+from utilities.functions import get_func_name
 from utilities.platform import SYSTEM
 from utilities.subprocess import chmod, chown, tee
+from utilities.tabulate import func_param_desc
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.setup_cronjob.constants import PATH_CONFIGS
 from actions.setup_cronjob.settings import SETTINGS
-from actions.utilities import log_func_call
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -30,18 +32,21 @@ def setup_cronjob(
     logs_keep: int = SETTINGS.logs_keep,
 ) -> None:
     """Set up a cronjob & logrotate."""
-    variables = [
-        f"{name=}",
-        f"{prepend_path=}",
-        f"{schedule=}",
-        f"{user=}",
-        f"{timeout=}",
-        f"{kill_after=}",
-        f"{command=}",
-        f"{args=}",
-        f"{logs_keep=}",
-    ]
-    LOGGER.info(log_func_call(setup_cronjob, *variables))
+    LOGGER.info(
+        func_param_desc(
+            setup_cronjob,
+            __version__,
+            f"{name=}",
+            f"{prepend_path=}",
+            f"{schedule=}",
+            f"{user=}",
+            f"{timeout=}",
+            f"{kill_after=}",
+            f"{command=}",
+            f"{args=}",
+            f"{logs_keep=}",
+        )
+    )
     if SYSTEM != "linux":
         msg = f"System must be 'linux'; got {SYSTEM!r}"
         raise TypeError(msg)
@@ -61,6 +66,7 @@ def setup_cronjob(
     _tee_and_perms(
         f"/etc/logrotate.d/{name}", _get_logrotate(name=name, logs_keep=logs_keep)
     )
+    LOGGER.info("Finished running %r", get_func_name(setup_cronjob))
 
 
 def _get_crontab(
