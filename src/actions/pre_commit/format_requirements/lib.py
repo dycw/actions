@@ -7,6 +7,7 @@ from utilities.functions import get_func_name
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
+from actions import __version__
 from actions.logging import LOGGER
 from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
 
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
 
 def format_requirements(*paths: PathLike) -> None:
-    LOGGER.info(func_param_desc(format_requirements, f"{paths=}"))
+    LOGGER.info(func_param_desc(format_requirements, __version__, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, modifications=modifications)
