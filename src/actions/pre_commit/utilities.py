@@ -5,7 +5,7 @@ from collections.abc import Iterator, MutableSet
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, assert_never
+from typing import TYPE_CHECKING, Any, assert_never, overload
 
 import tomlkit
 from libcst import Module, parse_module
@@ -23,7 +23,7 @@ from actions.logging import LOGGER
 from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, MutableSet
+    from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 
     from utilities.types import PathLike, StrDict
 
@@ -39,6 +39,10 @@ def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
             array.append(table_)
 
 
+@overload
+def ensure_contains(array: list[str], /, *objs: str) -> None: ...
+@overload
+def ensure_contains(array: list[StrDict], /, *objs: StrDict) -> None: ...
 def ensure_contains(array: HasAppend, /, *objs: Any) -> None:
     if isinstance(array, AoT):
         msg = f"Use {ensure_aot_contains.__name__!r} instead of {ensure_contains.__name__!r}"
@@ -49,7 +53,7 @@ def ensure_contains(array: HasAppend, /, *objs: Any) -> None:
 
 
 def ensure_contains_partial_dict(
-    container: HasAppend, partial: StrDict, /, *, extra: StrDict | None = None
+    container: list[StrDict], partial: StrDict, /, *, extra: StrDict | None = None
 ) -> StrDict:
     try:
         return get_partial_dict(container, partial, skip_log=True)
@@ -59,11 +63,11 @@ def ensure_contains_partial_dict(
         return dict_
 
 
-def ensure_contains_partial_str(container: HasAppend, text: str, /) -> str:
+def ensure_contains_partial_str(list_: HasAppend, text: str, /) -> str:
     try:
-        return get_partial_str(container, text, skip_log=True)
+        return get_partial_str(list_, text, skip_log=True)
     except OneEmptyError:
-        container.append(text)
+        list_.append(text)
         return text
 
 
@@ -169,7 +173,7 @@ def get_set_table(container: HasSetDefault, key: str, /) -> Table:
 
 
 def get_partial_dict(
-    iterable: Iterable[Any], dict_: StrDict, /, *, skip_log: bool = False
+    iterable: Iterable[StrDict], dict_: StrDict, /, *, skip_log: bool = False
 ) -> StrDict:
     try:
         return one(i for i in iterable if is_partial_dict(dict_, i))

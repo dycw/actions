@@ -516,21 +516,21 @@ def add_ci_pull_request_yaml(
             strategy_dict = get_set_dict(pytest_dict, "strategy")
             strategy_dict["fail-fast"] = False
             matrix = get_set_dict(strategy_dict, "matrix")
-            os = get_set_list_dicts(matrix, "os")
+            os = get_set_list_strs(matrix, "os")
             if pytest__macos:
                 ensure_contains(os, "macos-latest")
             if pytest__ubuntu:
                 ensure_contains(os, "ubuntu-latest")
             if pytest__windows:
                 ensure_contains(os, "windows-latest")
-            python_version_dict = get_set_list_dicts(matrix, "python-version")
+            python_version_dict = get_set_list_strs(matrix, "python-version")
             if pytest__all_versions:
                 ensure_contains(
                     python_version_dict, *yield_python_versions(python_version)
                 )
             else:
                 ensure_contains(python_version_dict, python_version)
-            resolution = get_set_list_dicts(matrix, "resolution")
+            resolution = get_set_list_strs(matrix, "resolution")
             ensure_contains(resolution, "highest", "lowest-direct")
             if pytest__timeout is not None:
                 pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
