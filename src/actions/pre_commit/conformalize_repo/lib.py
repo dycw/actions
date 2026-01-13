@@ -453,7 +453,7 @@ def add_ci_pull_request_yaml(
         dict_["name"] = "pull-request"
         on = get_set_dict(dict_, "on")
         pull_request = get_set_dict(on, "pull_request")
-        branches = get_set_list_dicts(pull_request, "branches")
+        branches = get_set_list_strs(pull_request, "branches")
         ensure_contains(branches, "master")
         schedule = get_set_list_dicts(on, "schedule")
         ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
@@ -584,7 +584,7 @@ def add_ci_push_yaml(
         dict_["name"] = "push"
         on = get_set_dict(dict_, "on")
         push = get_set_dict(on, "push")
-        branches = get_set_list_dicts(push, "branches")
+        branches = get_set_list_strs(push, "branches")
         ensure_contains(branches, "master")
         jobs = get_set_dict(dict_, "jobs")
         if publish__github:
@@ -1000,7 +1000,7 @@ def add_pyrightconfig_json(
     with yield_json_dict(PYRIGHTCONFIG_JSON, modifications=modifications) as dict_:
         dict_["deprecateTypingAliases"] = True
         dict_["enableReachabilityAnalysis"] = False
-        include = get_set_list_dicts(dict_, "include")
+        include = get_set_list_strs(dict_, "include")
         ensure_contains(include, "src" if script is None else script)
         dict_["pythonVersion"] = python_version
         dict_["reportCallInDefaultInitializer"] = True

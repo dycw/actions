@@ -1,14 +1,67 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pytest import mark, param, raises
+from utilities.pathlib import temp_cwd
 from utilities.text import strip_and_dedent
 
 from actions.constants import YAML_INSTANCE
 from actions.pre_commit.conformalize_repo.lib import (
     _add_envrc_uv_text,
     _add_pre_commit_config_repo,
+    add_bumpversion_toml,
+    add_ci_pull_request_yaml,
+    add_ci_push_yaml,
+    add_coveragerc_toml,
+    add_envrc,
+    add_gitignore,
+    add_pre_commit_config_yaml,
+    add_pyproject_toml,
+    add_pyrightconfig_json,
+    add_pytest_toml,
+    add_readme_md,
+    add_ruff_toml,
     yield_python_versions,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+
+class TestAddBumpversionToml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_bumpversion_toml()
+
+
+class TestAddCIPullRequestYaml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_ci_pull_request_yaml()
+
+
+class TestAddCIPushYaml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_ci_push_yaml()
+
+
+class TestAddCoverageRcToml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_coveragerc_toml()
+
+
+class TestAddEnvrc:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_envrc()
 
 
 class TestAddEnvrcUvText:
@@ -50,6 +103,55 @@ class TestAddPreCommitConfigRepo:
             pre_commit_dict, "url", "id", args=("add", ["--arg"])
         )
         assert pre_commit_dict == YAML_INSTANCE.load(text)
+
+
+class TestAddGitIgnore:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_gitignore()
+
+
+class TestAddPreCommitConfigYaml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_pre_commit_config_yaml()
+
+
+class TestAddPyProjectToml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_pyproject_toml()
+
+
+class TestAddPyrightConfigJson:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_pyrightconfig_json()
+
+
+class TestAddPytestToml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_pytest_toml()
+
+
+class TestAddReadMeMd:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_readme_md()
+
+
+class TestAddRuffToml:
+    def test_main(self, *, tmp_path: Path) -> None:
+        with temp_cwd(tmp_path):
+            for _ in range(2):
+                add_ruff_toml()
 
 
 class TestYieldPythonVersions:
