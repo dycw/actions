@@ -74,18 +74,19 @@ from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
 from actions.pre_commit.update_requirements.constants import UPDATE_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.utilities import (
+    ensure_aot,
     ensure_aot_contains,
+    ensure_array,
     ensure_contains,
     ensure_contains_partial_dict,
     ensure_contains_partial_str,
+    ensure_dict,
+    ensure_list,
     ensure_not_contains,
-    get_set_aot,
-    get_set_array,
-    get_set_dict,
-    get_set_list,
-    get_set_table,
+    ensure_table,
     path_throttle_cache,
     yield_json_dict,
+    yield_pyproject_toml,
     yield_text_file,
     yield_toml_doc,
     yield_yaml_dict,
@@ -389,10 +390,10 @@ def add_bumpversion_toml(
     python_package_name: str | None = SETTINGS.python_package_name,
 ) -> None:
     with yield_bumpversion_toml(modifications=modifications) as doc:
-        tool = get_set_table(doc, "tool")
-        bumpversion = get_set_table(tool, "bumpversion")
+        tool = ensure_table(doc, "tool")
+        bumpversion = ensure_table(tool, "bumpversion")
         if pyproject:
-            files = get_set_aot(bumpversion, "files")
+            files = ensure_aot(bumpversion, "files")
             ensure_aot_contains(
                 files,
                 _add_bumpversion_toml_file(PYPROJECT_TOML, 'version = "${version}"'),
@@ -402,7 +403,7 @@ def add_bumpversion_toml(
             package_name=package_name, python_package_name=python_package_name
         )
     ) is not None:
-        files = get_set_aot(bumpversion, "files")
+        files = ensure_aot(bumpversion, "files")
         ensure_aot_contains(
             files,
             _add_bumpversion_toml_file(
@@ -450,17 +451,17 @@ def add_ci_pull_request_yaml(
     path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
     with yield_yaml_dict(path, modifications=modifications) as dict_:
         dict_["name"] = "pull-request"
-        on = get_set_dict(dict_, "on")
-        pull_request = get_set_dict(on, "pull_request")
-        branches = get_set_list(pull_request, "branches")
+        on = ensure_dict(dict_, "on")
+        pull_request = ensure_dict(on, "pull_request")
+        branches = ensure_list(pull_request, "branches")
         ensure_contains(branches, "master")
-        schedule = get_set_list(on, "schedule")
+        schedule = ensure_list(on, "schedule")
         ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
-        jobs = get_set_dict(dict_, "jobs")
+        jobs = ensure_dict(dict_, "jobs")
         if pre_commit:
-            pre_commit_dict = get_set_dict(jobs, "pre-commit")
+            pre_commit_dict = ensure_dict(jobs, "pre-commit")
             pre_commit_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(pre_commit_dict, "steps")
+            steps = ensure_list(pre_commit_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("pre-commit"))
             ensure_contains(
@@ -474,9 +475,9 @@ def add_ci_pull_request_yaml(
                 ),
             )
         if pyright:
-            pyright_dict = get_set_dict(jobs, "pyright")
+            pyright_dict = ensure_dict(jobs, "pyright")
             pyright_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(pyright_dict, "steps")
+            steps = ensure_list(pyright_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("pyright"))
             ensure_contains(
@@ -490,14 +491,14 @@ def add_ci_pull_request_yaml(
                 ),
             )
         if pytest__macos or pytest__ubuntu or pytest__windows:
-            pytest_dict = get_set_dict(jobs, "pytest")
-            env = get_set_dict(pytest_dict, "env")
+            pytest_dict = ensure_dict(jobs, "pytest")
+            env = ensure_dict(pytest_dict, "env")
             env["CI"] = "1"
             pytest_dict["name"] = (
                 "pytest (${{matrix.os}}, ${{matrix.python-version}}, ${{matrix.resolution}})"
             )
             pytest_dict["runs-on"] = "${{matrix.os}}"
-            steps = get_set_list(pytest_dict, "steps")
+            steps = ensure_list(pytest_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("pytest"))
             ensure_contains(
@@ -512,31 +513,31 @@ def add_ci_pull_request_yaml(
                     with_requirements=script,
                 ),
             )
-            strategy_dict = get_set_dict(pytest_dict, "strategy")
+            strategy_dict = ensure_dict(pytest_dict, "strategy")
             strategy_dict["fail-fast"] = False
-            matrix = get_set_dict(strategy_dict, "matrix")
-            os = get_set_list(matrix, "os")
+            matrix = ensure_dict(strategy_dict, "matrix")
+            os = ensure_list(matrix, "os")
             if pytest__macos:
                 ensure_contains(os, "macos-latest")
             if pytest__ubuntu:
                 ensure_contains(os, "ubuntu-latest")
             if pytest__windows:
                 ensure_contains(os, "windows-latest")
-            python_version_dict = get_set_list(matrix, "python-version")
+            python_version_dict = ensure_list(matrix, "python-version")
             if pytest__all_versions:
                 ensure_contains(
                     python_version_dict, *yield_python_versions(python_version)
                 )
             else:
                 ensure_contains(python_version_dict, python_version)
-            resolution = get_set_list(matrix, "resolution")
+            resolution = ensure_list(matrix, "resolution")
             ensure_contains(resolution, "highest", "lowest-direct")
             if pytest__timeout is not None:
                 pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
         if ruff:
-            ruff_dict = get_set_dict(jobs, "ruff")
+            ruff_dict = ensure_dict(jobs, "ruff")
             ruff_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(ruff_dict, "steps")
+            steps = ensure_list(ruff_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("steps"))
             ensure_contains(
@@ -581,11 +582,11 @@ def add_ci_push_yaml(
     path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
     with yield_yaml_dict(path, modifications=modifications) as dict_:
         dict_["name"] = "push"
-        on = get_set_dict(dict_, "on")
-        push = get_set_dict(on, "push")
-        branches = get_set_list(push, "branches")
+        on = ensure_dict(dict_, "on")
+        push = ensure_dict(on, "push")
+        branches = ensure_list(push, "branches")
         ensure_contains(branches, "master")
-        jobs = get_set_dict(dict_, "jobs")
+        jobs = ensure_dict(dict_, "jobs")
         if publish__github:
             _add_ci_push_yaml_publish_dict(
                 jobs,
@@ -619,9 +620,9 @@ def add_ci_push_yaml(
                 uv__native_tls=uv__native_tls,
             )
         if tag:
-            tag_dict = get_set_dict(jobs, "tag")
+            tag_dict = ensure_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(tag_dict, "steps")
+            steps = ensure_list(tag_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("tag"))
             ensure_contains(
@@ -647,14 +648,14 @@ def _add_ci_push_yaml_publish_dict(
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     publish_name = f"publish-{name}"
-    publish_dict = get_set_dict(jobs, publish_name)
+    publish_dict = ensure_dict(jobs, publish_name)
     if github:
-        environment = get_set_dict(publish_dict, "environment")
+        environment = ensure_dict(publish_dict, "environment")
         environment["name"] = "pypi"
-        permissions = get_set_dict(publish_dict, "permissions")
+        permissions = ensure_dict(publish_dict, "permissions")
         permissions["id-token"] = "write"
     publish_dict["runs-on"] = "ubuntu-latest"
-    steps = get_set_list(publish_dict, "steps")
+    steps = ensure_list(publish_dict, "steps")
     if certificates:
         ensure_contains(steps, update_ca_certificates_dict(publish_name))
     ensure_contains(
@@ -675,15 +676,15 @@ def _add_ci_push_yaml_publish_dict(
 
 def add_coveragerc_toml(*, modifications: MutableSet[Path] | None = None) -> None:
     with yield_toml_doc(COVERAGERC_TOML, modifications=modifications) as doc:
-        html = get_set_table(doc, "html")
+        html = ensure_table(doc, "html")
         html["directory"] = ".coverage/html"
-        report = get_set_table(doc, "report")
-        exclude_also = get_set_array(report, "exclude_also")
+        report = ensure_table(doc, "report")
+        exclude_also = ensure_array(report, "exclude_also")
         ensure_contains(exclude_also, "@overload", "if TYPE_CHECKING:")
         report["fail_under"] = 100.0
         report["skip_covered"] = True
         report["skip_empty"] = True
-        run = get_set_table(doc, "run")
+        run = ensure_table(doc, "run")
         run["branch"] = True
         run["data_file"] = ".coverage/data"
         run["parallel"] = True
@@ -895,11 +896,11 @@ def _add_pre_commit_config_repo(
     types_or: list[str] | None = None,
     args: tuple[Literal["add", "exact"], list[str]] | None = None,
 ) -> None:
-    repos_list = get_set_list(pre_commit_dict, "repos")
+    repos_list = ensure_list(pre_commit_dict, "repos")
     repo_dict = ensure_contains_partial_dict(
         repos_list, {"repo": url}, extra={} if url == "local" else {"rev": "master"}
     )
-    hooks_list = get_set_list(repo_dict, "hooks")
+    hooks_list = ensure_list(repo_dict, "hooks")
     hook_dict = ensure_contains_partial_dict(hooks_list, {"id": id_})
     if name is not None:
         hook_dict["name"] = name
@@ -914,7 +915,7 @@ def _add_pre_commit_config_repo(
     if args is not None:
         match args:
             case "add", list() as args_i:
-                hook_args = get_set_list(hook_dict, "args")
+                hook_args = ensure_list(hook_dict, "args")
                 ensure_contains(hook_args, *args_i)
             case "exact", list() as args_i:
                 hook_dict["args"] = args_i
@@ -936,11 +937,11 @@ def add_pyproject_toml(
     python_package_name: str | None = SETTINGS.python_package_name,
     uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
 ) -> None:
-    with yield_toml_doc(PYPROJECT_TOML, modifications=modifications) as doc:
-        build_system = get_set_table(doc, "build-system")
+    with yield_pyproject_toml(modifications=modifications) as doc:
+        build_system = ensure_table(doc, "build-system")
         build_system["build-backend"] = "uv_build"
         build_system["requires"] = ["uv_build"]
-        project = get_set_table(doc, "project")
+        project = ensure_table(doc, "project")
         project["requires-python"] = f">= {python_version}"
         if description is not None:
             project["description"] = description
@@ -949,27 +950,27 @@ def add_pyproject_toml(
         if readme:
             project["readme"] = "README.md"
         project.setdefault("version", "0.1.0")
-        dependency_groups = get_set_table(doc, "dependency-groups")
-        dev = get_set_array(dependency_groups, "dev")
+        dependency_groups = ensure_table(doc, "dependency-groups")
+        dev = ensure_array(dependency_groups, "dev")
         _ = ensure_contains_partial_str(dev, "dycw-utilities[test]")
         _ = ensure_contains_partial_str(dev, "pyright")
         _ = ensure_contains_partial_str(dev, "rich")
         if optional_dependencies__scripts:
-            optional_dependencies = get_set_table(project, "optional-dependencies")
-            scripts = get_set_array(optional_dependencies, "scripts")
+            optional_dependencies = ensure_table(project, "optional-dependencies")
+            scripts = ensure_array(optional_dependencies, "scripts")
             _ = ensure_contains_partial_str(scripts, "click")
         if python_package_name is not None:
-            tool = get_set_table(doc, "tool")
-            uv = get_set_table(tool, "uv")
-            build_backend = get_set_table(uv, "build-backend")
+            tool = ensure_table(doc, "tool")
+            uv = ensure_table(tool, "uv")
+            build_backend = ensure_table(uv, "build-backend")
             build_backend["module-name"] = get_python_package_name(
                 package_name=package_name, python_package_name=python_package_name
             )
             build_backend["module-root"] = "src"
         if len(uv__indexes) >= 1:
-            tool = get_set_table(doc, "tool")
-            uv = get_set_table(tool, "uv")
-            indexes = get_set_aot(uv, "index")
+            tool = ensure_table(doc, "tool")
+            uv = ensure_table(tool, "uv")
+            indexes = ensure_aot(uv, "index")
             for name, url in uv__indexes:
                 index = table()
                 index["explicit"] = True
@@ -990,7 +991,7 @@ def add_pyrightconfig_json(
     with yield_json_dict(PYRIGHTCONFIG_JSON, modifications=modifications) as dict_:
         dict_["deprecateTypingAliases"] = True
         dict_["enableReachabilityAnalysis"] = False
-        include = get_set_list(dict_, "include")
+        include = ensure_list(dict_, "include")
         ensure_contains(include, "src" if script is None else script)
         dict_["pythonVersion"] = python_version
         dict_["reportCallInDefaultInitializer"] = True
@@ -1031,8 +1032,8 @@ def add_pytest_toml(
     script: str | None = SETTINGS.script,
 ) -> None:
     with yield_toml_doc(PYTEST_TOML, modifications=modifications) as doc:
-        pytest = get_set_table(doc, "pytest")
-        addopts = get_set_array(pytest, "addopts")
+        pytest = ensure_table(doc, "pytest")
+        addopts = ensure_array(pytest, "addopts")
         ensure_contains(
             addopts,
             "-ra",
@@ -1057,18 +1058,18 @@ def add_pytest_toml(
             )
         pytest["collect_imported_tests"] = False
         pytest["empty_parameter_set_mark"] = "fail_at_collect"
-        filterwarnings = get_set_array(pytest, "filterwarnings")
+        filterwarnings = ensure_array(pytest, "filterwarnings")
         ensure_contains(filterwarnings, "error")
         pytest["minversion"] = "9.0"
         pytest["strict"] = True
-        testpaths = get_set_array(pytest, "testpaths")
+        testpaths = ensure_array(pytest, "testpaths")
         ensure_contains(testpaths, "src/tests" if script is None else "tests")
         pytest["xfail_strict"] = True
         if asyncio:
             pytest["asyncio_default_fixture_loop_scope"] = "function"
             pytest["asyncio_mode"] = "auto"
         if ignore_warnings:
-            filterwarnings = get_set_array(pytest, "filterwarnings")
+            filterwarnings = ensure_array(pytest, "filterwarnings")
             ensure_contains(
                 filterwarnings,
                 "ignore::DeprecationWarning",
@@ -1110,14 +1111,14 @@ def add_ruff_toml(
     with yield_toml_doc(RUFF_TOML, modifications=modifications) as doc:
         doc["target-version"] = f"py{python_version.replace('.', '')}"
         doc["unsafe-fixes"] = True
-        fmt = get_set_table(doc, "format")
+        fmt = ensure_table(doc, "format")
         fmt["preview"] = True
         fmt["skip-magic-trailing-comma"] = True
-        lint = get_set_table(doc, "lint")
+        lint = ensure_table(doc, "lint")
         lint["explicit-preview-rules"] = True
-        fixable = get_set_array(lint, "fixable")
+        fixable = ensure_array(lint, "fixable")
         ensure_contains(fixable, "ALL")
-        ignore = get_set_array(lint, "ignore")
+        ignore = ensure_array(lint, "ignore")
         ensure_contains(
             ignore,
             "ANN401",  # any-type
@@ -1158,27 +1159,27 @@ def add_ruff_toml(
             "ISC002",  # multi-line-implicit-string-concatenation
         )
         lint["preview"] = True
-        select = get_set_array(lint, "select")
+        select = ensure_array(lint, "select")
         selected_rules = [
             "RUF022",  # unsorted-dunder-all
             "RUF029",  # unused-async
         ]
         ensure_contains(select, "ALL", *selected_rules)
-        extend_per_file_ignores = get_set_table(lint, "extend-per-file-ignores")
-        test_py = get_set_array(extend_per_file_ignores, "test_*.py")
+        extend_per_file_ignores = ensure_table(lint, "extend-per-file-ignores")
+        test_py = ensure_array(extend_per_file_ignores, "test_*.py")
         test_py_rules = [
             "S101",  # assert
             "SLF001",  # private-member-access
         ]
         ensure_contains(test_py, *test_py_rules)
         ensure_not_contains(ignore, *selected_rules, *test_py_rules)
-        bugbear = get_set_table(lint, "flake8-bugbear")
-        extend_immutable_calls = get_set_array(bugbear, "extend-immutable-calls")
+        bugbear = ensure_table(lint, "flake8-bugbear")
+        extend_immutable_calls = ensure_array(bugbear, "extend-immutable-calls")
         ensure_contains(extend_immutable_calls, "typing.cast")
-        tidy_imports = get_set_table(lint, "flake8-tidy-imports")
+        tidy_imports = ensure_table(lint, "flake8-tidy-imports")
         tidy_imports["ban-relative-imports"] = "all"
-        isort = get_set_table(lint, "isort")
-        req_imps = get_set_array(isort, "required-imports")
+        isort = ensure_table(lint, "isort")
+        req_imps = ensure_array(isort, "required-imports")
         ensure_contains(req_imps, "from __future__ import annotations")
         isort["split-on-trailing-comma"] = False
 
@@ -1232,8 +1233,8 @@ def get_version_from_bumpversion_toml(
 ) -> Version:
     match obj:
         case TOMLDocument() as doc:
-            tool = get_set_table(doc, "tool")
-            bumpversion = get_set_table(tool, "bumpversion")
+            tool = ensure_table(doc, "tool")
+            bumpversion = ensure_table(tool, "bumpversion")
             return parse_version(str(bumpversion["current_version"]))
         case str() as text:
             return get_version_from_bumpversion_toml(obj=tomlkit.parse(text))
@@ -1388,8 +1389,8 @@ def yield_bumpversion_toml(
     *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[TOMLDocument]:
     with yield_toml_doc(BUMPVERSION_TOML, modifications=modifications) as doc:
-        tool = get_set_table(doc, "tool")
-        bumpversion = get_set_table(tool, "bumpversion")
+        tool = ensure_table(doc, "tool")
+        bumpversion = ensure_table(tool, "bumpversion")
         bumpversion["allow_dirty"] = True
         bumpversion.setdefault("current_version", str(Version(0, 1, 0)))
         yield doc

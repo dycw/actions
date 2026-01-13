@@ -11,6 +11,7 @@ from utilities.text import repr_str
 from utilities.throttle import throttle
 
 from actions import __version__
+from actions.constants import PYPROJECT_TOML
 from actions.logging import LOGGER
 from actions.pre_commit.constants import THROTTLE_DELTA
 from actions.pre_commit.utilities import path_throttle_cache
@@ -47,7 +48,7 @@ def _format_path(
     if not path.is_file():
         msg = f"Expected a file; {str(path)!r} is not"
         raise FileNotFoundError(msg)
-    if path.name != "pyproject.toml":
+    if path.name != PYPROJECT_TOML.name:
         msg = f"Expected 'pyproject.toml'; got {str(path)!r}"
         raise TypeError(msg)
     src = path.parent / "src"

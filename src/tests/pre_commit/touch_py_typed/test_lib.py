@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from actions.constants import PYPROJECT_TOML
 from actions.pre_commit.touch_py_typed.lib import _format_path
 
 if TYPE_CHECKING:
@@ -10,7 +11,7 @@ if TYPE_CHECKING:
 
 class TestFormatPath:
     def test_main(self, *, tmp_path: Path) -> None:
-        pyproject = tmp_path / "pyproject.toml"
+        pyproject = tmp_path / PYPROJECT_TOML.name
         pyproject.touch()
         src = tmp_path / "src"
         src.mkdir()
