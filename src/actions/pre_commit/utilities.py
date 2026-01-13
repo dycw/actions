@@ -5,7 +5,7 @@ from collections.abc import Iterator, MutableSet
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, assert_never
+from typing import TYPE_CHECKING, Any, assert_never, overload
 
 import tomlkit
 from libcst import Module, parse_module
@@ -27,29 +27,26 @@ if TYPE_CHECKING:
 
     from utilities.types import PathLike, StrDict
 
-    from actions.types import FuncRequirement, HasAppend, HasSetDefault
+    from actions.types import ArrayLike, FuncRequirement, HasSetDefault
 
 
 ##
 
 
-def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
-    for table_ in tables:
-        if table_ not in array:
-            array.append(table_)
-
-
-def ensure_contains(array: HasAppend, /, *objs: Any) -> None:
-    if isinstance(array, AoT):
-        msg = f"Use {ensure_aot_contains.__name__!r} instead of {ensure_contains.__name__!r}"
-        raise TypeError(msg)
+@overload
+def ensure_contains(container: AoT, /, *objs: Table) -> None: ...
+@overload
+def ensure_contains(container: list[str], /, *objs: str) -> None: ...
+@overload
+def ensure_contains(container: list[StrDict], /, *objs: StrDict) -> None: ...
+def ensure_contains(container: ArrayLike, /, *objs: Any) -> None:
     for obj in objs:
-        if obj not in array:
-            array.append(obj)
+        if obj not in container:
+            container.append(obj)
 
 
 def ensure_contains_partial_dict(
-    container: HasAppend, partial: StrDict, /, *, extra: StrDict | None = None
+    container: list[StrDict], partial: StrDict, /, *, extra: StrDict | None = None
 ) -> StrDict:
     try:
         return get_partial_dict(container, partial, skip_log=True)
@@ -59,22 +56,28 @@ def ensure_contains_partial_dict(
         return dict_
 
 
-def ensure_contains_partial_str(container: HasAppend, text: str, /) -> str:
+def ensure_contains_partial_str(list_: Array | list[str], text: str, /) -> str:
     try:
-        return get_partial_str(container, text, skip_log=True)
+        return get_partial_str(list_, text, skip_log=True)
     except OneEmptyError:
-        container.append(text)
+        list_.append(text)
         return text
 
 
-def ensure_not_contains(array: Array, /, *objs: Any) -> None:
+@overload
+def ensure_not_contains(container: AoT, /, *objs: Table) -> None: ...
+@overload
+def ensure_not_contains(container: list[str], /, *objs: str) -> None: ...
+@overload
+def ensure_not_contains(container: list[StrDict], /, *objs: StrDict) -> None: ...
+def ensure_not_contains(container: ArrayLike, /, *objs: Any) -> None:
     for obj in objs:
         try:
-            index = next(i for i, o in enumerate(array) if o == obj)
+            index = next(i for i, o in enumerate(container) if o == obj)
         except StopIteration:
             pass
         else:
-            del array[index]
+            del container[index]
 
 
 ##
@@ -169,7 +172,7 @@ def get_set_table(container: HasSetDefault, key: str, /) -> Table:
 
 
 def get_partial_dict(
-    iterable: Iterable[Any], dict_: StrDict, /, *, skip_log: bool = False
+    iterable: Iterable[StrDict], dict_: StrDict, /, *, skip_log: bool = False
 ) -> StrDict:
     try:
         return one(i for i in iterable if is_partial_dict(dict_, i))
@@ -452,7 +455,6 @@ def yield_yaml_dict(
 __all__ = [
     "PyProjectDependencies",
     "WriteContext",
-    "ensure_aot_contains",
     "ensure_contains",
     "ensure_contains_partial_dict",
     "ensure_contains_partial_str",

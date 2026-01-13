@@ -75,7 +75,6 @@ from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
 from actions.pre_commit.update_requirements.constants import UPDATE_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.utilities import (
-    ensure_aot_contains,
     ensure_contains,
     ensure_contains_partial_dict,
     ensure_contains_partial_str,
@@ -394,7 +393,7 @@ def add_bumpversion_toml(
         bumpversion = get_set_table(tool, "bumpversion")
         if pyproject:
             files = get_set_aot(bumpversion, "files")
-            ensure_aot_contains(
+            ensure_contains(
                 files,
                 _add_bumpversion_toml_file(PYPROJECT_TOML, 'version = "${version}"'),
             )
@@ -404,7 +403,7 @@ def add_bumpversion_toml(
         )
     ) is not None:
         files = get_set_aot(bumpversion, "files")
-        ensure_aot_contains(
+        ensure_contains(
             files,
             _add_bumpversion_toml_file(
                 f"src/{python_package_name_use}/__init__.py",
@@ -516,21 +515,21 @@ def add_ci_pull_request_yaml(
             strategy_dict = get_set_dict(pytest_dict, "strategy")
             strategy_dict["fail-fast"] = False
             matrix = get_set_dict(strategy_dict, "matrix")
-            os = get_set_list_dicts(matrix, "os")
+            os = get_set_list_strs(matrix, "os")
             if pytest__macos:
                 ensure_contains(os, "macos-latest")
             if pytest__ubuntu:
                 ensure_contains(os, "ubuntu-latest")
             if pytest__windows:
                 ensure_contains(os, "windows-latest")
-            python_version_dict = get_set_list_dicts(matrix, "python-version")
+            python_version_dict = get_set_list_strs(matrix, "python-version")
             if pytest__all_versions:
                 ensure_contains(
                     python_version_dict, *yield_python_versions(python_version)
                 )
             else:
                 ensure_contains(python_version_dict, python_version)
-            resolution = get_set_list_dicts(matrix, "resolution")
+            resolution = get_set_list_strs(matrix, "resolution")
             ensure_contains(resolution, "highest", "lowest-direct")
             if pytest__timeout is not None:
                 pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
@@ -985,7 +984,7 @@ def add_pyproject_toml(
                 index["explicit"] = True
                 index["name"] = name
                 index["url"] = url
-                ensure_aot_contains(indexes, index)
+                ensure_contains(indexes, index)
 
 
 ##
