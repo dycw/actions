@@ -1,13 +1,11 @@
+# ruff: noqa: TC003
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
 from actions.utilities import LOADER
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 @settings
