@@ -248,8 +248,8 @@ def conformalize_repo(
         shell=pre_commit__shell,
         taplo=pre_commit__taplo,
         uv=pre_commit__uv,
-        uv__indexes=uv__indexes,
         script=script,
+        uv__indexes=uv__indexes,
     )
     if (
         ci__pull_request__pre_commit
@@ -786,8 +786,8 @@ def add_pre_commit_config_yaml(
     shell: bool = SETTINGS.pre_commit__shell,
     taplo: bool = SETTINGS.pre_commit__taplo,
     uv: bool = SETTINGS.pre_commit__uv,
-    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
     script: str | None = SETTINGS.script,
+    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
 ) -> None:
     with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
         _add_pre_commit_config_repo(dict_, ACTIONS_URL, CONFORMALIZE_REPO_SUB_CMD)
