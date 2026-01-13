@@ -251,16 +251,14 @@ def conformalize_repo(
         uv=pre_commit__uv,
         script=script,
         uv__indexes=uv__indexes,
+        uv__native_tls=uv__native_tls,
     )
     if (
         ci__pull_request__pre_commit
-        or ci__pull_request__pre_commit__submodules
         or ci__pull_request__pyright
         or ci__pull_request__pytest__macos
         or ci__pull_request__pytest__ubuntu
         or ci__pull_request__pytest__windows
-        or ci__pull_request__pytest__all_versions
-        or (ci__pull_request__pytest__sops_age_key is not None)
         or ci__pull_request__ruff
     ):
         add_ci_pull_request_yaml(
@@ -282,6 +280,7 @@ def conformalize_repo(
             script=script,
             token_checkout=ci__token_checkout,
             token_github=ci__token_github,
+            uv__indexes=uv__indexes,
             uv__native_tls=uv__native_tls,
         )
     if (
@@ -789,6 +788,7 @@ def add_pre_commit_config_yaml(
     uv: bool = SETTINGS.pre_commit__uv,
     script: str | None = SETTINGS.script,
     uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
+    uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
         _add_pre_commit_config_repo(dict_, ACTIONS_URL, CONFORMALIZE_REPO_SUB_CMD)
@@ -836,13 +836,16 @@ def add_pre_commit_config_yaml(
             )
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD)
+            args: list[str] = []
+            if len(uv__indexes) >= 1:
+                args.extend(["--index", ",".join(v for _, v in uv__indexes)])
+            if uv__native_tls:
+                args.append("--native-tls")
             _add_pre_commit_config_repo(
                 dict_,
                 ACTIONS_URL,
                 UPDATE_REQUIREMENTS_SUB_CMD,
-                args=("add", ["--index", ",".join(v for _, v in uv__indexes)])
-                if len(uv__indexes) >= 1
-                else None,
+                args=("add", args) if len(args) >= 1 else None,
             )
         if ruff:
             _add_pre_commit_config_repo(
@@ -870,16 +873,21 @@ def add_pre_commit_config_yaml(
                 ),
             )
         if uv:
+            args: list[str] = [
+                "--upgrade",
+                "--resolution",
+                "highest",
+                "--prerelease",
+                "disallow",
+            ]
+            if script is not None:
+                args.extend(["--script", script])
             _add_pre_commit_config_repo(
                 dict_,
                 UV_URL,
                 "uv-lock",
                 files=None if script is None else rf"^{escape(script)}$",
-                args=(
-                    "add",
-                    ["--upgrade", "--resolution", "highest", "--prerelease", "disallow"]
-                    + ([] if script is None else [f"--script={script}"]),
-                ),
+                args=("add", args),
             )
 
 
