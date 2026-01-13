@@ -31,6 +31,7 @@ from actions.constants import (
     ENVRC,
     GITEA_PULL_REQUEST_YAML,
     GITEA_PUSH_YAML,
+    GITHUB,
     GITHUB_PULL_REQUEST_YAML,
     GITHUB_PUSH_YAML,
     GITIGNORE,
@@ -1368,7 +1369,7 @@ def update_action_file_extensions(
 
 def update_action_versions(*, modifications: MutableSet[Path] | None = None) -> None:
     try:
-        paths = list(Path(".github").rglob("**/*.yaml"))
+        paths = list(GITHUB.rglob("**/*.yaml"))
     except FileNotFoundError:
         return
     versions = {
