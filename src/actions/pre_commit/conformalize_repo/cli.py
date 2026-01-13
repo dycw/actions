@@ -57,7 +57,6 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         pre_commit__uv=settings.pre_commit__uv,
         pyproject=settings.pyproject,
         pyproject__project__optional_dependencies__scripts=settings.pyproject__project__optional_dependencies__scripts,
-        pyproject__tool__uv__indexes=settings.pyproject__tool__uv__indexes,
         pyright=settings.pyright,
         pytest=settings.pytest,
         pytest__asyncio=settings.pytest__asyncio,
@@ -70,6 +69,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         ruff=settings.ruff,
         run_version_bump=settings.run_version_bump,
         script=settings.script,
+        uv__indexes=settings.uv__indexes,
         uv__native_tls=settings.uv__native_tls,
     )
 

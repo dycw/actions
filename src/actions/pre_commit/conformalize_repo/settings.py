@@ -115,9 +115,6 @@ class Settings:
         default=False,
         help="Set up 'pyproject.toml' [project.optional-dependencies.scripts]",
     )
-    pyproject__tool__uv__indexes: list[tuple[str, str]] = option(
-        factory=list, help="Set up 'pyproject.toml' [[uv.tool.index]]"
-    )
     pyright: bool = option(default=False, help="Set up 'pyrightconfig.json'")
     pytest: bool = option(default=False, help="Set up 'pytest.toml'")
     pytest__asyncio: bool = option(default=False, help="Set up 'pytest.toml' asyncio_*")
@@ -135,6 +132,9 @@ class Settings:
     repo_name: str | None = option(default=None, help="Repo name")
     ruff: bool = option(default=False, help="Set up 'ruff.toml'")
     run_version_bump: bool = option(default=RUN_VERSION_BUMP, help="Run version bump")
+    uv__indexes: list[tuple[str, str]] = option(
+        factory=list, help="Set up 'uv' with index indexes"
+    )
     uv__native_tls: bool = option(default=False, help="Setup 'uv' with native TLS")
     script: str | None = option(
         default=None, help="Set up a script instead of a package"

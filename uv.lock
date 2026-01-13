@@ -197,7 +197,7 @@ wheels = [
 
 [[package]]
 name = "dycw-actions"
-version = "0.11.5"
+version = "0.12.0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -227,7 +227,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3.1,<9" },
-    { name = "dycw-utilities", specifier = ">=0.179.3,<1" },
+    { name = "dycw-utilities", specifier = ">=0.179.4,<1" },
     { name = "inflect", specifier = ">=7.5.0,<8" },
     { name = "libcst", specifier = ">=1.8.6,<2" },
     { name = "packaging", specifier = ">=25.0,<26" },
@@ -244,7 +244,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.179.3,<1" },
+    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.179.4,<1" },
     { name = "orjson", specifier = ">=3.11.5,<4" },
     { name = "pyright", specifier = ">=1.1.408,<2" },
     { name = "rich", specifier = ">=14.2.0,<15" },
@@ -264,7 +264,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.179.3"
+version = "0.179.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -273,7 +273,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/7b/0049ff95bf72851e7ebdcc96038811ece07aa8abd7a4cf367a7648230c0e/dycw_utilities-0.179.3-py3-none-any.whl", hash = "sha256:c15ae6f231a614c4ae37008b7b59f6ff7a8381793e49cc37daae551f91d9de2f", size = 208557, upload-time = "2026-01-12T03:26:35.577Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/55/7e0b5de65af908e5c619a15ed4d55d2d44cb7be65b44a3949ea2ed724701/dycw_utilities-0.179.4-py3-none-any.whl", hash = "sha256:a53e07a0094dd2de1596223662c3ab56617ea5d96483b3dd4695611740b9dd71", size = 208575, upload-time = "2026-01-13T04:07:34.667Z" },
 ]
 
 [package.optional-dependencies]
