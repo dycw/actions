@@ -36,12 +36,10 @@ class TestFormatPath:
               dependencies = ["{input_}"]
         """)
         _ = path.write_text(full_input)
-        expected = strip_and_dedent(
-            f"""
-                [project]
-                  dependencies = ["{output}"]
-            """
-        )
+        expected = strip_and_dedent(f"""
+            [project]
+              dependencies = ["{output}"]
+        """)
         changed = input_ != output
         for i in range(2):
             modifications: set[Path] = set()
