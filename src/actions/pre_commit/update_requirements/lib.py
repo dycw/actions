@@ -75,18 +75,23 @@ def _format_path(
 
 
 def _get_versions(*, indexes: list[str] | None = SETTINGS.indexes) -> VersionSet:
-    all_indexes = [*_yield_indexes(), *(() if indexes is None else indexes)]
-    if len(all_indexes) >= 1:
-        with temp_environ(UV_INDEX=",".join(all_indexes)):
-            return _get_versions()
-    json1 = logged_run(
-        "uv", "pip", "list", "--format", "json", "--strict", return_=True
-    )
+    all_ = [*_yield_indexes(), *(() if indexes is None else indexes)]
+    with temp_environ(UV_INDEX=",".join(all_) if len(all_) >= 1 else None):
+        json1 = logged_run(
+            "uv", "pip", "list", "--format", "json", "--strict", return_=True
+        )
+        json2 = logged_run(
+            "uv",
+            "pip",
+            "list",
+            "--format",
+            "json",
+            "--outdated",
+            "--strict",
+            return_=True,
+        )
     models1 = TypeAdapter(list[PipListOutput]).validate_json(json1)
     versions1 = {p.name: parse_version2_or_3(p.version) for p in models1}
-    json2 = logged_run(
-        "uv", "pip", "list", "--format", "json", "--outdated", "--strict", return_=True
-    )
     models2 = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json2)
     versions2 = {p.name: parse_version2_or_3(p.latest_version) for p in models2}
     out: StrDict = {}
