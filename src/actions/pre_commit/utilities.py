@@ -94,12 +94,8 @@ def get_dict(container: HasSetDefault, key: str, /) -> StrDict:
     raise TypeError(value)
 
 
-def get_list(container: HasSetDefault, key: str, /) -> list[Any]:
-    return ensure_class(container[key], list)
-
-
-def get_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
-    list_ = get_list(container, key)
+def get_list(container: HasSetDefault, key: str, /) -> list[StrDict]:
+    list_ = ensure_class(container[key], list)
     for i in list_:
         if not is_str_dict(i):
             raise TypeError(i)
@@ -137,17 +133,9 @@ def get_set_dict(container: HasSetDefault, key: str, /) -> StrDict:
         return value
 
 
-def get_set_list(container: HasSetDefault, key: str, /) -> list[Any]:
+def get_set_list(container: HasSetDefault, key: str, /) -> list[StrDict]:
     try:
         return get_list(container, key)
-    except KeyError:
-        value = container[key] = []
-        return value
-
-
-def get_set_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
-    try:
-        return get_list_dicts(container, key)
     except KeyError:
         value = container[key] = []
         return value
@@ -457,7 +445,7 @@ __all__ = [
     "get_array",
     "get_dict",
     "get_list",
-    "get_list_dicts",
+    "get_list",
     "get_partial_dict",
     "get_partial_str",
     "get_pyproject_dependencies",
@@ -465,7 +453,7 @@ __all__ = [
     "get_set_array",
     "get_set_dict",
     "get_set_list",
-    "get_set_list_dicts",
+    "get_set_list",
     "get_set_table",
     "get_table",
     "is_partial_dict",
