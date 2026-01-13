@@ -23,11 +23,11 @@ from actions.logging import LOGGER
 from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
+    from collections.abc import Callable, Iterable, Iterator, MutableSet
 
     from utilities.types import PathLike, StrDict
 
-    from actions.types import FuncRequirement, HasAppend, HasSetDefault
+    from actions.types import FuncRequirement, HasSetDefault
 
 
 ##
@@ -43,7 +43,7 @@ def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
 def ensure_contains(array: list[str], /, *objs: str) -> None: ...
 @overload
 def ensure_contains(array: list[StrDict], /, *objs: StrDict) -> None: ...
-def ensure_contains(array: HasAppend, /, *objs: Any) -> None:
+def ensure_contains(array: list[Any], /, *objs: Any) -> None:
     if isinstance(array, AoT):
         msg = f"Use {ensure_aot_contains.__name__!r} instead of {ensure_contains.__name__!r}"
         raise TypeError(msg)
@@ -63,7 +63,7 @@ def ensure_contains_partial_dict(
         return dict_
 
 
-def ensure_contains_partial_str(list_: HasAppend, text: str, /) -> str:
+def ensure_contains_partial_str(list_: Array | list[str], text: str, /) -> str:
     try:
         return get_partial_str(list_, text, skip_log=True)
     except OneEmptyError:

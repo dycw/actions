@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from hypothesis import given
-from hypothesis.strategies import booleans, integers, just, none, sampled_from
+from hypothesis.strategies import booleans, integers, none, sampled_from
 from pytest import mark, param, raises
 from typed_settings import Secret
 from utilities.hypothesis import temp_paths, text_ascii
@@ -82,7 +82,7 @@ class TestAddCIPullRequestYaml:
         pytest__all_versions=booleans(),
         pytest__sops_age_key=text_ascii().map(Secret) | none(),
         pytest__timeout=integers() | none(),
-        python_version=just("3.1") | none(),
+        python_version=sampled_from([f"3.{i}" for i in range(1, 11)]),
         repo_name=text_ascii() | none(),
         ruff=booleans(),
         script=text_ascii() | none(),
