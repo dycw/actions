@@ -29,6 +29,9 @@ if TYPE_CHECKING:
     from actions.types import FuncRequirement, HasAppend, HasSetDefault
 
 
+##
+
+
 def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
     for table_ in tables:
         if table_ not in array:
@@ -77,22 +80,45 @@ def ensure_not_contains(array: Array, /, *objs: Any) -> None:
 
 
 def get_aot(container: HasSetDefault, key: str, /) -> AoT:
-    return ensure_class(container.setdefault(key, aot()), AoT)
+    return ensure_class(container[key], AoT)
 
 
 def get_array(container: HasSetDefault, key: str, /) -> Array:
-    return ensure_class(container.setdefault(key, array()), Array)
+    return ensure_class(container[key], Array)
 
 
 def get_dict(container: HasSetDefault, key: str, /) -> StrDict:
-    return ensure_class(container.setdefault(key, {}), dict)
+    return ensure_class(container[key], dict)
 
 
 def get_list(container: HasSetDefault, key: str, /) -> list[Any]:
-    return ensure_class(container.setdefault(key, []), list)
+    return ensure_class(container[key], list)
 
 
 def get_table(container: HasSetDefault, key: str, /) -> Table:
+    return ensure_class(container[key], Table)
+
+
+##
+
+
+def get_set_aot(container: HasSetDefault, key: str, /) -> AoT:
+    return ensure_class(container.setdefault(key, aot()), AoT)
+
+
+def get_set_array(container: HasSetDefault, key: str, /) -> Array:
+    return ensure_class(container.setdefault(key, array()), Array)
+
+
+def get_set_dict(container: HasSetDefault, key: str, /) -> StrDict:
+    return ensure_class(container.setdefault(key, {}), dict)
+
+
+def get_set_list(container: HasSetDefault, key: str, /) -> list[Any]:
+    return ensure_class(container.setdefault(key, []), list)
+
+
+def get_set_table(container: HasSetDefault, key: str, /) -> Table:
     return ensure_class(container.setdefault(key, table()), Table)
 
 
@@ -177,19 +203,21 @@ def is_partial_str(obj: Any, text: str, /) -> bool:
 def get_pyproject_dependencies(doc: TOMLDocument, /) -> PyProjectDependencies:
     out = PyProjectDependencies()
     if (project_key := "project") in doc:
-        project = get_table(doc, project_key)
+        project = get_set_table(doc, project_key)
         if (dep_key := "dependencies") in project:
-            out.dependencies = get_array(project, dep_key)
+            out.dependencies = get_set_array(project, dep_key)
         if (opt_dep_key := "optional-dependencies") in project:
-            opt_dependencies = get_table(project, opt_dep_key)
+            opt_dependencies = get_set_table(project, opt_dep_key)
             out.opt_dependencies = {}
             for key in opt_dependencies:
-                out.opt_dependencies[ensure_str(key)] = get_array(opt_dependencies, key)
+                out.opt_dependencies[ensure_str(key)] = get_set_array(
+                    opt_dependencies, key
+                )
     if (dep_grps_key := "dependency-groups") in doc:
-        dep_grps = get_table(doc, dep_grps_key)
+        dep_grps = get_set_table(doc, dep_grps_key)
         out.dep_groups = {}
         for key in dep_grps:
-            out.dep_groups[ensure_str(key)] = get_array(dep_grps, key)
+            out.dep_groups[ensure_str(key)] = get_set_array(dep_grps, key)
     return out
 
 
@@ -382,6 +410,11 @@ __all__ = [
     "get_partial_dict",
     "get_partial_str",
     "get_pyproject_dependencies",
+    "get_set_aot",
+    "get_set_array",
+    "get_set_dict",
+    "get_set_list",
+    "get_set_table",
     "get_table",
     "is_partial_dict",
     "is_partial_str",
