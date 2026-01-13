@@ -12,7 +12,6 @@ from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
 from actions import __version__
-from actions.constants import PYPROJECT_TOML
 from actions.logging import LOGGER
 from actions.pre_commit.update_requirements.classes import (
     PipListOutdatedOutput,
@@ -102,7 +101,7 @@ def _yield_indexes() -> Iterator[str]:
             except KeyError:
                 return
             try:
-                uv = ensure_class(tool["uv"], Table)
+                ensure_class(tool["uv"], Table)
             except KeyError:
                 return
             yield "as"

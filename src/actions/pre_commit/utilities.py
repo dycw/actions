@@ -16,7 +16,6 @@ from utilities.functions import ensure_class, ensure_str, get_func_name
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.packaging import Requirement
 from utilities.types import PathLike, StrDict
-from utilities.typing import is_str_dict
 
 from actions.constants import PATH_CACHE, PYPROJECT_TOML, YAML_INSTANCE
 from actions.logging import LOGGER
