@@ -280,7 +280,6 @@ def conformalize_repo(
             script=script,
             token_checkout=ci__token_checkout,
             token_github=ci__token_github,
-            uv__indexes=uv__indexes,
             uv__native_tls=uv__native_tls,
         )
     if (
