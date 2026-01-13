@@ -14,6 +14,7 @@ from yaml import safe_load
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.pre_commit.utilities import get_list
 from actions.run_hooks.settings import SETTINGS
 from actions.utilities import logged_run
 
@@ -56,7 +57,7 @@ def _yield_hooks(
     hooks_exclude: list[str] | None = SETTINGS.hooks_exclude,
 ) -> Iterator[str]:
     dict_ = safe_load(Path(".pre-commit-config.yaml").read_text())
-    repos_list = ensure_class(dict_["repos"], list)
+    repos_list = get_list(dict_, "repos")
     results: set[str] = set()
     for repo in (ensure_class(r, dict) for r in repos_list):
         url = repo["repo"]
