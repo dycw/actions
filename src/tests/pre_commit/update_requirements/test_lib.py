@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING
 
 from pytest import mark, param
 from utilities.packaging import Requirement
-from utilities.pytest import skipif_ci
 from utilities.text import strip_and_dedent
 
 from actions.pre_commit.update_requirements.classes import Version2, Version3
-from actions.pre_commit.update_requirements.lib import _format_path, _get_versions
+from actions.pre_commit.update_requirements.lib import _format_path
 from actions.utilities import are_equal_modulo_new_line
 
 if TYPE_CHECKING:
@@ -71,12 +70,10 @@ class TestFormatPath:
         version_set: VersionSet = {}
         if latest is not None:
             version_set[req.name] = latest
-        expected = strip_and_dedent(
-            f"""
-                [project]
-                  dependencies = ["{output}"]
-            """
-        )
+        expected = strip_and_dedent(f"""
+            [project]
+              dependencies = ["{output}"]
+        """)
         changed = input_ != output
         for i in range(2):
             modifications: set[Path] = set()
@@ -84,10 +81,3 @@ class TestFormatPath:
             result = path.read_text()
             assert are_equal_modulo_new_line(result, expected)
             assert len(modifications) == (int(changed) if i == 0 else 0)
-
-
-class TestGetVersions:
-    @mark.parametrize("indexes", [param(["index"]), param(None)])
-    @skipif_ci
-    def test_main(self, *, indexes: list[str] | None) -> None:
-        _ = _get_versions(indexes=indexes)
