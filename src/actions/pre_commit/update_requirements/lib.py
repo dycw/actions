@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
 from utilities.functions import get_func_name, max_nullable
+from utilities.os import temp_environ
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
@@ -20,6 +21,7 @@ from actions.pre_commit.update_requirements.classes import (
     parse_version1_or_2,
     parse_version2_or_3,
 )
+from actions.pre_commit.update_requirements.settings import SETTINGS
 from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
 from actions.utilities import logged_run
 
@@ -33,11 +35,11 @@ if TYPE_CHECKING:
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
 
 
-def update_requirements(*paths: PathLike) -> None:
+def update_requirements(*paths: PathLike, index: str | None = SETTINGS.index) -> None:
     LOGGER.info(func_param_desc(update_requirements, __version__, f"{paths=}"))
     modifications: set[Path] = set()
     for path in paths:
-        _format_path(path, modifications=modifications)
+        _format_path(path, index=index, modifications=modifications)
     if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
@@ -52,16 +54,20 @@ def _format_path(
     /,
     *,
     versions: VersionSet | None = None,
+    index: str | None = SETTINGS.index,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
-    versions_use = _get_versions() if versions is None else versions
+    versions_use = _get_versions(index=index) if versions is None else versions
     with yield_toml_doc(path, modifications=modifications) as doc:
         get_pyproject_dependencies(doc).apply(
             partial(_format_req, versions=versions_use)
         )
 
 
-def _get_versions() -> VersionSet:
+def _get_versions(*, index: str | None = SETTINGS.index) -> VersionSet:
+    if index is not None:
+        with temp_environ(UV_INDEX=index):
+            return _get_versions()
     json1 = logged_run(
         "uv", "pip", "list", "--format", "json", "--strict", return_=True
     )
