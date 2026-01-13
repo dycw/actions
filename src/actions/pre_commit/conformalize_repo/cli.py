@@ -29,6 +29,7 @@ def conformalize_repo_sub_cmd(settings: Settings, /) -> None:
         ci__pull_request__pytest__all_versions=settings.ci__pull_request__pytest__all_versions,
         ci__pull_request__pytest__sops_age_key=settings.ci__pull_request__pytest__sops_age_key,
         ci__pull_request__ruff=settings.ci__pull_request__ruff,
+        ci__push__publish__github=settings.ci__push__publish__github,
         ci__push__publish__primary=settings.ci__push__publish__primary,
         ci__push__publish__primary__job_name=settings.ci__push__publish__primary__job_name,
         ci__push__publish__primary__username=settings.ci__push__publish__primary__username,

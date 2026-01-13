@@ -46,6 +46,9 @@ class Settings:
     ci__pull_request__ruff: bool = option(
         default=False, help="Set up CI 'pull-request.yaml' ruff"
     )
+    ci__push__publish__github: bool = option(
+        default=False, help="Set up CI 'push.yaml' publishing to GitHub"
+    )
     ci__push__publish__primary: bool = option(
         default=False, help="Set up CI 'push.yaml' publishing #1"
     )

@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/dycw/actions
-    rev: 0.10.12
+    rev: 0.11.2
     hooks:
       - id: conformalize-repo
         args:
@@ -10,7 +10,7 @@ repos:
           - --ci--pull-request--pytest--macos
           - --ci--pull-request--pytest--ubuntu
           - --ci--pull-request--ruff
-          - --ci--push--publish
+          - --ci--push--publish--primary
           - --ci--push--tag
           - --description=Library of actions
           - --envrc

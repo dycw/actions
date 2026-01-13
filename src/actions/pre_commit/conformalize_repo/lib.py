@@ -117,6 +117,7 @@ def conformalize_repo(
     ci__pull_request__pytest__sops_age_key: Secret[str]
     | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
     ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
+    ci__push__publish__github: bool = SETTINGS.ci__push__publish__github,
     ci__push__publish__primary: bool = SETTINGS.ci__push__publish__primary,
     ci__push__publish__primary__job_name: str = SETTINGS.ci__push__publish__primary__job_name,
     ci__push__publish__primary__username: str
@@ -184,6 +185,7 @@ def conformalize_repo(
             f"{ci__pull_request__pytest__all_versions=}",
             f"{ci__pull_request__pytest__sops_age_key=}",
             f"{ci__pull_request__ruff=}",
+            f"{ci__push__publish__github=}",
             f"{ci__push__publish__primary=}",
             f"{ci__push__publish__primary__job_name=}",
             f"{ci__push__publish__primary__username=}",
@@ -283,7 +285,8 @@ def conformalize_repo(
             uv__native_tls=uv__native_tls,
         )
     if (
-        ci__push__publish__primary
+        ci__push__publish__github
+        or ci__push__publish__primary
         or (ci__push__publish__primary__username is not None)
         or (ci__push__publish__primary__password is not None)
         or (ci__push__publish__primary__publish_url is not None)
@@ -298,6 +301,7 @@ def conformalize_repo(
             gitea=ci__gitea,
             modifications=modifications,
             certificates=ci__certificates,
+            publish__github=ci__push__publish__github,
             publish__primary=ci__push__publish__primary,
             publish__primary__job_name=ci__push__publish__primary__job_name,
             publish__primary__username=ci__push__publish__primary__username,
@@ -556,6 +560,7 @@ def add_ci_push_yaml(
     gitea: bool = SETTINGS.ci__gitea,
     modifications: MutableSet[Path] | None = None,
     certificates: bool = SETTINGS.ci__certificates,
+    publish__github: bool = SETTINGS.ci__push__publish__github,
     publish__primary: bool = SETTINGS.ci__push__publish__primary,
     publish__primary__job_name: str = SETTINGS.ci__push__publish__primary__job_name,
     publish__primary__username: str
@@ -586,11 +591,18 @@ def add_ci_push_yaml(
         branches = get_list(push, "branches")
         ensure_contains(branches, "master")
         jobs = get_dict(dict_, "jobs")
+        if publish__github:
+            _add_ci_push_yaml_publish_dict(
+                jobs,
+                "github",
+                github=True,
+                token_checkout=token_checkout,
+                token_github=token_github,
+            )
         if publish__primary:
             _add_ci_push_yaml_publish_dict(
                 jobs,
                 publish__primary__job_name,
-                gitea=gitea,
                 certificates=certificates,
                 token_checkout=token_checkout,
                 token_github=token_github,
@@ -603,7 +615,6 @@ def add_ci_push_yaml(
             _add_ci_push_yaml_publish_dict(
                 jobs,
                 publish__secondary__job_name,
-                gitea=gitea,
                 certificates=certificates,
                 token_checkout=token_checkout,
                 token_github=token_github,
@@ -628,10 +639,10 @@ def add_ci_push_yaml(
 
 def _add_ci_push_yaml_publish_dict(
     jobs: StrDict,
-    job_name: str,
+    name: str,
     /,
     *,
-    gitea: bool = SETTINGS.ci__gitea,
+    github: bool = False,
     certificates: bool = SETTINGS.ci__certificates,
     token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
     token_github: Secret[str] | None = SETTINGS.ci__token_github,
@@ -640,9 +651,9 @@ def _add_ci_push_yaml_publish_dict(
     publish_url: str | None = None,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
-    publish_name = f"publish-{job_name}"
+    publish_name = f"publish-{name}"
     publish_dict = get_dict(jobs, publish_name)
-    if not gitea:
+    if github:
         environment = get_dict(publish_dict, "environment")
         environment["name"] = "pypi"
         permissions = get_dict(publish_dict, "permissions")
