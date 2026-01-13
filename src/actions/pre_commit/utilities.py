@@ -16,6 +16,7 @@ from utilities.functions import ensure_class, ensure_str, get_func_name
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.packaging import Requirement
 from utilities.types import PathLike, StrDict
+from utilities.typing import is_str_dict
 
 from actions.constants import PATH_CACHE, YAML_INSTANCE
 from actions.logging import LOGGER
@@ -88,11 +89,21 @@ def get_array(container: HasSetDefault, key: str, /) -> Array:
 
 
 def get_dict(container: HasSetDefault, key: str, /) -> StrDict:
-    return ensure_class(container[key], dict)
+    if is_str_dict(value := container[key]):
+        return value
+    raise TypeError(value)
 
 
 def get_list(container: HasSetDefault, key: str, /) -> list[Any]:
     return ensure_class(container[key], list)
+
+
+def get_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
+    list_ = get_list(container, key)
+    for i in list_:
+        if not is_str_dict(i):
+            raise TypeError(i)
+    return list_
 
 
 def get_table(container: HasSetDefault, key: str, /) -> Table:
@@ -103,23 +114,51 @@ def get_table(container: HasSetDefault, key: str, /) -> Table:
 
 
 def get_set_aot(container: HasSetDefault, key: str, /) -> AoT:
-    return ensure_class(container.setdefault(key, aot()), AoT)
+    try:
+        return get_aot(container, key)
+    except KeyError:
+        value = container[key] = aot()
+        return value
 
 
 def get_set_array(container: HasSetDefault, key: str, /) -> Array:
-    return ensure_class(container.setdefault(key, array()), Array)
+    try:
+        return get_array(container, key)
+    except KeyError:
+        value = container[key] = array()
+        return value
 
 
 def get_set_dict(container: HasSetDefault, key: str, /) -> StrDict:
-    return ensure_class(container.setdefault(key, {}), dict)
+    try:
+        return get_dict(container, key)
+    except KeyError:
+        value = container[key] = {}
+        return value
 
 
 def get_set_list(container: HasSetDefault, key: str, /) -> list[Any]:
-    return ensure_class(container.setdefault(key, []), list)
+    try:
+        return get_list(container, key)
+    except KeyError:
+        value = container[key] = []
+        return value
+
+
+def get_set_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
+    try:
+        return get_list_dicts(container, key)
+    except KeyError:
+        value = container[key] = []
+        return value
 
 
 def get_set_table(container: HasSetDefault, key: str, /) -> Table:
-    return ensure_class(container.setdefault(key, table()), Table)
+    try:
+        return get_table(container, key)
+    except KeyError:
+        value = container[key] = table()
+        return value
 
 
 ##
@@ -407,6 +446,7 @@ __all__ = [
     "get_array",
     "get_dict",
     "get_list",
+    "get_list_dicts",
     "get_partial_dict",
     "get_partial_str",
     "get_pyproject_dependencies",
@@ -414,6 +454,7 @@ __all__ = [
     "get_set_array",
     "get_set_dict",
     "get_set_list",
+    "get_set_list_dicts",
     "get_set_table",
     "get_table",
     "is_partial_dict",
