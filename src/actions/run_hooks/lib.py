@@ -5,20 +5,23 @@ from contextlib import suppress
 from pathlib import Path
 from re import search
 from subprocess import CalledProcessError
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from utilities.functions import ensure_class, ensure_str, get_func_name
+from utilities.functions import ensure_str, get_func_name
 from utilities.tabulate import func_param_desc
 from whenever import TimeDelta
 from yaml import safe_load
 
 from actions import __version__
 from actions.logging import LOGGER
+from actions.pre_commit.utilities import get_list_dicts
 from actions.run_hooks.settings import SETTINGS
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+    from utilities.types import StrDict
 
 
 def run_hooks(
@@ -56,9 +59,9 @@ def _yield_hooks(
     hooks_exclude: list[str] | None = SETTINGS.hooks_exclude,
 ) -> Iterator[str]:
     dict_ = safe_load(Path(".pre-commit-config.yaml").read_text())
-    repos_list = ensure_class(dict_["repos"], list)
+    repos_list = get_list_dicts(dict_, "repos")
     results: set[str] = set()
-    for repo in (ensure_class(r, dict) for r in repos_list):
+    for repo in repos_list:
         url = repo["repo"]
         if (repos is not None) and any(search(repo_i, url) for repo_i in repos):
             results.update(_yield_repo_hooks(repo))
@@ -73,9 +76,8 @@ def _yield_hooks(
     yield from sorted(results)
 
 
-def _yield_repo_hooks(repo: dict[str, Any], /) -> Iterator[str]:
-    hooks = ensure_class(repo["hooks"], list)
-    for hook in (ensure_class(r, dict) for r in hooks):
+def _yield_repo_hooks(repo: StrDict, /) -> Iterator[str]:
+    for hook in get_list_dicts(repo, "hooks"):
         yield ensure_str(hook["id"])
 
 
