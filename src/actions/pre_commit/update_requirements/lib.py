@@ -5,7 +5,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
-from utilities.functions import get_func_name, max_nullable
+from utilities.functions import ensure_str, get_func_name, max_nullable
 from utilities.os import temp_environ
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
@@ -22,11 +22,17 @@ from actions.pre_commit.update_requirements.classes import (
     parse_version2_or_3,
 )
 from actions.pre_commit.update_requirements.settings import SETTINGS
-from actions.pre_commit.utilities import get_pyproject_dependencies, yield_toml_doc
+from actions.pre_commit.utilities import (
+    get_aot,
+    get_pyproject_dependencies,
+    get_table,
+    yield_pyproject_toml,
+    yield_toml_doc,
+)
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSet
+    from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
     from utilities.packaging import Requirement
@@ -35,13 +41,15 @@ if TYPE_CHECKING:
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
 
 
-def update_requirements(*paths: PathLike, index: str | None = SETTINGS.index) -> None:
+def update_requirements(
+    *paths: PathLike, indexes: list[str] | None = SETTINGS.indexes
+) -> None:
     LOGGER.info(
-        func_param_desc(update_requirements, __version__, f"{paths=}", f"{index=}")
+        func_param_desc(update_requirements, __version__, f"{paths=}", f"{indexes=}")
     )
     modifications: set[Path] = set()
     for path in paths:
-        _format_path(path, index=index, modifications=modifications)
+        _format_path(path, indexes=indexes, modifications=modifications)
     if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
@@ -56,19 +64,20 @@ def _format_path(
     /,
     *,
     versions: VersionSet | None = None,
-    index: str | None = SETTINGS.index,
+    indexes: list[str] | None = SETTINGS.indexes,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
-    versions_use = _get_versions(index=index) if versions is None else versions
+    versions_use = _get_versions(indexes=indexes) if versions is None else versions
     with yield_toml_doc(path, modifications=modifications) as doc:
         get_pyproject_dependencies(doc).apply(
             partial(_format_req, versions=versions_use)
         )
 
 
-def _get_versions(*, index: str | None = SETTINGS.index) -> VersionSet:
-    if index is not None:
-        with temp_environ(UV_INDEX=index):
+def _get_versions(*, indexes: list[str] | None = SETTINGS.indexes) -> VersionSet:
+    all_indexes = [*_yield_indexes(), *(() if indexes is None else indexes)]
+    if len(all_indexes) >= 1:
+        with temp_environ(UV_INDEX=",".join(all_indexes)):
             return _get_versions()
     json1 = logged_run(
         "uv", "pip", "list", "--format", "json", "--strict", return_=True
@@ -84,6 +93,28 @@ def _get_versions(*, index: str | None = SETTINGS.index) -> VersionSet:
     for key in set(versions1) | set(versions2):
         out[key] = max_nullable([versions1.get(key), versions2.get(key)])
     return out
+
+
+def _yield_indexes() -> Iterator[str]:
+    try:
+        with yield_pyproject_toml() as doc:
+            try:
+                tool = get_table(doc, "tool")
+            except KeyError:
+                return
+            try:
+                uv = get_table(tool, "uv")
+            except KeyError:
+                return
+            try:
+                indexes = get_aot(uv, "index")
+            except KeyError:
+                return
+            else:
+                for index in indexes:
+                    yield ensure_str(index["url"])
+    except FileNotFoundError:
+        return
 
 
 def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Requirement:

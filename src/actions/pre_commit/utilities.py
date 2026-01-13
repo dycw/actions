@@ -18,7 +18,7 @@ from utilities.packaging import Requirement
 from utilities.types import PathLike, StrDict
 from utilities.typing import is_str_dict
 
-from actions.constants import PATH_CACHE, YAML_INSTANCE
+from actions.constants import PATH_CACHE, PYPROJECT_TOML, YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
@@ -363,6 +363,17 @@ def yield_json_dict(
 
 
 @contextmanager
+def yield_pyproject_toml(
+    *, modifications: MutableSet[Path] | None = None
+) -> Iterator[TOMLDocument]:
+    with yield_toml_doc(PYPROJECT_TOML, modifications=modifications) as doc:
+        yield doc
+
+
+##
+
+
+@contextmanager
 def yield_mutable_write_context[T](
     path: PathLike,
     loads: Callable[[str], T],
@@ -463,6 +474,7 @@ __all__ = [
     "yield_immutable_write_context",
     "yield_json_dict",
     "yield_mutable_write_context",
+    "yield_pyproject_toml",
     "yield_python_file",
     "yield_text_file",
     "yield_toml_doc",

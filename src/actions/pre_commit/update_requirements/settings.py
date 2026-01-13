@@ -7,9 +7,9 @@ from actions.utilities import LOADER
 
 @settings
 class Settings:
-    index: str | None = option(
-        default=None,
-        help="Space-separated list of URLs as additional indexes when searching for packages",
+    indexes: list[str] | None = option(
+        factory=list,
+        help="List of URLs as additional indexes when searching for packages",
     )
 
 
