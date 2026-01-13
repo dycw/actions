@@ -27,22 +27,22 @@ if TYPE_CHECKING:
 
     from utilities.types import PathLike, StrDict
 
-    from actions.types import FuncRequirement, HasSetDefault
+    from actions.types import ArrayLike, FuncRequirement, HasSetDefault
 
 
 ##
 
 
 @overload
-def ensure_contains(array: AoT, /, *objs: Table) -> None: ...
+def ensure_contains(container: AoT, /, *objs: Table) -> None: ...
 @overload
-def ensure_contains(array: list[str], /, *objs: str) -> None: ...
+def ensure_contains(container: list[str], /, *objs: str) -> None: ...
 @overload
-def ensure_contains(array: list[StrDict], /, *objs: StrDict) -> None: ...
-def ensure_contains(array: list[Any], /, *objs: Any) -> None:
+def ensure_contains(container: list[StrDict], /, *objs: StrDict) -> None: ...
+def ensure_contains(container: ArrayLike, /, *objs: Any) -> None:
     for obj in objs:
-        if obj not in array:
-            array.append(obj)
+        if obj not in container:
+            container.append(obj)
 
 
 def ensure_contains_partial_dict(
@@ -64,14 +64,20 @@ def ensure_contains_partial_str(list_: Array | list[str], text: str, /) -> str:
         return text
 
 
-def ensure_not_contains(array: Array, /, *objs: Any) -> None:
+@overload
+def ensure_not_contains(container: AoT, /, *objs: Table) -> None: ...
+@overload
+def ensure_not_contains(container: list[str], /, *objs: str) -> None: ...
+@overload
+def ensure_not_contains(container: list[StrDict], /, *objs: StrDict) -> None: ...
+def ensure_not_contains(container: ArrayLike, /, *objs: Any) -> None:
     for obj in objs:
         try:
-            index = next(i for i, o in enumerate(array) if o == obj)
+            index = next(i for i, o in enumerate(container) if o == obj)
         except StopIteration:
             pass
         else:
-            del array[index]
+            del container[index]
 
 
 ##
