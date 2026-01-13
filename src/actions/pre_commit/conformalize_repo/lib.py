@@ -82,7 +82,8 @@ from actions.pre_commit.utilities import (
     get_set_aot,
     get_set_array,
     get_set_dict,
-    get_set_list,
+    get_set_list_dicts,
+    get_set_list_strs,
     get_set_table,
     path_throttle_cache,
     yield_json_dict,
@@ -451,15 +452,15 @@ def add_ci_pull_request_yaml(
         dict_["name"] = "pull-request"
         on = get_set_dict(dict_, "on")
         pull_request = get_set_dict(on, "pull_request")
-        branches = get_set_list(pull_request, "branches")
+        branches = get_set_list_dicts(pull_request, "branches")
         ensure_contains(branches, "master")
-        schedule = get_set_list(on, "schedule")
+        schedule = get_set_list_dicts(on, "schedule")
         ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
         jobs = get_set_dict(dict_, "jobs")
         if pre_commit:
             pre_commit_dict = get_set_dict(jobs, "pre-commit")
             pre_commit_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(pre_commit_dict, "steps")
+            steps = get_set_list_dicts(pre_commit_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("pre-commit"))
             ensure_contains(
@@ -475,7 +476,7 @@ def add_ci_pull_request_yaml(
         if pyright:
             pyright_dict = get_set_dict(jobs, "pyright")
             pyright_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(pyright_dict, "steps")
+            steps = get_set_list_dicts(pyright_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("pyright"))
             ensure_contains(
@@ -496,7 +497,7 @@ def add_ci_pull_request_yaml(
                 "pytest (${{matrix.os}}, ${{matrix.python-version}}, ${{matrix.resolution}})"
             )
             pytest_dict["runs-on"] = "${{matrix.os}}"
-            steps = get_set_list(pytest_dict, "steps")
+            steps = get_set_list_dicts(pytest_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("pytest"))
             ensure_contains(
@@ -514,28 +515,28 @@ def add_ci_pull_request_yaml(
             strategy_dict = get_set_dict(pytest_dict, "strategy")
             strategy_dict["fail-fast"] = False
             matrix = get_set_dict(strategy_dict, "matrix")
-            os = get_set_list(matrix, "os")
+            os = get_set_list_dicts(matrix, "os")
             if pytest__macos:
                 ensure_contains(os, "macos-latest")
             if pytest__ubuntu:
                 ensure_contains(os, "ubuntu-latest")
             if pytest__windows:
                 ensure_contains(os, "windows-latest")
-            python_version_dict = get_set_list(matrix, "python-version")
+            python_version_dict = get_set_list_dicts(matrix, "python-version")
             if pytest__all_versions:
                 ensure_contains(
                     python_version_dict, *yield_python_versions(python_version)
                 )
             else:
                 ensure_contains(python_version_dict, python_version)
-            resolution = get_set_list(matrix, "resolution")
+            resolution = get_set_list_dicts(matrix, "resolution")
             ensure_contains(resolution, "highest", "lowest-direct")
             if pytest__timeout is not None:
                 pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
         if ruff:
             ruff_dict = get_set_dict(jobs, "ruff")
             ruff_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(ruff_dict, "steps")
+            steps = get_set_list_dicts(ruff_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("steps"))
             ensure_contains(
@@ -582,7 +583,7 @@ def add_ci_push_yaml(
         dict_["name"] = "push"
         on = get_set_dict(dict_, "on")
         push = get_set_dict(on, "push")
-        branches = get_set_list(push, "branches")
+        branches = get_set_list_dicts(push, "branches")
         ensure_contains(branches, "master")
         jobs = get_set_dict(dict_, "jobs")
         if publish__github:
@@ -620,7 +621,7 @@ def add_ci_push_yaml(
         if tag:
             tag_dict = get_set_dict(jobs, "tag")
             tag_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list(tag_dict, "steps")
+            steps = get_set_list_dicts(tag_dict, "steps")
             if certificates:
                 ensure_contains(steps, update_ca_certificates_dict("tag"))
             ensure_contains(
@@ -653,7 +654,7 @@ def _add_ci_push_yaml_publish_dict(
         permissions = get_set_dict(publish_dict, "permissions")
         permissions["id-token"] = "write"
     publish_dict["runs-on"] = "ubuntu-latest"
-    steps = get_set_list(publish_dict, "steps")
+    steps = get_set_list_dicts(publish_dict, "steps")
     if certificates:
         ensure_contains(steps, update_ca_certificates_dict(publish_name))
     ensure_contains(
@@ -903,11 +904,11 @@ def _add_pre_commit_config_repo(
     types_or: list[str] | None = None,
     args: tuple[Literal["add", "exact"], list[str]] | None = None,
 ) -> None:
-    repos_list = get_set_list(pre_commit_dict, "repos")
+    repos_list = get_set_list_dicts(pre_commit_dict, "repos")
     repo_dict = ensure_contains_partial_dict(
         repos_list, {"repo": url}, extra={} if url == "local" else {"rev": "master"}
     )
-    hooks_list = get_set_list(repo_dict, "hooks")
+    hooks_list = get_set_list_dicts(repo_dict, "hooks")
     hook_dict = ensure_contains_partial_dict(hooks_list, {"id": id_})
     if name is not None:
         hook_dict["name"] = name
@@ -922,7 +923,7 @@ def _add_pre_commit_config_repo(
     if args is not None:
         match args:
             case "add", list() as args_i:
-                hook_args = get_set_list(hook_dict, "args")
+                hook_args = get_set_list_strs(hook_dict, "args")
                 ensure_contains(hook_args, *args_i)
             case "exact", list() as args_i:
                 hook_dict["args"] = args_i
@@ -998,7 +999,7 @@ def add_pyrightconfig_json(
     with yield_json_dict(PYRIGHTCONFIG_JSON, modifications=modifications) as dict_:
         dict_["deprecateTypingAliases"] = True
         dict_["enableReachabilityAnalysis"] = False
-        include = get_set_list(dict_, "include")
+        include = get_set_list_dicts(dict_, "include")
         ensure_contains(include, "src" if script is None else script)
         dict_["pythonVersion"] = python_version
         dict_["reportCallInDefaultInitializer"] = True

@@ -3,8 +3,10 @@ from __future__ import annotations
 from pytest import mark, param, raises
 from utilities.text import strip_and_dedent
 
+from actions.constants import YAML_INSTANCE
 from actions.pre_commit.conformalize_repo.lib import (
     _add_envrc_uv_text,
+    _add_pre_commit_config_repo,
     yield_python_versions,
 )
 
@@ -30,6 +32,24 @@ class TestAddEnvrcUvText:
             uv sync --all-extras --all-groups --active --locked
         """)
         assert result == expected
+
+
+class TestAddPreCommitConfigRepo:
+    def test_main(self) -> None:
+        text = strip_and_dedent("""
+            repos:
+              - repo: url
+                rev: rev
+                hooks:
+                  - id: id
+                    args:
+                      - --arg
+        """)
+        pre_commit_dict = YAML_INSTANCE.load(text)
+        _add_pre_commit_config_repo(
+            pre_commit_dict, "url", "id", args=("add", ["--arg"])
+        )
+        assert pre_commit_dict == YAML_INSTANCE.load(text)
 
 
 class TestYieldPythonVersions:
