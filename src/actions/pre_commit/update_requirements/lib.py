@@ -4,6 +4,7 @@ import sys
 from functools import partial
 from typing import TYPE_CHECKING
 
+from ordered_set import OrderedSet
 from pydantic import TypeAdapter
 from utilities.functions import ensure_str, get_func_name, max_nullable
 from utilities.tabulate import func_param_desc
@@ -93,10 +94,10 @@ def _get_versions(
     indexes: list[str] | None = SETTINGS.indexes,
     native_tls: bool = SETTINGS.native_tls,
 ) -> VersionSet:
-    index_args: list[str] = []
-    index_args.extend(*_yield_indexes())
+    index_args: OrderedSet[str] = OrderedSet([])
+    _ = index_args.update(list(_yield_indexes()))
     if indexes is not None:
-        index_args.extend(indexes)
+        _ = index_args.update(indexes)
     head: list[str] = ["uv", "pip", "list", "--format", "json"]
     tail: list[str] = ["--strict"]
     if len(index_args) >= 1:
