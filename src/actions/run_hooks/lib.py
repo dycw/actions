@@ -77,8 +77,7 @@ def _yield_hooks(
 
 
 def _yield_repo_hooks(repo: StrDict, /) -> Iterator[str]:
-    hooks = get_list_dicts(repo, "hooks")
-    for hook in hooks:
+    for hook in get_list_dicts(repo, "hooks"):
         yield ensure_str(hook["id"])
 
 
