@@ -90,7 +90,9 @@ def _yield_env(
             with temp_environ(SOPS_AGE_KEY=key.get_secret_value()):
                 yield
         case None, None:
-            yield
+            path = xdg_config_home() / "sops/age/keys.txt"
+            with temp_environ(SOPS_AGE_KEY_FILE=str(path)):
+                yield
         case never:
             assert_never(never)
 
@@ -99,17 +101,10 @@ def _get_recipient() -> str:
     try:
         key_file = environ["SOPS_AGE_KEY_FILE"]
     except KeyError:
-        pass
+        with TemporaryFile(text=environ["SOPS_AGE_KEY"]) as temp:
+            return _get_recipient_from_path(temp)
     else:
         return _get_recipient_from_path(key_file)
-    try:
-        key = environ["SOPS_AGE_KEY"]
-    except KeyError:
-        pass
-    else:
-        with TemporaryFile(text=key) as temp:
-            return _get_recipient_from_path(temp)
-    return _get_recipient_from_path(xdg_config_home() / "sops/age/keys.txt")
 
 
 def _get_recipient_from_path(path: PathLike, /) -> str:
