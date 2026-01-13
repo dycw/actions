@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
 from utilities.functions import ensure_str, get_func_name, max_nullable
-from utilities.os import temp_environ
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
@@ -42,14 +41,24 @@ if TYPE_CHECKING:
 
 
 def update_requirements(
-    *paths: PathLike, indexes: list[str] | None = SETTINGS.indexes
+    *paths: PathLike,
+    indexes: list[str] | None = SETTINGS.indexes,
+    native_tls: bool = SETTINGS.native_tls,
 ) -> None:
     LOGGER.info(
-        func_param_desc(update_requirements, __version__, f"{paths=}", f"{indexes=}")
+        func_param_desc(
+            update_requirements,
+            __version__,
+            f"{paths=}",
+            f"{indexes=}",
+            f"{native_tls=}",
+        )
     )
     modifications: set[Path] = set()
     for path in paths:
-        _format_path(path, indexes=indexes, modifications=modifications)
+        _format_path(
+            path, indexes=indexes, native_tls=native_tls, modifications=modifications
+        )
     if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to modifications: %s",
@@ -65,33 +74,39 @@ def _format_path(
     *,
     versions: VersionSet | None = None,
     indexes: list[str] | None = SETTINGS.indexes,
+    native_tls: bool = SETTINGS.native_tls,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
-    versions_use = _get_versions(indexes=indexes) if versions is None else versions
+    versions_use = (
+        _get_versions(indexes=indexes, native_tls=native_tls)
+        if versions is None
+        else versions
+    )
     with yield_toml_doc(path, modifications=modifications) as doc:
         get_pyproject_dependencies(doc).apply(
             partial(_format_req, versions=versions_use)
         )
 
 
-def _get_versions(*, indexes: list[str] | None = SETTINGS.indexes) -> VersionSet:
-    all_ = [*_yield_indexes(), *(() if indexes is None else indexes)]
-    with temp_environ(UV_INDEX=",".join(all_) if len(all_) >= 1 else None):
-        json1 = logged_run(
-            "uv", "pip", "list", "--format", "json", "--strict", return_=True
-        )
-        json2 = logged_run(
-            "uv",
-            "pip",
-            "list",
-            "--format",
-            "json",
-            "--outdated",
-            "--strict",
-            return_=True,
-        )
+def _get_versions(
+    *,
+    indexes: list[str] | None = SETTINGS.indexes,
+    native_tls: bool = SETTINGS.native_tls,
+) -> VersionSet:
+    index_args: list[str] = []
+    index_args.extend(*_yield_indexes())
+    if indexes is not None:
+        index_args.extend(indexes)
+    head: list[str] = ["uv", "pip", "list", "--format", "json"]
+    tail: list[str] = ["--strict"]
+    if len(index_args) >= 1:
+        tail.extend(["--index", ",".join(index_args)])
+    if native_tls:
+        tail.append("--native-tls")
+    json1 = logged_run(*head, *tail, return_=True)
     models1 = TypeAdapter(list[PipListOutput]).validate_json(json1)
     versions1 = {p.name: parse_version2_or_3(p.version) for p in models1}
+    json2 = logged_run(*head, "--outdated", *tail, return_=True)
     models2 = TypeAdapter(list[PipListOutdatedOutput]).validate_json(json2)
     versions2 = {p.name: parse_version2_or_3(p.latest_version) for p in models2}
     out: StrDict = {}

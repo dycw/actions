@@ -24,7 +24,9 @@ def update_requirements_sub_cmd(
     if is_pytest():
         return
     basic_config(obj=LOGGER)
-    update_requirements(*paths, indexes=settings.indexes)
+    update_requirements(
+        *paths, indexes=settings.indexes, native_tls=settings.native_tls
+    )
 
 
 __all__ = ["update_requirements_sub_cmd"]
