@@ -33,20 +33,13 @@ if TYPE_CHECKING:
 ##
 
 
-def ensure_aot_contains(array: AoT, /, *tables: Table) -> None:
-    for table_ in tables:
-        if table_ not in array:
-            array.append(table_)
-
-
+@overload
+def ensure_contains(array: AoT, /, *objs: Table) -> None: ...
 @overload
 def ensure_contains(array: list[str], /, *objs: str) -> None: ...
 @overload
 def ensure_contains(array: list[StrDict], /, *objs: StrDict) -> None: ...
 def ensure_contains(array: list[Any], /, *objs: Any) -> None:
-    if isinstance(array, AoT):
-        msg = f"Use {ensure_aot_contains.__name__!r} instead of {ensure_contains.__name__!r}"
-        raise TypeError(msg)
     for obj in objs:
         if obj not in array:
             array.append(obj)
@@ -456,7 +449,6 @@ def yield_yaml_dict(
 __all__ = [
     "PyProjectDependencies",
     "WriteContext",
-    "ensure_aot_contains",
     "ensure_contains",
     "ensure_contains_partial_dict",
     "ensure_contains_partial_str",

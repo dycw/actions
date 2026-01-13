@@ -75,7 +75,6 @@ from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
 from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
 from actions.pre_commit.update_requirements.constants import UPDATE_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.utilities import (
-    ensure_aot_contains,
     ensure_contains,
     ensure_contains_partial_dict,
     ensure_contains_partial_str,
@@ -394,7 +393,7 @@ def add_bumpversion_toml(
         bumpversion = get_set_table(tool, "bumpversion")
         if pyproject:
             files = get_set_aot(bumpversion, "files")
-            ensure_aot_contains(
+            ensure_contains(
                 files,
                 _add_bumpversion_toml_file(PYPROJECT_TOML, 'version = "${version}"'),
             )
@@ -404,7 +403,7 @@ def add_bumpversion_toml(
         )
     ) is not None:
         files = get_set_aot(bumpversion, "files")
-        ensure_aot_contains(
+        ensure_contains(
             files,
             _add_bumpversion_toml_file(
                 f"src/{python_package_name_use}/__init__.py",
@@ -985,7 +984,7 @@ def add_pyproject_toml(
                 index["explicit"] = True
                 index["name"] = name
                 index["url"] = url
-                ensure_aot_contains(indexes, index)
+                ensure_contains(indexes, index)
 
 
 ##
