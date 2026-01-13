@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
 from tomlkit.items import Table
-from utilities.functions import ensure_class, get_func_name, max_nullable
+from utilities.functions import ensure_class, ensure_str, get_func_name, max_nullable
 from utilities.os import temp_environ
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
@@ -24,7 +24,9 @@ from actions.pre_commit.update_requirements.classes import (
 )
 from actions.pre_commit.update_requirements.settings import SETTINGS
 from actions.pre_commit.utilities import (
+    get_aot,
     get_pyproject_dependencies,
+    get_table,
     yield_pyproject_toml,
     yield_toml_doc,
 )
@@ -97,14 +99,20 @@ def _yield_indexes() -> Iterator[str]:
     try:
         with yield_pyproject_toml() as doc:
             try:
-                tool = ensure_class(doc["tool"], Table)
+                tool = get_table(doc, "tool")
             except KeyError:
                 return
             try:
-                ensure_class(tool["uv"], Table)
+                uv = get_table(tool, "uv")
             except KeyError:
                 return
-            yield "as"
+            try:
+                indexes = get_aot(uv, "index")
+            except KeyError:
+                return
+            else:
+                for index in indexes:
+                    yield ensure_str(index["url"])
     except FileNotFoundError:
         return
 
