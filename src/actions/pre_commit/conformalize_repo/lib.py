@@ -151,9 +151,6 @@ def conformalize_repo(
     pre_commit__uv: bool = SETTINGS.pre_commit__uv,
     pyproject: bool = SETTINGS.pyproject,
     pyproject__project__optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
-    pyproject__tool__uv__indexes: list[
-        tuple[str, str]
-    ] = SETTINGS.pyproject__tool__uv__indexes,
     pyright: bool = SETTINGS.pyright,
     pytest: bool = SETTINGS.pytest,
     pytest__asyncio: bool = SETTINGS.pytest__asyncio,
@@ -166,6 +163,7 @@ def conformalize_repo(
     ruff: bool = SETTINGS.ruff,
     run_version_bump: bool = SETTINGS.run_version_bump,
     script: str | None = SETTINGS.script,
+    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     LOGGER.info(
@@ -213,7 +211,6 @@ def conformalize_repo(
             f"{pre_commit__uv=}",
             f"{pyproject=}",
             f"{pyproject__project__optional_dependencies__scripts=}",
-            f"{pyproject__tool__uv__indexes=}",
             f"{pyright=}",
             f"{pytest=}",
             f"{pytest__asyncio=}",
@@ -226,6 +223,7 @@ def conformalize_repo(
             f"{ruff=}",
             f"{run_version_bump=}",
             f"{script=}",
+            f"{uv__indexes=}",
             f"{uv__native_tls=}",
         )
     )
@@ -250,6 +248,7 @@ def conformalize_repo(
         shell=pre_commit__shell,
         taplo=pre_commit__taplo,
         uv=pre_commit__uv,
+        uv__indexes=uv__indexes,
         script=script,
     )
     if (
@@ -330,11 +329,7 @@ def conformalize_repo(
         )
     if gitignore:
         add_gitignore(modifications=modifications)
-    if (
-        pyproject
-        or pyproject__project__optional_dependencies__scripts
-        or (len(pyproject__tool__uv__indexes) >= 1)
-    ):
+    if pyproject:
         add_pyproject_toml(
             modifications=modifications,
             python_version=python_version,
@@ -343,7 +338,7 @@ def conformalize_repo(
             readme=readme,
             optional_dependencies__scripts=pyproject__project__optional_dependencies__scripts,
             python_package_name=python_package_name,
-            tool__uv__indexes=pyproject__tool__uv__indexes,
+            uv__indexes=uv__indexes,
         )
     if pyright:
         add_pyrightconfig_json(
@@ -791,6 +786,7 @@ def add_pre_commit_config_yaml(
     shell: bool = SETTINGS.pre_commit__shell,
     taplo: bool = SETTINGS.pre_commit__taplo,
     uv: bool = SETTINGS.pre_commit__uv,
+    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
     script: str | None = SETTINGS.script,
 ) -> None:
     with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
@@ -839,7 +835,14 @@ def add_pre_commit_config_yaml(
             )
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
             _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD)
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, UPDATE_REQUIREMENTS_SUB_CMD)
+            _add_pre_commit_config_repo(
+                dict_,
+                ACTIONS_URL,
+                UPDATE_REQUIREMENTS_SUB_CMD,
+                args=("add", ["--index", ",".join(v for _, v in uv__indexes)])
+                if len(uv__indexes) >= 1
+                else None,
+            )
         if ruff:
             _add_pre_commit_config_repo(
                 dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
@@ -931,7 +934,7 @@ def add_pyproject_toml(
     readme: bool = SETTINGS.readme,
     optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
     python_package_name: str | None = SETTINGS.python_package_name,
-    tool__uv__indexes: list[tuple[str, str]] = SETTINGS.pyproject__tool__uv__indexes,
+    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
 ) -> None:
     with yield_toml_doc(PYPROJECT_TOML, modifications=modifications) as doc:
         build_system = get_table(doc, "build-system")
@@ -963,11 +966,11 @@ def add_pyproject_toml(
                 package_name=package_name, python_package_name=python_package_name
             )
             build_backend["module-root"] = "src"
-        if len(tool__uv__indexes) >= 1:
+        if len(uv__indexes) >= 1:
             tool = get_table(doc, "tool")
             uv = get_table(tool, "uv")
             indexes = get_aot(uv, "index")
-            for name, url in tool__uv__indexes:
+            for name, url in uv__indexes:
                 index = table()
                 index["explicit"] = True
                 index["name"] = name
