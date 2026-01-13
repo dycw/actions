@@ -16,8 +16,9 @@ from utilities.functions import ensure_class, ensure_str, get_func_name
 from utilities.iterables import OneEmptyError, OneNonUniqueError, one
 from utilities.packaging import Requirement
 from utilities.types import PathLike, StrDict
+from utilities.typing import is_str_dict
 
-from actions.constants import PATH_CACHE, PYPROJECT_TOML, YAML_INSTANCE
+from actions.constants import PATH_CACHE, YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 
@@ -79,24 +80,85 @@ def ensure_not_contains(array: Array, /, *objs: Any) -> None:
 ##
 
 
-def ensure_aot(container: HasSetDefault, key: str, /) -> AoT:
-    return ensure_class(container.setdefault(key, aot()), AoT)
+def get_aot(container: HasSetDefault, key: str, /) -> AoT:
+    return ensure_class(container[key], AoT)
 
 
-def ensure_array(container: HasSetDefault, key: str, /) -> Array:
-    return ensure_class(container.setdefault(key, array()), Array)
+def get_array(container: HasSetDefault, key: str, /) -> Array:
+    return ensure_class(container[key], Array)
 
 
-def ensure_dict(container: HasSetDefault, key: str, /) -> StrDict:
-    return ensure_class(container.setdefault(key, {}), dict)
+def get_dict(container: HasSetDefault, key: str, /) -> StrDict:
+    if is_str_dict(value := container[key]):
+        return value
+    raise TypeError(value)
 
 
-def ensure_list(container: HasSetDefault, key: str, /) -> list[Any]:
-    return ensure_class(container.setdefault(key, []), list)
+def get_list(container: HasSetDefault, key: str, /) -> list[Any]:
+    return ensure_class(container[key], list)
 
 
-def ensure_table(container: HasSetDefault, key: str, /) -> Table:
-    return ensure_class(container.setdefault(key, table()), Table)
+def get_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
+    list_ = get_list(container, key)
+    for i in list_:
+        if not is_str_dict(i):
+            raise TypeError(i)
+    return list_
+
+
+def get_table(container: HasSetDefault, key: str, /) -> Table:
+    return ensure_class(container[key], Table)
+
+
+##
+
+
+def get_set_aot(container: HasSetDefault, key: str, /) -> AoT:
+    try:
+        return get_aot(container, key)
+    except KeyError:
+        value = container[key] = aot()
+        return value
+
+
+def get_set_array(container: HasSetDefault, key: str, /) -> Array:
+    try:
+        return get_array(container, key)
+    except KeyError:
+        value = container[key] = array()
+        return value
+
+
+def get_set_dict(container: HasSetDefault, key: str, /) -> StrDict:
+    try:
+        return get_dict(container, key)
+    except KeyError:
+        value = container[key] = {}
+        return value
+
+
+def get_set_list(container: HasSetDefault, key: str, /) -> list[Any]:
+    try:
+        return get_list(container, key)
+    except KeyError:
+        value = container[key] = []
+        return value
+
+
+def get_set_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
+    try:
+        return get_list_dicts(container, key)
+    except KeyError:
+        value = container[key] = []
+        return value
+
+
+def get_set_table(container: HasSetDefault, key: str, /) -> Table:
+    try:
+        return get_table(container, key)
+    except KeyError:
+        value = container[key] = table()
+        return value
 
 
 ##
@@ -180,21 +242,21 @@ def is_partial_str(obj: Any, text: str, /) -> bool:
 def get_pyproject_dependencies(doc: TOMLDocument, /) -> PyProjectDependencies:
     out = PyProjectDependencies()
     if (project_key := "project") in doc:
-        project = ensure_table(doc, project_key)
+        project = get_set_table(doc, project_key)
         if (dep_key := "dependencies") in project:
-            out.dependencies = ensure_array(project, dep_key)
+            out.dependencies = get_set_array(project, dep_key)
         if (opt_dep_key := "optional-dependencies") in project:
-            opt_dependencies = ensure_table(project, opt_dep_key)
+            opt_dependencies = get_set_table(project, opt_dep_key)
             out.opt_dependencies = {}
             for key in opt_dependencies:
-                out.opt_dependencies[ensure_str(key)] = ensure_array(
+                out.opt_dependencies[ensure_str(key)] = get_set_array(
                     opt_dependencies, key
                 )
     if (dep_grps_key := "dependency-groups") in doc:
-        dep_grps = ensure_table(doc, dep_grps_key)
+        dep_grps = get_set_table(doc, dep_grps_key)
         out.dep_groups = {}
         for key in dep_grps:
-            out.dep_groups[ensure_str(key)] = ensure_array(dep_grps, key)
+            out.dep_groups[ensure_str(key)] = get_set_array(dep_grps, key)
     return out
 
 
@@ -320,17 +382,6 @@ def yield_mutable_write_context[T](
 
 
 @contextmanager
-def yield_pyproject_toml(
-    *, modifications: MutableSet[Path] | None = None
-) -> Iterator[TOMLDocument]:
-    with yield_toml_doc(PYPROJECT_TOML, modifications=modifications) as doc:
-        yield doc
-
-
-##
-
-
-@contextmanager
 def yield_python_file(
     path: PathLike, /, *, modifications: MutableSet[Path] | None = None
 ) -> Iterator[WriteContext[Module]]:
@@ -386,26 +437,32 @@ def yield_yaml_dict(
 __all__ = [
     "PyProjectDependencies",
     "WriteContext",
-    "ensure_aot",
     "ensure_aot_contains",
-    "ensure_array",
     "ensure_contains",
     "ensure_contains_partial_dict",
     "ensure_contains_partial_str",
-    "ensure_dict",
-    "ensure_list",
     "ensure_not_contains",
-    "ensure_table",
+    "get_aot",
+    "get_array",
+    "get_dict",
+    "get_list",
+    "get_list_dicts",
     "get_partial_dict",
     "get_partial_str",
     "get_pyproject_dependencies",
+    "get_set_aot",
+    "get_set_array",
+    "get_set_dict",
+    "get_set_list",
+    "get_set_list_dicts",
+    "get_set_table",
+    "get_table",
     "is_partial_dict",
     "is_partial_str",
     "path_throttle_cache",
     "yield_immutable_write_context",
     "yield_json_dict",
     "yield_mutable_write_context",
-    "yield_pyproject_toml",
     "yield_python_file",
     "yield_text_file",
     "yield_toml_doc",
