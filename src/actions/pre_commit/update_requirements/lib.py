@@ -5,8 +5,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
-from tomlkit.items import Table
-from utilities.functions import ensure_class, ensure_str, get_func_name, max_nullable
+from utilities.functions import ensure_str, get_func_name, max_nullable
 from utilities.os import temp_environ
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
@@ -68,7 +67,7 @@ def _format_path(
     indexes: list[str] | None = SETTINGS.indexes,
     modifications: MutableSet[Path] | None = None,
 ) -> None:
-    versions_use = _get_versions(index=indexes) if versions is None else versions
+    versions_use = _get_versions(indexes=indexes) if versions is None else versions
     with yield_toml_doc(path, modifications=modifications) as doc:
         get_pyproject_dependencies(doc).apply(
             partial(_format_req, versions=versions_use)
@@ -76,8 +75,9 @@ def _format_path(
 
 
 def _get_versions(*, indexes: list[str] | None = SETTINGS.indexes) -> VersionSet:
-    if index is not None:
-        with temp_environ(UV_INDEX=index):
+    all_indexes = [*_yield_indexes(), *(() if indexes is None else indexes)]
+    if len(all_indexes) >= 1:
+        with temp_environ(UV_INDEX=",".join(all_indexes)):
             return _get_versions()
     json1 = logged_run(
         "uv", "pip", "list", "--format", "json", "--strict", return_=True
