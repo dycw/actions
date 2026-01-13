@@ -14,6 +14,8 @@ from actions.utilities import logged_run
 if TYPE_CHECKING:
     from typed_settings import Secret
 
+    from actions.types import SecretLike
+
 
 def publish_package(
     *,
@@ -36,11 +38,11 @@ def publish_package(
     )
     build_head: list[str] = ["uv", "build", "--out-dir"]
     build_tail: list[str] = ["--wheel", "--clear"]
-    publish: list[str] = ["uv", "publish"]
+    publish: list[SecretLike] = ["uv", "publish"]
     if username is not None:
         publish.extend(["--username", username])
     if password is not None:
-        publish.extend(["--password", password.get_secret_value()])
+        publish.extend(["--password", password])
     if publish_url is not None:
         publish.extend(["--publish-url", publish_url])
     if trusted_publishing:
