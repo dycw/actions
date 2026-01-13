@@ -47,6 +47,8 @@ from actions.publish_package.constants import (
 )
 from actions.random_sleep.cli import random_sleep_sub_cmd
 from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING, RANDOM_SLEEP_SUB_CMD
+from actions.re_encrypt.cli import re_encrypt_sub_cmd
+from actions.re_encrypt.constants import RE_ENCRYPT_DOCSTRING, RE_ENCRYPT_SUB_CMD
 from actions.register_gitea_runner.cli import register_gitea_runner_sub_cmd
 from actions.register_gitea_runner.constants import (
     REGISTER_GITEA_RUNNER_DOCSTRING,
@@ -87,6 +89,9 @@ _ = _main.command(name=RUN_HOOKS_SUB_CMD, help=RUN_HOOKS_DOCSTRING, **CONTEXT_SE
 _ = _main.command(
     name=RANDOM_SLEEP_SUB_CMD, help=RANDOM_SLEEP_DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)
+_ = _main.command(
+    name=RE_ENCRYPT_SUB_CMD, help=RE_ENCRYPT_DOCSTRING, **CONTEXT_SETTINGS
+)(re_encrypt_sub_cmd)
 _ = _main.command(
     name=REGISTER_GITEA_RUNNER_SUB_CMD,
     help=REGISTER_GITEA_RUNNER_DOCSTRING,
