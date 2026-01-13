@@ -11,6 +11,7 @@ from utilities.os import temp_environ
 from utilities.subprocess import run
 from utilities.tabulate import func_param_desc
 from utilities.tempfile import TemporaryFile
+from xdg_base_dirs import xdg_config_home
 
 from actions import __version__
 from actions.logging import LOGGER
@@ -98,14 +99,22 @@ def _get_recipient() -> str:
     try:
         key_file = environ["SOPS_AGE_KEY_FILE"]
     except KeyError:
-        with TemporaryFile(text=environ["SOPS_AGE_KEY"]) as temp:
-            return _get_recipient_from_path(temp)
+        pass
     else:
         return _get_recipient_from_path(key_file)
+    try:
+        key = environ["SOPS_AGE_KEY"]
+    except KeyError:
+        pass
+    else:
+        with TemporaryFile(text=key) as temp:
+            return _get_recipient_from_path(temp)
+    return _get_recipient_from_path(xdg_config_home() / "sops/age/keys.txt")
 
 
 def _get_recipient_from_path(path: PathLike, /) -> str:
-    return run("age-keygen", "-y", str(path), return_=True)
+    recipient, *_ = run("age-keygen", "-y", str(path), return_=True).splitlines()
+    return recipient
 
 
 __all__ = ["re_encrypt"]
