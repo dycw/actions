@@ -36,7 +36,9 @@ if TYPE_CHECKING:
 
 
 def update_requirements(*paths: PathLike, index: str | None = SETTINGS.index) -> None:
-    LOGGER.info(func_param_desc(update_requirements, __version__, f"{paths=}"))
+    LOGGER.info(
+        func_param_desc(update_requirements, __version__, f"{paths=}", f"{index=}")
+    )
     modifications: set[Path] = set()
     for path in paths:
         _format_path(path, index=index, modifications=modifications)
