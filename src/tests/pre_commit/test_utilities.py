@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Any
 
 from libcst import parse_statement
 from pytest import mark, param
+from tomlkit import table
+from tomlkit.items import AoT, Array, Table
 from utilities.iterables import one
 
 from actions.pre_commit.utilities import (
@@ -12,6 +14,9 @@ from actions.pre_commit.utilities import (
     ensure_contains_partial_str,
     get_partial_dict,
     get_partial_str,
+    get_set_aot,
+    get_set_array,
+    get_set_table,
     is_partial_dict,
     is_partial_str,
     yield_immutable_write_context,
@@ -72,6 +77,27 @@ class TestGetPartialStr:
         dependencies = ["dycw-utilities[test]>=1.2.3, <2"]
         result = get_partial_str(dependencies, "dycw-utilities[test]")
         assert result == one(dependencies)
+
+
+class TestGetSetAoT:
+    def test_main(self) -> None:
+        t = table()
+        assert isinstance(get_set_aot(t, "key"), AoT)
+        assert len(t) == 1
+
+
+class TestGetSetArray:
+    def test_main(self) -> None:
+        t = table()
+        assert isinstance(get_set_array(t, "key"), Array)
+        assert len(t) == 1
+
+
+class TestGetSetTable:
+    def test_main(self) -> None:
+        t = table()
+        assert isinstance(get_set_table(t, "key"), Table)
+        assert len(t) == 1
 
 
 class TestIsPartialDict:
