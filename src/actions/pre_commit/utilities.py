@@ -25,10 +25,9 @@ from actions.utilities import are_equal_modulo_new_line, write_text, yaml_dump
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, MutableSet
 
-    from tomlkit.container import Container
     from utilities.types import PathLike, StrDict
 
-    from actions.types import ArrayLike, FuncRequirement
+    from actions.types import ArrayLike, ContainerLike, FuncRequirement
 
 
 ##
@@ -84,11 +83,11 @@ def ensure_not_contains(container: ArrayLike, /, *objs: Any) -> None:
 ##
 
 
-def get_aot(container: Container, key: str, /) -> AoT:
+def get_aot(container: ContainerLike, key: str, /) -> AoT:
     return ensure_class(container[key], AoT)
 
 
-def get_array(container: Container, key: str, /) -> Array:
+def get_array(container: ContainerLike, key: str, /) -> Array:
     return ensure_class(container[key], Array)
 
 
@@ -114,14 +113,14 @@ def get_list_strs(dict_: StrDict, key: str, /) -> list[str]:
     return list_
 
 
-def get_table(container: Container, key: str, /) -> Table:
+def get_table(container: ContainerLike, key: str, /) -> Table:
     return ensure_class(container[key], Table)
 
 
 ##
 
 
-def get_set_aot(container: Container, key: str, /) -> AoT:
+def get_set_aot(container: ContainerLike, key: str, /) -> AoT:
     try:
         return get_aot(container, key)
     except KeyError:
@@ -129,7 +128,7 @@ def get_set_aot(container: Container, key: str, /) -> AoT:
         return value
 
 
-def get_set_array(container: Container, key: str, /) -> Array:
+def get_set_array(container: ContainerLike, key: str, /) -> Array:
     try:
         return get_array(container, key)
     except KeyError:
@@ -161,7 +160,7 @@ def get_set_list_strs(dict_: StrDict, key: str, /) -> list[str]:
         return value
 
 
-def get_set_table(container: Container, key: str, /) -> Table:
+def get_set_table(container: ContainerLike, key: str, /) -> Table:
     try:
         return get_table(container, key)
     except KeyError:
