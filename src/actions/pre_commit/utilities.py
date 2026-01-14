@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
     from utilities.types import PathLike, StrDict
 
-    from actions.types import ArrayLike, FuncRequirement
+    from actions.types import ArrayLike, FuncRequirement, TableLike
 
 
 ##
@@ -113,7 +113,7 @@ def get_list_strs(dict_: StrDict, key: str, /) -> list[str]:
     return list_
 
 
-def get_table(table: Table, key: str, /) -> Table:
+def get_table(table: TableLike, key: str, /) -> Table:
     return ensure_class(table[key], Table)
 
 
@@ -160,7 +160,7 @@ def get_set_list_strs(dict_: StrDict, key: str, /) -> list[str]:
         return value
 
 
-def get_set_table(table_: Table, key: str, /) -> Table:
+def get_set_table(table_: TableLike, key: str, /) -> Table:
     try:
         return get_table(table_, key)
     except KeyError:
