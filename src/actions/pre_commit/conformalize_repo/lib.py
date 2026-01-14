@@ -968,16 +968,14 @@ def add_pyproject_toml(
             scripts = get_set_array(optional_dependencies, "scripts")
             _ = ensure_contains_partial_str(scripts, "click")
         if python_package_name is not None:
-            tool = get_set_table(doc, "tool")
-            uv = get_set_table(tool, "uv")
+            uv = get_tool_uv(doc)
             build_backend = get_set_table(uv, "build-backend")
             build_backend["module-name"] = get_python_package_name(
                 package_name=package_name, python_package_name=python_package_name
             )
             build_backend["module-root"] = "src"
         if len(uv__indexes) >= 1:
-            tool = get_set_table(doc, "tool")
-            uv = get_set_table(tool, "uv")
+            uv = get_tool_uv(doc)
             indexes = get_set_aot(uv, "index")
             for name, url in uv__indexes:
                 index = table()
@@ -1236,6 +1234,14 @@ def get_python_package_name(
 ##
 
 
+def get_tool_uv(doc: TOMLDocument, /) -> Table:
+    tool = get_set_table(doc, "tool")
+    return get_set_table(tool, "uv")
+
+
+##
+
+
 def get_version_from_bumpversion_toml(
     *, obj: TOMLDocument | str | None = None
 ) -> Version:
@@ -1446,6 +1452,7 @@ __all__ = [
     "check_versions",
     "get_cron_job",
     "get_python_package_name",
+    "get_tool_uv",
     "get_version_from_bumpversion_toml",
     "get_version_from_git_show",
     "get_version_from_git_tag",
