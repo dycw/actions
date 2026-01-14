@@ -13,6 +13,7 @@
 [project]
   dependencies = [
     "click>=8.3.1, <9",
+    "coloredlogs>=15.0.1, <16",
     "dycw-utilities>=0.180.1, <1",
     "inflect>=7.5.0, <8",
     "libcst>=1.8.6, <2",
@@ -32,7 +33,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.13.6"
+  version = "0.13.7"
 
   [project.scripts]
     action = "actions.cli:_main"
