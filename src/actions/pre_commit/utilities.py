@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
     from utilities.types import PathLike, StrDict
 
-    from actions.types import ArrayLike, FuncRequirement, HasSetDefault
+    from actions.types import ArrayLike, FuncRequirement
 
 
 ##
@@ -83,88 +83,88 @@ def ensure_not_contains(container: ArrayLike, /, *objs: Any) -> None:
 ##
 
 
-def get_aot(container: HasSetDefault, key: str, /) -> AoT:
-    return ensure_class(container[key], AoT)
+def get_aot(table: Table, key: str, /) -> AoT:
+    return ensure_class(table[key], AoT)
 
 
-def get_array(container: HasSetDefault, key: str, /) -> Array:
-    return ensure_class(container[key], Array)
+def get_array(table: Table, key: str, /) -> Array:
+    return ensure_class(table[key], Array)
 
 
-def get_dict(container: HasSetDefault, key: str, /) -> StrDict:
-    if is_str_dict(value := container[key]):
+def get_dict(dict_: StrDict, key: str, /) -> StrDict:
+    if is_str_dict(value := dict_[key]):
         return value
     raise TypeError(value)
 
 
-def get_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
-    list_ = ensure_class(container[key], list)
+def get_list_dicts(dict_: StrDict, key: str, /) -> list[StrDict]:
+    list_ = ensure_class(dict_[key], list)
     for i in list_:
         if not is_str_dict(i):
             raise TypeError(i)
     return list_
 
 
-def get_list_strs(container: HasSetDefault, key: str, /) -> list[str]:
-    list_ = ensure_class(container[key], list)
+def get_list_strs(dict_: StrDict, key: str, /) -> list[str]:
+    list_ = ensure_class(dict_[key], list)
     for i in list_:
         if not isinstance(i, str):
             raise TypeError(i)
     return list_
 
 
-def get_table(container: HasSetDefault, key: str, /) -> Table:
-    return ensure_class(container[key], Table)
+def get_table(table: Table, key: str, /) -> Table:
+    return ensure_class(table[key], Table)
 
 
 ##
 
 
-def get_set_aot(container: HasSetDefault, key: str, /) -> AoT:
+def get_set_aot(table: Table, key: str, /) -> AoT:
     try:
-        return get_aot(container, key)
+        return get_aot(table, key)
     except KeyError:
-        value = container[key] = aot()
+        value = table[key] = aot()
         return value
 
 
-def get_set_array(container: HasSetDefault, key: str, /) -> Array:
+def get_set_array(table: Table, key: str, /) -> Array:
     try:
-        return get_array(container, key)
+        return get_array(table, key)
     except KeyError:
-        value = container[key] = array()
+        value = table[key] = array()
         return value
 
 
-def get_set_dict(container: HasSetDefault, key: str, /) -> StrDict:
+def get_set_dict(dict_: StrDict, key: str, /) -> StrDict:
     try:
-        return get_dict(container, key)
+        return get_dict(dict_, key)
     except KeyError:
-        value = container[key] = {}
+        value = dict_[key] = {}
         return value
 
 
-def get_set_list_dicts(container: HasSetDefault, key: str, /) -> list[StrDict]:
+def get_set_list_dicts(dict_: StrDict, key: str, /) -> list[StrDict]:
     try:
-        return get_list_dicts(container, key)
+        return get_list_dicts(dict_, key)
     except KeyError:
-        value = container[key] = []
+        value = dict_[key] = []
         return value
 
 
-def get_set_list_strs(container: HasSetDefault, key: str, /) -> list[str]:
+def get_set_list_strs(dict_: StrDict, key: str, /) -> list[str]:
     try:
-        return get_list_strs(container, key)
+        return get_list_strs(dict_, key)
     except KeyError:
-        value = container[key] = []
+        value = dict_[key] = []
         return value
 
 
-def get_set_table(container: HasSetDefault, key: str, /) -> Table:
+def get_set_table(table_: Table, key: str, /) -> Table:
     try:
-        return get_table(container, key)
+        return get_table(table_, key)
     except KeyError:
-        value = container[key] = table()
+        value = table_[key] = table()
         return value
 
 
