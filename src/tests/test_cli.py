@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from pytest import mark, param
+from utilities.constants import MINUTE
 from utilities.pytest import throttle_test
 from utilities.subprocess import run
-from utilities.whenever import MINUTE
 
 from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
 from actions.git_clone_with.constants import GIT_CLONE_WITH_SUB_CMD
@@ -48,17 +48,17 @@ class TestCLI:
             param([TAG_COMMIT_SUB_CMD]),
         ],
     )
-    @throttle_test(delta=MINUTE)
+    @throttle_test(duration=MINUTE)
     def test_main(self, *, args: list[str]) -> None:
         run("action", *args)
 
-    @throttle_test(delta=MINUTE)
+    @throttle_test(duration=MINUTE)
     def test_git_clone_with(self, *, tmp_path: Path) -> None:
         key = tmp_path / "key.txt"
         key.touch()
         run("action", GIT_CLONE_WITH_SUB_CMD, str(key), "owner", "repo", cwd=tmp_path)
 
-    @throttle_test(delta=MINUTE)
+    @throttle_test(duration=MINUTE)
     def test_re_encrypt(self, *, tmp_path: Path) -> None:
         path = tmp_path / "secrets.json"
         path.touch()

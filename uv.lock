@@ -209,7 +209,7 @@ wheels = [
 
 [[package]]
 name = "dycw-actions"
-version = "0.13.7"
+version = "0.13.8"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -280,7 +280,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.180.1"
+version = "0.181.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -289,7 +289,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/67/44/ab459c48b6f7c37a8d67642b3477a74b2ae43c0b65d9e78cd4e9604b49cf/dycw_utilities-0.180.1-py3-none-any.whl", hash = "sha256:8a56fe8204fb7819fba48879b3229cc82b8c07adae01d6edc12a5c320221ac9d", size = 211774, upload-time = "2026-01-14T03:55:15.978Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/78/49040454863e3c1b6857d54ee3735dab1314620888ddbe99f72e5c207ac1/dycw_utilities-0.181.0-py3-none-any.whl", hash = "sha256:42285f092b33bd9fb363bed816a23709a56bef1d7f1e62638f0f7c9bc4fbe82f", size = 213709, upload-time = "2026-01-15T05:22:29.386Z" },
 ]
 
 [package.optional-dependencies]
