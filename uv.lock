@@ -8,6 +8,7 @@ resolution-markers = [
 ]
 
 [options]
+resolution-mode = "lowest-direct"
 prerelease-mode = "disallow"
 
 [[package]]
