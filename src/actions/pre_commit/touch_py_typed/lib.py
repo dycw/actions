@@ -13,7 +13,7 @@ from utilities.throttle import throttle
 from actions import __version__
 from actions.constants import PYPROJECT_TOML
 from actions.logging import LOGGER
-from actions.pre_commit.constants import THROTTLE_DELTA
+from actions.pre_commit.constants import THROTTLE_DURATION
 from actions.pre_commit.utilities import path_throttle_cache
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ def _touch_py_typed(*paths: PathLike) -> None:
 
 
 touch_py_typed = throttle(
-    delta=THROTTLE_DELTA, path=path_throttle_cache(_touch_py_typed)
+    duration=THROTTLE_DURATION, path=path_throttle_cache(_touch_py_typed)
 )(_touch_py_typed)
 
 

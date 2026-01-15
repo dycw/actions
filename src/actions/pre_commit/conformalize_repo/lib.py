@@ -66,7 +66,7 @@ from actions.pre_commit.conformalize_repo.constants import (
     UV_URL,
 )
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
-from actions.pre_commit.constants import THROTTLE_DELTA
+from actions.pre_commit.constants import THROTTLE_DURATION
 from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.replace_sequence_strs.constants import (
     REPLACE_SEQUENCE_STRS_SUB_CMD,
@@ -1308,7 +1308,7 @@ def _run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> 
 
 
 run_pre_commit_update = throttle(
-    delta=THROTTLE_DELTA, path=path_throttle_cache(_run_pre_commit_update)
+    duration=THROTTLE_DURATION, path=path_throttle_cache(_run_pre_commit_update)
 )(_run_pre_commit_update)
 
 
