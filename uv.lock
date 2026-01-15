@@ -8,6 +8,7 @@ resolution-markers = [
 ]
 
 [options]
+resolution-mode = "lowest-direct"
 prerelease-mode = "disallow"
 
 [[package]]
@@ -209,7 +210,7 @@ wheels = [
 
 [[package]]
 name = "dycw-actions"
-version = "0.14.1"
+version = "0.14.2"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
