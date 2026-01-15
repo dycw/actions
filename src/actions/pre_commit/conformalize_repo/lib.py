@@ -877,7 +877,7 @@ def add_pre_commit_config_yaml(
             args: list[str] = [
                 "--upgrade",
                 "--resolution",
-                "highest",
+                "lowest-direct",
                 "--prerelease",
                 "disallow",
             ]
