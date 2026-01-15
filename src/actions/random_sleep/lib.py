@@ -27,9 +27,9 @@ def random_sleep(
         )
     )
     start = get_now()
-    delta = TimeDelta(seconds=choice(range(min, max, step)))
-    LOGGER.info("Sleeping for %s...", delta)
-    end = (start + delta).round(mode="ceil")
+    duration = TimeDelta(seconds=choice(range(min, max, step)))
+    LOGGER.info("Sleeping for %s...", duration)
+    end = (start + duration).round(mode="ceil")
     while (now := get_now()) < end:
         _intermediate(start, now, end, log_freq=log_freq)
     LOGGER.info("Finished running %r", get_func_name(random_sleep))

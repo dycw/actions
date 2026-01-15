@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import time
 from contextlib import suppress
 from re import search
 from subprocess import CalledProcessError
 from typing import TYPE_CHECKING
 
+import utilities.time
 from utilities.functions import ensure_str, get_func_name
 from utilities.tabulate import func_param_desc
 from whenever import TimeDelta
@@ -96,7 +96,7 @@ def _run_hook(hook: str, /, *, sleep: int = SETTINGS.sleep) -> bool:
         "succeeded" if is_success else "failed",
         delta,
     )
-    time.sleep(sleep)
+    utilities.time.sleep(sleep)
     LOGGER.info("Finished sleeping for %s", delta)
     return is_success
 
