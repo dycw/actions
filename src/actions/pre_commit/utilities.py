@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterator, MutableSet
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, assert_never, overload
@@ -248,22 +248,29 @@ def is_partial_str(obj: Any, text: str, /) -> bool:
 
 def get_pyproject_dependencies(doc: TOMLDocument, /) -> PyProjectDependencies:
     out = PyProjectDependencies()
-    if (project_key := "project") in doc:
-        project = get_set_table(doc, project_key)
-        if (dep_key := "dependencies") in project:
-            out.dependencies = get_set_array(project, dep_key)
-        if (opt_dep_key := "optional-dependencies") in project:
-            opt_dependencies = get_set_table(project, opt_dep_key)
+    try:
+        project = get_table(doc, "project")
+    except KeyError:
+        pass
+    else:
+        with suppress(KeyError):
+            out.dependencies = get_array(project, "dependencies")
+        try:
+            opt_dependencies = get_table(project, "optional-dependencies")
+        except KeyError:
+            pass
+        else:
             out.opt_dependencies = {}
             for key in opt_dependencies:
-                out.opt_dependencies[ensure_str(key)] = get_set_array(
-                    opt_dependencies, key
-                )
-    if (dep_grps_key := "dependency-groups") in doc:
-        dep_grps = get_set_table(doc, dep_grps_key)
+                out.opt_dependencies[ensure_str(key)] = get_array(opt_dependencies, key)
+    try:
+        dep_grps = get_table(doc, "dependency-groups")
+    except KeyError:
+        pass
+    else:
         out.dep_groups = {}
         for key in dep_grps:
-            out.dep_groups[ensure_str(key)] = get_set_array(dep_grps, key)
+            out.dep_groups[ensure_str(key)] = get_array(dep_grps, key)
     return out
 
 
