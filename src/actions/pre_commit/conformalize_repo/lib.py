@@ -848,7 +848,9 @@ def add_pre_commit_config_yaml(
         _add_pre_commit_config_repo(
             dict_, BUILTIN, "no-commit-to-branch", priority=LINTER_PRIORITY
         )
-        ###########
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "trailing-whitespace", priority=FORMATTER_PRIORITY
+        )
         _add_pre_commit_config_repo(
             dict_,
             PRE_COMMIT_HOOKS_URL,
@@ -856,7 +858,13 @@ def add_pre_commit_config_yaml(
             rev=True,
             priority=LINTER_PRIORITY,
         )
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "destroyed-symlinks")
+        _add_pre_commit_config_repo(
+            dict_,
+            PRE_COMMIT_HOOKS_URL,
+            "destroyed-symlinks",
+            rev=True,
+            priority=LINTER_PRIORITY,
+        )
         _add_pre_commit_config_repo(
             dict_,
             PRE_COMMIT_HOOKS_URL,
@@ -865,12 +873,6 @@ def add_pre_commit_config_yaml(
             args=("add", ["--autofix"]),
             priority=FORMATTER_PRIORITY,
         )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "no-commit-to-branch", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "trailing-whitespace", priority=FORMATTER_PRIORITY
-        )
         if dockerfmt:
             _add_pre_commit_config_repo(
                 dict_,
@@ -878,6 +880,7 @@ def add_pre_commit_config_yaml(
                 "dockerfmt",
                 rev=True,
                 args=("add", ["--newline", "--write"]),
+                priority=FORMATTER_PRIORITY,
             )
         if prettier:
             _add_pre_commit_config_repo(
@@ -888,19 +891,36 @@ def add_pre_commit_config_yaml(
                 entry="npx prettier --write",
                 language="system",
                 types_or=["markdown", "yaml"],
+                priority=FORMATTER_PRIORITY,
             )
         if python:
             _add_pre_commit_config_repo(
-                dict_, ACTIONS_URL, FORMAT_REQUIREMENTS_SUB_CMD, rev=True
+                dict_,
+                ACTIONS_URL,
+                FORMAT_REQUIREMENTS_SUB_CMD,
+                rev=True,
+                priority=FORMATTER_PRIORITY,
             )
             _add_pre_commit_config_repo(
-                dict_, ACTIONS_URL, REPLACE_SEQUENCE_STRS_SUB_CMD, rev=True
+                dict_,
+                ACTIONS_URL,
+                REPLACE_SEQUENCE_STRS_SUB_CMD,
+                rev=True,
+                priority=FORMATTER_PRIORITY,
             )
             _add_pre_commit_config_repo(
-                dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD, rev=True
+                dict_,
+                ACTIONS_URL,
+                TOUCH_EMPTY_PY_SUB_CMD,
+                rev=True,
+                priority=FORMATTER_PRIORITY,
             )
             _add_pre_commit_config_repo(
-                dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD, rev=True
+                dict_,
+                ACTIONS_URL,
+                TOUCH_PY_TYPED_SUB_CMD,
+                rev=True,
+                priority=FORMATTER_PRIORITY,
             )
             args: list[str] = []
             if len(uv__indexes) >= 1:
@@ -913,15 +933,27 @@ def add_pre_commit_config_yaml(
                 UPDATE_REQUIREMENTS_SUB_CMD,
                 rev=True,
                 args=("add", args) if len(args) >= 1 else None,
+                priority=FORMATTER_PRIORITY,
             )
         if ruff:
             _add_pre_commit_config_repo(
-                dict_, RUFF_URL, "ruff-check", rev=True, args=("add", ["--fix"])
+                dict_,
+                RUFF_URL,
+                "ruff-check",
+                rev=True,
+                args=("add", ["--fix"]),
+                priority=LINTER_PRIORITY,
             )
-            _add_pre_commit_config_repo(dict_, RUFF_URL, "ruff-format", rev=True)
+            _add_pre_commit_config_repo(
+                dict_, RUFF_URL, "ruff-format", rev=True, priority=FORMATTER_PRIORITY
+            )
         if shell:
-            _add_pre_commit_config_repo(dict_, SHFMT_URL, "shfmt", rev=True)
-            _add_pre_commit_config_repo(dict_, SHELLCHECK_URL, "shellcheck", rev=True)
+            _add_pre_commit_config_repo(
+                dict_, SHFMT_URL, "shfmt", rev=True, priority=FORMATTER_PRIORITY
+            )
+            _add_pre_commit_config_repo(
+                dict_, SHELLCHECK_URL, "shellcheck", rev=True, priority=LINTER_PRIORITY
+            )
         if taplo:
             _add_pre_commit_config_repo(
                 dict_,
@@ -939,6 +971,7 @@ def add_pre_commit_config_yaml(
                         "reorder_keys=true",
                     ],
                 ),
+                priority=FORMATTER_PRIORITY,
             )
         if uv:
             args: list[str] = [
@@ -957,6 +990,7 @@ def add_pre_commit_config_yaml(
                 rev=True,
                 files=None if script is None else rf"^{escape(script)}$",
                 args=("add", args),
+                priority=FORMATTER_PRIORITY,
             )
 
 
@@ -973,7 +1007,7 @@ def _add_pre_commit_config_repo(
     files: str | None = None,
     types_or: list[str] | None = None,
     args: tuple[Literal["add", "exact"], list[str]] | None = None,
-    priority: int,  # | None = None,
+    priority: int | None = None,
 ) -> None:
     repos_list = get_set_list_dicts(pre_commit_dict, "repos")
     repo_dict = ensure_contains_partial_dict(
