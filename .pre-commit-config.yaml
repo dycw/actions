@@ -95,6 +95,6 @@ repos:
         args:
           - --upgrade
           - --resolution
-          - lowest-direct
+          - highest
           - --prerelease
           - disallow
