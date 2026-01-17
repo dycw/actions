@@ -4,30 +4,31 @@
 
 [dependency-groups]
   dev = [
-    "orjson>=3.11.5, <4",
-    "pyright>=1.1.408, <2",
-    "rich>=14.2.0, <15",
-    "dycw-utilities[test]>=0.183.3, <1",
+    "orjson>=3.11.5",
+    "pyright>=1.1.408",
+    "rich>=14.2.0",
+    "dycw-utilities[test]>=0.183.3",
   ]
 
 [project]
   dependencies = [
-    "click>=8.3.1, <9",
-    "coloredlogs>=15.0.1, <16",
-    "dycw-utilities>=0.183.3, <1",
-    "inflect>=7.5.0, <8",
-    "libcst>=1.8.6, <2",
-    "ordered-set>=4.1.0, <5",
-    "packaging>=25.0, <26",
-    "pydantic>=2.12.5, <3",
-    "pyyaml>=6.0.3, <7",
-    "requests>=2.32.5, <3",
-    "rich>=14.2.0, <15",
-    "ruamel-yaml>=0.19.1, <1",
-    "tabulate>=0.9.0, <1",
-    "tomlkit>=0.14.0, <1",
-    "typed-settings[attrs,click]>=25.3.0",
-    "xdg-base-dirs>=6.0.2, <7",
+    "attrs>=25.4.0",
+    "click>=8.3.1",
+    "coloredlogs>=15.0.1",
+    "dycw-utilities>=0.183.3",
+    "inflect>=7.5.0",
+    "libcst>=1.8.6",
+    "ordered-set>=4.1.0",
+    "packaging>=25.0",
+    "pydantic>=2.12.5",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "rich>=14.2.0",
+    "ruamel-yaml>=0.19.1",
+    "tabulate>=0.9.0",
+    "tomlkit>=0.14.0",
+    "typed-settings>=25.3.0",
+    "xdg-base-dirs>=6.0.2",
   ]
   description = "Library of actions"
   name = "dycw-actions"
@@ -40,6 +41,7 @@
 
   [project.optional-dependencies]
     cli = [
+      "attrs==25.4.0",
       "click==8.3.1",
       "coloredlogs==15.0.1",
       "dycw-utilities==0.183.3",
@@ -54,7 +56,7 @@
       "ruamel-yaml==0.19.1",
       "tabulate==0.9.0",
       "tomlkit==0.14.0",
-      "typed-settings[attrs,click]==25.3.0",
+      "typed-settings==25.3.0",
       "xdg-base-dirs==6.0.2",
     ]
 
