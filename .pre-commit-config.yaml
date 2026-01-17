@@ -4,7 +4,6 @@ repos:
     hooks:
       - id: conformalize-repo
         args:
-          - --ci--pull-request--pre-commit
           - --ci--pull-request--pyright
           - --ci--pull-request--pytest--all-versions
           - --ci--pull-request--pytest--macos
