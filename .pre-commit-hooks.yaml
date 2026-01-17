@@ -1,39 +1,39 @@
 - id: conformalize-repo
   name: conformalize-repo
-  entry: action pre-commit conformalize-repo
+  entry: cli pre-commit conformalize-repo
   language: python
   always_run: true
   pass_filenames: false
   description: Conformalize a repo
 - id: format-requirements
   name: format-requirements
-  entry: action pre-commit format-requirements
+  entry: cli pre-commit format-requirements
   language: python
   types: [toml]
   files: pyproject\.toml
   description: Format a set of requirements
 - id: replace-sequence-strs
   name: replace-sequence-strs
-  entry: action pre-commit replace-sequence-strs
+  entry: cli pre-commit replace-sequence-strs
   language: python
   types: [python]
   description: Replace 'Sequence[str]' with 'list[str]'
 - id: touch-empty-py
   name: touch-empty-py
-  entry: action pre-commit touch-empty-py
+  entry: cli pre-commit touch-empty-py
   language: python
   types: [python]
   description: Touch empty '.py' files
 - id: touch-py-typed
   name: touch-py-typed
-  entry: action pre-commit touch-py-typed
+  entry: cli pre-commit touch-py-typed
   language: python
   types: [toml]
   files: pyproject\.toml
   description: Touch 'py.typed'
 - id: update-requirements
   name: update-requirements
-  entry: uv tool run --from dycw-actions@latest --isolated --resolution highest --prerelease disallow action pre-commit update-requirements
+  entry: uv tool run --from dycw-actions[cli]@latest --isolated --resolution highest --prerelease disallow cli pre-commit update-requirements
   language: system
   types: [toml]
   files: pyproject\.toml
