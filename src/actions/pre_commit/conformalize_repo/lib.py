@@ -55,8 +55,11 @@ from actions.pre_commit.conformalize_repo.action_dicts import (
     update_ca_certificates_dict,
 )
 from actions.pre_commit.conformalize_repo.constants import (
+    BUILTIN,
     CONFORMALIZE_REPO_SUB_CMD,
     DOCKERFMT_URL,
+    FORMATTER_PRIORITY,
+    LINTER_PRIORITY,
     PATH_CONFIGS,
     PRE_COMMIT_HOOKS_URL,
     RUFF_URL,
@@ -792,32 +795,88 @@ def add_pre_commit_config_yaml(
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
-        _add_pre_commit_config_repo(dict_, ACTIONS_URL, CONFORMALIZE_REPO_SUB_CMD)
         _add_pre_commit_config_repo(
-            dict_, PRE_COMMIT_HOOKS_URL, "check-executables-have-shebangs"
+            dict_,
+            ACTIONS_URL,
+            CONFORMALIZE_REPO_SUB_CMD,
+            rev=True,
+            priority=FORMATTER_PRIORITY,
         )
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "check-merge-conflict")
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "check-symlinks")
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-added-large-files", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-case-conflict", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-executables-have-shebangs", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-json", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-merge-conflict", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-symlinks", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-toml", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-xml", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-yaml", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "detect-private-key", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "end-of-file-fixer", priority=FORMATTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "fix-byte-order-marker", priority=FORMATTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_,
+            BUILTIN,
+            "mixed-line-ending",
+            args=("add", ["--fix=lf"]),
+            priority=FORMATTER_PRIORITY,
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "no-commit-to-branch", priority=LINTER_PRIORITY
+        )
+        ###########
+        _add_pre_commit_config_repo(
+            dict_,
+            PRE_COMMIT_HOOKS_URL,
+            "check-illegal-windows-names",
+            rev=True,
+            priority=LINTER_PRIORITY,
+        )
         _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "destroyed-symlinks")
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "detect-private-key")
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "end-of-file-fixer")
-        _add_pre_commit_config_repo(
-            dict_, PRE_COMMIT_HOOKS_URL, "mixed-line-ending", args=("add", ["--fix=lf"])
-        )
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "no-commit-to-branch")
         _add_pre_commit_config_repo(
             dict_,
             PRE_COMMIT_HOOKS_URL,
             "pretty-format-json",
+            rev=True,
             args=("add", ["--autofix"]),
+            priority=FORMATTER_PRIORITY,
         )
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "no-commit-to-branch")
-        _add_pre_commit_config_repo(dict_, PRE_COMMIT_HOOKS_URL, "trailing-whitespace")
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "no-commit-to-branch", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
+            dict_, BUILTIN, "trailing-whitespace", priority=FORMATTER_PRIORITY
+        )
         if dockerfmt:
             _add_pre_commit_config_repo(
                 dict_,
                 DOCKERFMT_URL,
                 "dockerfmt",
+                rev=True,
                 args=("add", ["--newline", "--write"]),
             )
         if prettier:
@@ -831,12 +890,18 @@ def add_pre_commit_config_yaml(
                 types_or=["markdown", "yaml"],
             )
         if python:
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, FORMAT_REQUIREMENTS_SUB_CMD)
             _add_pre_commit_config_repo(
-                dict_, ACTIONS_URL, REPLACE_SEQUENCE_STRS_SUB_CMD
+                dict_, ACTIONS_URL, FORMAT_REQUIREMENTS_SUB_CMD, rev=True
             )
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD)
-            _add_pre_commit_config_repo(dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD)
+            _add_pre_commit_config_repo(
+                dict_, ACTIONS_URL, REPLACE_SEQUENCE_STRS_SUB_CMD, rev=True
+            )
+            _add_pre_commit_config_repo(
+                dict_, ACTIONS_URL, TOUCH_EMPTY_PY_SUB_CMD, rev=True
+            )
+            _add_pre_commit_config_repo(
+                dict_, ACTIONS_URL, TOUCH_PY_TYPED_SUB_CMD, rev=True
+            )
             args: list[str] = []
             if len(uv__indexes) >= 1:
                 args.extend(["--index", ",".join(v for _, v in uv__indexes)])
@@ -846,21 +911,23 @@ def add_pre_commit_config_yaml(
                 dict_,
                 ACTIONS_URL,
                 UPDATE_REQUIREMENTS_SUB_CMD,
+                rev=True,
                 args=("add", args) if len(args) >= 1 else None,
             )
         if ruff:
             _add_pre_commit_config_repo(
-                dict_, RUFF_URL, "ruff-check", args=("add", ["--fix"])
+                dict_, RUFF_URL, "ruff-check", rev=True, args=("add", ["--fix"])
             )
-            _add_pre_commit_config_repo(dict_, RUFF_URL, "ruff-format")
+            _add_pre_commit_config_repo(dict_, RUFF_URL, "ruff-format", rev=True)
         if shell:
-            _add_pre_commit_config_repo(dict_, SHFMT_URL, "shfmt")
-            _add_pre_commit_config_repo(dict_, SHELLCHECK_URL, "shellcheck")
+            _add_pre_commit_config_repo(dict_, SHFMT_URL, "shfmt", rev=True)
+            _add_pre_commit_config_repo(dict_, SHELLCHECK_URL, "shellcheck", rev=True)
         if taplo:
             _add_pre_commit_config_repo(
                 dict_,
                 TAPLO_URL,
                 "taplo-format",
+                rev=True,
                 args=(
                     "exact",
                     [
@@ -887,6 +954,7 @@ def add_pre_commit_config_yaml(
                 dict_,
                 UV_URL,
                 "uv-lock",
+                rev=True,
                 files=None if script is None else rf"^{escape(script)}$",
                 args=("add", args),
             )
@@ -898,16 +966,18 @@ def _add_pre_commit_config_repo(
     id_: str,
     /,
     *,
+    rev: bool = False,
     name: str | None = None,
     entry: str | None = None,
     language: str | None = None,
     files: str | None = None,
     types_or: list[str] | None = None,
     args: tuple[Literal["add", "exact"], list[str]] | None = None,
+    priority: int,  # | None = None,
 ) -> None:
     repos_list = get_set_list_dicts(pre_commit_dict, "repos")
     repo_dict = ensure_contains_partial_dict(
-        repos_list, {"repo": url}, extra={} if url == "local" else {"rev": "master"}
+        repos_list, {"repo": url}, extra={"rev": "master"} if rev else {}
     )
     hooks_list = get_set_list_dicts(repo_dict, "hooks")
     hook_dict = ensure_contains_partial_dict(hooks_list, {"id": id_})
@@ -930,6 +1000,8 @@ def _add_pre_commit_config_repo(
                 hook_dict["args"] = args_i
             case never:
                 assert_never(never)
+    if priority is not None:
+        hook_dict["priority"] = priority
 
 
 ##
