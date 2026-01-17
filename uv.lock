@@ -8,7 +8,6 @@ resolution-markers = [
 ]
 
 [options]
-resolution-mode = "lowest-direct"
 prerelease-mode = "disallow"
 
 [[package]]
@@ -210,9 +209,29 @@ wheels = [
 
 [[package]]
 name = "dycw-actions"
-version = "0.14.4"
+version = "0.14.5"
 source = { editable = "." }
 dependencies = [
+    { name = "click" },
+    { name = "coloredlogs" },
+    { name = "dycw-utilities" },
+    { name = "inflect" },
+    { name = "libcst" },
+    { name = "ordered-set" },
+    { name = "packaging" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "rich" },
+    { name = "ruamel-yaml" },
+    { name = "tabulate" },
+    { name = "tomlkit" },
+    { name = "typed-settings", extra = ["attrs", "click"] },
+    { name = "xdg-base-dirs" },
+]
+
+[package.optional-dependencies]
+cli = [
     { name = "click" },
     { name = "coloredlogs" },
     { name = "dycw-utilities" },
@@ -242,26 +261,43 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3.1,<9" },
+    { name = "click", marker = "extra == 'cli'", specifier = "==8.3.1" },
     { name = "coloredlogs", specifier = ">=15.0.1,<16" },
-    { name = "dycw-utilities", specifier = ">=0.183.0,<1" },
+    { name = "coloredlogs", marker = "extra == 'cli'", specifier = "==15.0.1" },
+    { name = "dycw-utilities", specifier = ">=0.183.3,<1" },
+    { name = "dycw-utilities", marker = "extra == 'cli'", specifier = "==0.183.3" },
     { name = "inflect", specifier = ">=7.5.0,<8" },
+    { name = "inflect", marker = "extra == 'cli'", specifier = "==7.5.0" },
     { name = "libcst", specifier = ">=1.8.6,<2" },
+    { name = "libcst", marker = "extra == 'cli'", specifier = "==1.8.6" },
     { name = "ordered-set", specifier = ">=4.1.0,<5" },
+    { name = "ordered-set", marker = "extra == 'cli'", specifier = "==4.1.0" },
     { name = "packaging", specifier = ">=25.0,<26" },
+    { name = "packaging", marker = "extra == 'cli'", specifier = "==25.0" },
     { name = "pydantic", specifier = ">=2.12.5,<3" },
+    { name = "pydantic", marker = "extra == 'cli'", specifier = "==2.12.5" },
     { name = "pyyaml", specifier = ">=6.0.3,<7" },
+    { name = "pyyaml", marker = "extra == 'cli'", specifier = "==6.0.3" },
     { name = "requests", specifier = ">=2.32.5,<3" },
+    { name = "requests", marker = "extra == 'cli'", specifier = "==2.32.5" },
     { name = "rich", specifier = ">=14.2.0,<15" },
+    { name = "rich", marker = "extra == 'cli'", specifier = "==14.2.0" },
     { name = "ruamel-yaml", specifier = ">=0.19.1,<1" },
+    { name = "ruamel-yaml", marker = "extra == 'cli'", specifier = "==0.19.1" },
     { name = "tabulate", specifier = ">=0.9.0,<1" },
+    { name = "tabulate", marker = "extra == 'cli'", specifier = "==0.9.0" },
     { name = "tomlkit", specifier = ">=0.14.0,<1" },
+    { name = "tomlkit", marker = "extra == 'cli'", specifier = "==0.14.0" },
     { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0" },
+    { name = "typed-settings", extras = ["attrs", "click"], marker = "extra == 'cli'", specifier = "==25.3.0" },
     { name = "xdg-base-dirs", specifier = ">=6.0.2,<7" },
+    { name = "xdg-base-dirs", marker = "extra == 'cli'", specifier = "==6.0.2" },
 ]
+provides-extras = ["cli"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.181.0,<1" },
+    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.183.3,<1" },
     { name = "orjson", specifier = ">=3.11.5,<4" },
     { name = "pyright", specifier = ">=1.1.408,<2" },
     { name = "rich", specifier = ">=14.2.0,<15" },
@@ -281,7 +317,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.183.0"
+version = "0.183.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -290,7 +326,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2f/5b/488dab35c6ee6a03517cce961a9f01174e19e39f00893c2588dfe9352a1c/dycw_utilities-0.183.0-py3-none-any.whl", hash = "sha256:041a55183dfdbe2c062c7f8dca492a079cd00bbe8cd30a8575310352fca0809f", size = 214574, upload-time = "2026-01-17T09:29:13.798Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/f2/01c06f47cf065ed9507cab8857d8a59058e0a8a59e78f97b105ef0df6cf5/dycw_utilities-0.183.3-py3-none-any.whl", hash = "sha256:e55fa5d93816b80d6887ab2955f6e7c20b802f1a72ef6051579589d5103d7b29", size = 214185, upload-time = "2026-01-17T12:59:36.086Z" },
 ]
 
 [package.optional-dependencies]
