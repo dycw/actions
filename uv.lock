@@ -243,7 +243,7 @@ dev = [
 requires-dist = [
     { name = "click", specifier = ">=8.3.1,<9" },
     { name = "coloredlogs", specifier = ">=15.0.1,<16" },
-    { name = "dycw-utilities", specifier = ">=0.181.0,<1" },
+    { name = "dycw-utilities", specifier = ">=0.183.0,<1" },
     { name = "inflect", specifier = ">=7.5.0,<8" },
     { name = "libcst", specifier = ">=1.8.6,<2" },
     { name = "ordered-set", specifier = ">=4.1.0,<5" },
@@ -255,7 +255,7 @@ requires-dist = [
     { name = "ruamel-yaml", specifier = ">=0.19.1,<1" },
     { name = "tabulate", specifier = ">=0.9.0,<1" },
     { name = "tomlkit", specifier = ">=0.14.0,<1" },
-    { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0,<26" },
+    { name = "typed-settings", extras = ["attrs", "click"], specifier = ">=25.3.0" },
     { name = "xdg-base-dirs", specifier = ">=6.0.2,<7" },
 ]
 
@@ -281,7 +281,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.181.0"
+version = "0.183.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -290,7 +290,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/78/49040454863e3c1b6857d54ee3735dab1314620888ddbe99f72e5c207ac1/dycw_utilities-0.181.0-py3-none-any.whl", hash = "sha256:42285f092b33bd9fb363bed816a23709a56bef1d7f1e62638f0f7c9bc4fbe82f", size = 213709, upload-time = "2026-01-15T05:22:29.386Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/5b/488dab35c6ee6a03517cce961a9f01174e19e39f00893c2588dfe9352a1c/dycw_utilities-0.183.0-py3-none-any.whl", hash = "sha256:041a55183dfdbe2c062c7f8dca492a079cd00bbe8cd30a8575310352fca0809f", size = 214574, upload-time = "2026-01-17T09:29:13.798Z" },
 ]
 
 [package.optional-dependencies]
