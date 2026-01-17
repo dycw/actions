@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING
 
 from ordered_set import OrderedSet
 from pydantic import TypeAdapter
+from tomlkit import string
 from utilities.functions import ensure_str, get_func_name, max_nullable
+from utilities.packaging import Requirement
 from utilities.tabulate import func_param_desc
 from utilities.text import repr_str
 
@@ -25,6 +27,8 @@ from actions.pre_commit.update_requirements.settings import SETTINGS
 from actions.pre_commit.utilities import (
     get_aot,
     get_pyproject_dependencies,
+    get_set_array,
+    get_set_table,
     get_table,
     yield_pyproject_toml,
     yield_toml_doc,
@@ -35,7 +39,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
-    from utilities.packaging import Requirement
+    from tomlkit import TOMLDocument
     from utilities.types import PathLike, StrDict
 
     from actions.pre_commit.update_requirements.classes import Version2or3, VersionSet
@@ -87,6 +91,7 @@ def _format_path(
         get_pyproject_dependencies(doc).apply(
             partial(_format_req, versions=versions_use)
         )
+        _pin_cli_dependencies(doc, versions_use)
 
 
 def _get_versions(
@@ -188,6 +193,30 @@ def _format_req(requirement: Requirement, /, *, versions: VersionSet) -> Require
     if new_upper is not None:
         requirement = requirement.replace("<", str(new_upper))
     return requirement
+
+
+def _pin_cli_dependencies(doc: TOMLDocument, versions: VersionSet, /) -> None:
+    try:
+        project = get_table(doc, "project")
+    except KeyError:
+        return
+    try:
+        _ = get_table(project, "scripts")
+    except KeyError:
+        return
+    dependencies = get_set_array(project, "dependencies")
+    opt_dependencies = get_set_table(project, "optional-dependencies")
+    cli = get_set_array(opt_dependencies, "cli")
+    cli.clear()
+    for dep in dependencies:
+        req = Requirement(dep)
+        try:
+            version = versions[req.name]
+        except KeyError:
+            pass
+        else:
+            req = req.replace(">=", None).replace("<", None).replace("==", str(version))
+            cli.append(string(str(req)))
 
 
 __all__ = ["update_requirements"]
