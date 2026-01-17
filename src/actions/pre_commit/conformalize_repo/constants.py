@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from re import search
 
+from utilities.constants import IS_CI
 from utilities.pathlib import GetRootError, get_root
-from utilities.pytest import IS_CI
 
 from actions.pre_commit.constants import PATH_PRE_COMMIT
 
