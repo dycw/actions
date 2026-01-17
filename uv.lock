@@ -8,6 +8,7 @@ resolution-markers = [
 ]
 
 [options]
+resolution-mode = "lowest-direct"
 prerelease-mode = "disallow"
 
 [[package]]
@@ -280,7 +281,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.183.1"
+version = "0.183.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -289,7 +290,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/db/fe/5c9b7a1fc387ea491cea664432ea14f0226ad4312475059be6b1c5845fef/dycw_utilities-0.183.1-py3-none-any.whl", hash = "sha256:cca4ff97d384289034a9028cac7fe11b432d416d209d983c7b29046d8ab9d7d6", size = 214110, upload-time = "2026-01-17T12:35:00.043Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/5b/488dab35c6ee6a03517cce961a9f01174e19e39f00893c2588dfe9352a1c/dycw_utilities-0.183.0-py3-none-any.whl", hash = "sha256:041a55183dfdbe2c062c7f8dca492a079cd00bbe8cd30a8575310352fca0809f", size = 214574, upload-time = "2026-01-17T09:29:13.798Z" },
 ]
 
 [package.optional-dependencies]

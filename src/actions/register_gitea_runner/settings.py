@@ -3,8 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from typed_settings import load_settings, option, settings
-from utilities.constants import USER
-from utilities.socket import HOSTNAME
+from utilities.constants import HOSTNAME, USER
 
 from actions.utilities import LOADER
 
