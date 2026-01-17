@@ -741,7 +741,7 @@ def _add_envrc_uv_text(
         strip_and_dedent(f"""
             export UV_PRERELEASE='disallow'
             export UV_PYTHON='{python_version}'
-            export UV_RESOLUTION='lowest-direct'
+            export UV_RESOLUTION='highest'
             export UV_VENV_CLEAR=1
             if ! command -v uv >/dev/null 2>&1; then
             \techo_date "ERROR: 'uv' not found" && exit 1
@@ -877,7 +877,7 @@ def add_pre_commit_config_yaml(
             args: list[str] = [
                 "--upgrade",
                 "--resolution",
-                "lowest-direct",
+                "highest",
                 "--prerelease",
                 "disallow",
             ]
