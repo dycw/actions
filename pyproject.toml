@@ -57,6 +57,7 @@
       "typed-settings[attrs,click]==25.3.0",
       "xdg-base-dirs==6.0.2",
     ]
+
 [tool]
   [tool.uv]
     [tool.uv.build-backend]
