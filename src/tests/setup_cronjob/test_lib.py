@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from utilities.getpass import USER
+from utilities.constants import USER
 
 from actions.setup_cronjob.lib import _get_crontab
 
