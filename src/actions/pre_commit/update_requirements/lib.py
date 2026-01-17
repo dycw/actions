@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from ordered_set import OrderedSet
 from pydantic import TypeAdapter
+from tomlkit import string
 from utilities.functions import ensure_str, get_func_name, max_nullable
 from utilities.packaging import Requirement
 from utilities.tabulate import func_param_desc
@@ -208,8 +209,14 @@ def _pin_cli_dependencies(doc: TOMLDocument, versions: VersionSet, /) -> None:
     cli = get_set_array(opt_dependencies, "cli")
     cli.clear()
     for dep in dependencies:
-        Requirement(dep).replace()
-        a
+        req = Requirement(dep)
+        try:
+            version = versions[req.name]
+        except KeyError:
+            pass
+        else:
+            req = req.replace(">=", None).replace("<", None).replace("==", str(version))
+            cli.append(string(str(req)))
 
 
 __all__ = ["update_requirements"]
