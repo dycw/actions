@@ -50,16 +50,16 @@ class TestCLI:
     )
     @throttle_test(duration=MINUTE)
     def test_main(self, *, args: list[str]) -> None:
-        run("action", *args)
+        run("cli", *args)
 
     @throttle_test(duration=MINUTE)
     def test_git_clone_with(self, *, tmp_path: Path) -> None:
         key = tmp_path / "key.txt"
         key.touch()
-        run("action", GIT_CLONE_WITH_SUB_CMD, str(key), "owner", "repo", cwd=tmp_path)
+        run("cli", GIT_CLONE_WITH_SUB_CMD, str(key), "owner", "repo", cwd=tmp_path)
 
     @throttle_test(duration=MINUTE)
     def test_re_encrypt(self, *, tmp_path: Path) -> None:
         path = tmp_path / "secrets.json"
         path.touch()
-        run("action", RE_ENCRYPT_SUB_CMD, str(path), cwd=tmp_path)
+        run("cli", RE_ENCRYPT_SUB_CMD, str(path), cwd=tmp_path)
