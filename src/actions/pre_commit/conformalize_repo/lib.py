@@ -815,6 +815,9 @@ def add_pre_commit_config_yaml(
             dict_, BUILTIN, "check-json", priority=LINTER_PRIORITY
         )
         _add_pre_commit_config_repo(
+            dict_, BUILTIN, "check-json5", priority=LINTER_PRIORITY
+        )
+        _add_pre_commit_config_repo(
             dict_, BUILTIN, "check-merge-conflict", priority=LINTER_PRIORITY
         )
         _add_pre_commit_config_repo(
