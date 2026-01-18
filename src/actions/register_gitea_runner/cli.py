@@ -22,6 +22,7 @@ def register_gitea_runner_sub_cmd(settings: Settings, /) -> None:
         gitea_container_name=settings.gitea_container_name,
         runner_certificate=settings.runner_certificate,
         runner_capacity=settings.runner_capacity,
+        runner_labels=settings.runner_labels,
         runner_container_name=settings.runner_container_name,
         gitea_host=settings.gitea_host,
         gitea_port=settings.gitea_port,
