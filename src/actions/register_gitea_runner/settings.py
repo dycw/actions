@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import suppress
-from os import environ, getenv
+from os import environ
 from pathlib import Path
 
 from typed_settings import load_settings, option, settings
