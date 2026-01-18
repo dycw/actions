@@ -8,7 +8,7 @@ from utilities.constants import CPU_COUNT, HOSTNAME, USER
 
 from actions.utilities import LOADER
 
-_DEFAULT_HOST = "gitea.maihn"
+_DEFAULT_HOST = "gitea.main"
 
 
 @settings
