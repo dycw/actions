@@ -1410,16 +1410,16 @@ def run_bump_my_version(*, modifications: MutableSet[Path] | None = None) -> Non
 ##
 
 
-def _run_pre_commit_update(*, modifications: MutableSet[Path] | None = None) -> None:
+def _run_prek_autoupdate(*, modifications: MutableSet[Path] | None = None) -> None:
     current = PRE_COMMIT_CONFIG_YAML.read_text()
-    logged_run("pre-commit", "autoupdate", print=True)
+    logged_run("prek", "autoupdate", print=True)
     if (modifications is not None) and (PRE_COMMIT_CONFIG_YAML.read_text() != current):
         modifications.add(PRE_COMMIT_CONFIG_YAML)
 
 
 run_pre_commit_update = throttle(
-    duration=THROTTLE_DURATION, path=path_throttle_cache(_run_pre_commit_update)
-)(_run_pre_commit_update)
+    duration=THROTTLE_DURATION, path=path_throttle_cache(_run_prek_autoupdate)
+)(_run_prek_autoupdate)
 
 
 ##
