@@ -1,14 +1,19 @@
 from __future__ import annotations
 
-from os import getenv
+from contextlib import suppress
+from os import environ, getenv
 from pathlib import Path
 
 from typed_settings import load_settings, option, settings
-from utilities.constants import CPU_COUNT, HOSTNAME, USER
+from utilities.constants import CPU_COUNT, HOSTNAME, SYSTEM, USER
 
 from actions.utilities import LOADER
 
 _DEFAULT_HOST = "gitea.main"
+_RUNNER_INSTANCE_NAME_PARTS: list[str] = [USER, HOSTNAME]
+with suppress(KeyError):
+    _RUNNER_INSTANCE_NAME_PARTS.append(environ["SUBNET"])
+_RUNNER_INSTANCE_NAME = "--".join(_RUNNER_INSTANCE_NAME_PARTS).lower()
 
 
 @settings
@@ -23,10 +28,11 @@ class Settings:
     runner_capacity: int = option(
         default=max(round(CPU_COUNT / 2), 1), help="Runner capacity"
     )
-    runner_labels: list[str] = option(factory=list, help="Runner labels")
+    runner_labels: list[str] = option(
+        factory=lambda: [f"host-{SYSTEM}"], help="Runner labels"
+    )
     runner_instance_name: str = option(
-        default=f"{USER}--{HOSTNAME}{getenv('SUBNET', '')}".lower(),
-        help="Runner instance name",
+        default=_RUNNER_INSTANCE_NAME, help="Runner instance name"
     )
     gitea_host: str = option(default=_DEFAULT_HOST, help="Gitea host")
     gitea_port: int = option(default=3000, help="Gitea port")
