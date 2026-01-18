@@ -109,7 +109,7 @@ def register_against_local(
 
 def _check_certificate(*, certificate: PathLike = SETTINGS.runner_certificate) -> None:
     if not Path(certificate).is_file():
-        msg = f"Missing certificate {certificate!r}"
+        msg = f"Missing certificate {str(certificate)!r}"
         raise FileNotFoundError(msg)
 
 
@@ -235,7 +235,7 @@ def _start_runner(
     gitea_host: str = SETTINGS.gitea_host,
     gitea_port: int = SETTINGS.gitea_port,
     runner_instance_name: str = SETTINGS.runner_instance_name,
-    runner_labels: MaybeSequenceStr = SETTINGS.runner_labels,
+    runner_labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
 ) -> None:
     _check_certificate(certificate=runner_certificate)
     _check_token(token)
