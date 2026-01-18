@@ -24,6 +24,7 @@ class Settings:
         default=Path("root.pem"), help="Runner root certificate"
     )
     runner_container_name: str = option(default="runner", help="Runner container name")
+    runner_labels: list[str] = option(factory=list, help="Runner labels")
 
 
 SETTINGS = load_settings(Settings, [LOADER])

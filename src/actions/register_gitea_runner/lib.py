@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from requests import get
 from utilities.atomicwrites import writer
 from utilities.functions import get_func_name
+from utilities.iterables import always_iterable
 from utilities.subprocess import chmod, rm_cmd, ssh, sudo_cmd
 from utilities.tabulate import func_param_desc
 
@@ -23,7 +24,7 @@ from actions.register_gitea_runner.settings import SETTINGS
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
-    from utilities.types import PathLike
+    from utilities.types import MaybeSequenceStr, PathLike
 
 
 def register_gitea_runner(
@@ -38,6 +39,7 @@ def register_gitea_runner(
     gitea_host: str = SETTINGS.gitea_host,
     gitea_port: int = SETTINGS.gitea_port,
     runner_instance_name: str = SETTINGS.runner_instance_name,
+    runner_labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
 ) -> None:
     """Register against a remote instance of Gitea."""
     LOGGER.info(
@@ -54,6 +56,7 @@ def register_gitea_runner(
             f"{gitea_host=}",
             f"{gitea_port=}",
             f"{runner_instance_name=}",
+            f"{runner_labels=}",
         )
     )
     token = ssh(
@@ -71,6 +74,7 @@ def register_gitea_runner(
         gitea_host=gitea_host,
         gitea_port=gitea_port,
         runner_instance_name=runner_instance_name,
+        runner_labels=runner_labels,
     )
     LOGGER.info("Finished running %r", get_func_name(register_gitea_runner))
 
@@ -140,13 +144,14 @@ def _docker_run_act_runner_args(
     port: int = SETTINGS.gitea_port,
     runner_certificate: PathLike = SETTINGS.runner_certificate,
     instance_name: str = SETTINGS.runner_instance_name,
+    runner_labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
     container_name: str = SETTINGS.runner_container_name,
 ) -> list[str]:
     config_host = _get_config_path(token)
     config_cont = "/config.yml"
     entrypoint_host = _get_entrypoint_path(host=host, port=port)
     entrypoint_cont = Path("/usr/local/bin/entrypoint.sh")
-    return [
+    args: list[str] = [
         "docker",
         "run",
         "--detach",
@@ -160,6 +165,12 @@ def _docker_run_act_runner_args(
         f"GITEA_RUNNER_NAME={instance_name}",
         "--env",
         f"GITEA_RUNNER_REGISTRATION_TOKEN={token}",
+    ]
+    if runner_labels is not None:
+        joined = ",".join(always_iterable(runner_labels))
+        args.extend(["--env", f"GITEA_RUNNER_LABELS={joined}"])
+    return [
+        *args,
         "--name",
         container_name,
         "--restart",
@@ -224,6 +235,7 @@ def _start_runner(
     gitea_host: str = SETTINGS.gitea_host,
     gitea_port: int = SETTINGS.gitea_port,
     runner_instance_name: str = SETTINGS.runner_instance_name,
+    runner_labels: MaybeSequenceStr = SETTINGS.runner_labels,
 ) -> None:
     _check_certificate(certificate=runner_certificate)
     _check_token(token)
@@ -239,6 +251,7 @@ def _start_runner(
             port=gitea_port,
             runner_certificate=runner_certificate,
             instance_name=runner_instance_name,
+            runner_labels=runner_labels,
             container_name=runner_container_name,
         )
     )
