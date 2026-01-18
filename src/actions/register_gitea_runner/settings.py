@@ -28,9 +28,7 @@ class Settings:
     runner_capacity: int = option(
         default=max(round(CPU_COUNT / 2), 1), help="Runner capacity"
     )
-    runner_labels: list[str] = option(
-        factory=lambda: [f"host-{SYSTEM}"], help="Runner labels"
-    )
+    runner_labels: list[str] = option(default=[f"host-{SYSTEM}"], help="Runner labels")
     runner_instance_name: str = option(
         default=_RUNNER_INSTANCE_NAME, help="Runner instance name"
     )
