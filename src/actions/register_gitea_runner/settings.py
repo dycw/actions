@@ -17,20 +17,20 @@ class Settings:
     ssh_host: str = option(default=_DEFAULT_HOST, help="SSH host")
     gitea_container_user: str = option(default="git", help="Gitea container user name")
     gitea_container_name: str = option(default="gitea", help="Gitea container name")
-    gitea_host: str = option(default=_DEFAULT_HOST, help="Gitea host")
-    gitea_port: int = option(default=3000, help="Gitea port")
+    runner_certificate: Path = option(
+        default=Path("root.pem"), help="Runner root certificate"
+    )
     runner_capacity: int = option(
         default=max(round(CPU_COUNT / 2), 1), help="Runner capacity"
     )
+    runner_labels: list[str] = option(factory=list, help="Runner labels")
     runner_instance_name: str = option(
         default=f"{USER}--{HOSTNAME}{getenv('SUBNET', '')}".lower(),
         help="Runner instance name",
     )
-    runner_certificate: Path = option(
-        default=Path("root.pem"), help="Runner root certificate"
-    )
+    gitea_host: str = option(default=_DEFAULT_HOST, help="Gitea host")
+    gitea_port: int = option(default=3000, help="Gitea port")
     runner_container_name: str = option(default="runner", help="Runner container name")
-    runner_labels: list[str] = option(factory=list, help="Runner labels")
 
 
 SETTINGS = load_settings(Settings, [LOADER])
