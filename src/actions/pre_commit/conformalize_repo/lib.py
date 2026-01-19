@@ -63,8 +63,6 @@ def conformalize_repo(
     pytest__timeout: int | None = SETTINGS.pytest__timeout,
     python_package_name: str | None = SETTINGS.python_package_name,
     python_version: str = SETTINGS.python_version,
-    repo_name: str | None = SETTINGS.repo_name,
-    uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     modifications: set[Path] = set()
     run_ripgrep_and_replace(modifications=modifications, version=python_version)
@@ -93,253 +91,6 @@ def conformalize_repo(
         )
         sys.exit(1)
     LOGGER.info("Finished running %r", get_func_name(conformalize_repo))
-
-
-##
-
-
-def add_ci_pull_request_yaml(
-    *,
-    gitea: bool = SETTINGS.ci__gitea,
-    modifications: MutableSet[Path] | None = None,
-    certificates: bool = SETTINGS.ci__certificates,
-    pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    pre_commit__submodules: str
-    | None = SETTINGS.ci__pull_request__pre_commit__submodules,
-    pyright: bool = SETTINGS.ci__pull_request__pyright,
-    pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
-    pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
-    pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
-    pytest__all_versions: bool = SETTINGS.ci__pull_request__pytest__all_versions,
-    pytest__sops_age_key: Secret[str]
-    | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
-    pytest__timeout: int | None = SETTINGS.pytest__timeout,
-    python_version: str = SETTINGS.python_version,
-    repo_name: str | None = SETTINGS.repo_name,
-    ruff: bool = SETTINGS.ci__pull_request__ruff,
-    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
-    token_github: Secret[str] | None = SETTINGS.ci__token_github,
-    uv__native_tls: bool = SETTINGS.uv__native_tls,
-) -> None:
-    path = GITEA_PULL_REQUEST_YAML if gitea else GITHUB_PULL_REQUEST_YAML
-    with yield_yaml_dict(path, modifications=modifications) as dict_:
-        dict_["name"] = "pull-request"
-        on = get_set_dict(dict_, "on")
-        pull_request = get_set_dict(on, "pull_request")
-        branches = get_set_list_strs(pull_request, "branches")
-        ensure_contains(branches, "master")
-        schedule = get_set_list_dicts(on, "schedule")
-        ensure_contains(schedule, {"cron": get_cron_job(repo_name=repo_name)})
-        jobs = get_set_dict(dict_, "jobs")
-        if pre_commit:
-            pre_commit_dict = get_set_dict(jobs, "pre-commit")
-            pre_commit_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list_dicts(pre_commit_dict, "steps")
-            if certificates:
-                ensure_contains(steps, update_ca_certificates_dict("pre-commit"))
-            ensure_contains(
-                steps,
-                action_run_hooks_dict(
-                    token_checkout=token_checkout,
-                    token_github=token_github,
-                    submodules=pre_commit__submodules,
-                    repos=["dycw/actions", "pre-commit/pre-commit-hooks"],
-                    gitea=gitea,
-                ),
-            )
-        if pyright:
-            pyright_dict = get_set_dict(jobs, "pyright")
-            pyright_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list_dicts(pyright_dict, "steps")
-            if certificates:
-                ensure_contains(steps, update_ca_certificates_dict("pyright"))
-            ensure_contains(
-                steps,
-                action_pyright_dict(
-                    token_checkout=token_checkout,
-                    token_github=token_github,
-                    python_version=python_version,
-                    native_tls=uv__native_tls,
-                ),
-            )
-        if pytest__macos or pytest__ubuntu or pytest__windows:
-            pytest_dict = get_set_dict(jobs, "pytest")
-            env = get_set_dict(pytest_dict, "env")
-            env["CI"] = "1"
-            pytest_dict["name"] = (
-                "pytest (${{matrix.os}}, ${{matrix.python-version}}, ${{matrix.resolution}})"
-            )
-            pytest_dict["runs-on"] = "${{matrix.os}}"
-            steps = get_set_list_dicts(pytest_dict, "steps")
-            if certificates:
-                ensure_contains(steps, update_ca_certificates_dict("pytest"))
-            ensure_contains(
-                steps,
-                action_pytest_dict(
-                    token_checkout=token_checkout,
-                    token_github=token_github,
-                    python_version="${{matrix.python-version}}",
-                    sops_age_key=pytest__sops_age_key,
-                    resolution="${{matrix.resolution}}",
-                    native_tls=uv__native_tls,
-                ),
-            )
-            strategy_dict = get_set_dict(pytest_dict, "strategy")
-            strategy_dict["fail-fast"] = False
-            matrix = get_set_dict(strategy_dict, "matrix")
-            os = get_set_list_strs(matrix, "os")
-            if pytest__macos:
-                ensure_contains(os, "macos-latest")
-            if pytest__ubuntu:
-                ensure_contains(os, "ubuntu-latest")
-            if pytest__windows:
-                ensure_contains(os, "windows-latest")
-            python_version_dict = get_set_list_strs(matrix, "python-version")
-            if pytest__all_versions:
-                ensure_contains(
-                    python_version_dict, *yield_python_versions(python_version)
-                )
-            else:
-                ensure_contains(python_version_dict, python_version)
-            resolution = get_set_list_strs(matrix, "resolution")
-            ensure_contains(resolution, "highest", "lowest-direct")
-            if pytest__timeout is not None:
-                pytest_dict["timeout-minutes"] = max(round(pytest__timeout / 60), 1)
-        if ruff:
-            ruff_dict = get_set_dict(jobs, "ruff")
-            ruff_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list_dicts(ruff_dict, "steps")
-            if certificates:
-                ensure_contains(steps, update_ca_certificates_dict("steps"))
-            ensure_contains(
-                steps,
-                action_ruff_dict(
-                    token_checkout=token_checkout, token_github=token_github
-                ),
-            )
-
-
-##
-
-
-def add_ci_push_yaml(
-    *,
-    gitea: bool = SETTINGS.ci__gitea,
-    modifications: MutableSet[Path] | None = None,
-    certificates: bool = SETTINGS.ci__certificates,
-    publish__github: bool = SETTINGS.ci__push__publish__github,
-    publish__primary: bool = SETTINGS.ci__push__publish__primary,
-    publish__primary__job_name: str = SETTINGS.ci__push__publish__primary__job_name,
-    publish__primary__username: str
-    | None = SETTINGS.ci__push__publish__primary__username,
-    publish__primary__password: Secret[str]
-    | None = SETTINGS.ci__push__publish__primary__password,
-    publish__primary__publish_url: str
-    | None = SETTINGS.ci__push__publish__primary__publish_url,
-    publish__secondary: bool = SETTINGS.ci__push__publish__secondary,
-    publish__secondary__job_name: str = SETTINGS.ci__push__publish__secondary__job_name,
-    publish__secondary__username: str
-    | None = SETTINGS.ci__push__publish__secondary__username,
-    publish__secondary__password: Secret[str]
-    | None = SETTINGS.ci__push__publish__secondary__password,
-    publish__secondary__publish_url: str
-    | None = SETTINGS.ci__push__publish__secondary__publish_url,
-    tag: bool = SETTINGS.ci__push__tag,
-    tag__all: bool = SETTINGS.ci__push__tag__all,
-    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
-    token_github: Secret[str] | None = SETTINGS.ci__token_github,
-    uv__native_tls: bool = SETTINGS.uv__native_tls,
-) -> None:
-    path = GITEA_PUSH_YAML if gitea else GITHUB_PUSH_YAML
-    with yield_yaml_dict(path, modifications=modifications) as dict_:
-        dict_["name"] = "push"
-        on = get_set_dict(dict_, "on")
-        push = get_set_dict(on, "push")
-        branches = get_set_list_strs(push, "branches")
-        ensure_contains(branches, "master")
-        jobs = get_set_dict(dict_, "jobs")
-        if publish__github:
-            _add_ci_push_yaml_publish_dict(
-                jobs,
-                "github",
-                github=True,
-                token_checkout=token_checkout,
-                token_github=token_github,
-            )
-        if publish__primary:
-            _add_ci_push_yaml_publish_dict(
-                jobs,
-                publish__primary__job_name,
-                certificates=certificates,
-                token_checkout=token_checkout,
-                token_github=token_github,
-                username=publish__primary__username,
-                password=publish__primary__password,
-                publish_url=publish__primary__publish_url,
-                uv__native_tls=uv__native_tls,
-            )
-        if publish__secondary:
-            _add_ci_push_yaml_publish_dict(
-                jobs,
-                publish__secondary__job_name,
-                certificates=certificates,
-                token_checkout=token_checkout,
-                token_github=token_github,
-                username=publish__secondary__username,
-                password=publish__secondary__password,
-                publish_url=publish__secondary__publish_url,
-                uv__native_tls=uv__native_tls,
-            )
-        if tag:
-            tag_dict = get_set_dict(jobs, "tag")
-            tag_dict["runs-on"] = "ubuntu-latest"
-            steps = get_set_list_dicts(tag_dict, "steps")
-            if certificates:
-                ensure_contains(steps, update_ca_certificates_dict("tag"))
-            ensure_contains(
-                steps,
-                action_tag_commit_dict(
-                    major_minor=tag__all, major=tag__all, latest=tag__all
-                ),
-            )
-
-
-def _add_ci_push_yaml_publish_dict(
-    jobs: StrDict,
-    name: str,
-    /,
-    *,
-    github: bool = False,
-    certificates: bool = SETTINGS.ci__certificates,
-    token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
-    token_github: Secret[str] | None = SETTINGS.ci__token_github,
-    username: str | None = None,
-    password: Secret[str] | None = None,
-    publish_url: str | None = None,
-    uv__native_tls: bool = SETTINGS.uv__native_tls,
-) -> None:
-    publish_name = f"publish-{name}"
-    publish_dict = get_set_dict(jobs, publish_name)
-    if github:
-        environment = get_set_dict(publish_dict, "environment")
-        environment["name"] = "pypi"
-        permissions = get_set_dict(publish_dict, "permissions")
-        permissions["id-token"] = "write"
-    publish_dict["runs-on"] = "ubuntu-latest"
-    steps = get_set_list_dicts(publish_dict, "steps")
-    if certificates:
-        ensure_contains(steps, update_ca_certificates_dict(publish_name))
-    ensure_contains(
-        steps,
-        action_publish_package_dict(
-            token_checkout=token_checkout,
-            token_github=token_github,
-            username=username,
-            password=password,
-            publish_url=publish_url,
-            native_tls=uv__native_tls,
-        ),
-    )
 
 
 ##
@@ -426,20 +177,6 @@ def add_pytest_toml(
 ##
 
 
-def get_cron_job(*, repo_name: str | None = SETTINGS.repo_name) -> str:
-    if repo_name is None:
-        minute = hour = 0
-    else:
-        digest = blake2b(repo_name.encode(), digest_size=8).digest()
-        value = int.from_bytes(digest, "big")
-        minute = value % 60
-        hour = (value // 60) % 24
-    return f"{minute} {hour} * * *"
-
-
-##
-
-
 def get_python_package_name(
     *,
     package_name: str | None = SETTINGS.package_name,
@@ -450,14 +187,6 @@ def get_python_package_name(
     if package_name is not None:
         return package_name.replace("-", "_")
     return None
-
-
-##
-
-
-def get_tool_uv(doc: TOMLDocument, /) -> Table:
-    tool = get_set_table(doc, "tool")
-    return get_set_table(tool, "uv")
 
 
 ##
@@ -489,37 +218,9 @@ def run_ripgrep_and_replace(
 ##
 
 
-def yield_python_versions(
-    version: str, /, *, max_: str = MAX_PYTHON_VERSION
-) -> Iterator[str]:
-    major, minor = _yield_python_version_tuple(version)
-    max_major, max_minor = _yield_python_version_tuple(max_)
-    if major != max_major:
-        msg = f"Major versions must be equal; got {major} and {max_major}"
-        raise ValueError(msg)
-    if minor > max_minor:
-        msg = f"Minor version must be at most {max_minor}; got {minor}"
-        raise ValueError(msg)
-    for i in range(minor, max_minor + 1):
-        yield f"{major}.{i}"
-
-
-def _yield_python_version_tuple(version: str, /) -> tuple[int, int]:
-    major, minor = extract_groups(r"^(\d+)\.(\d+)$", version)
-    return int(major), int(minor)
-
-
-##
-
-
 __all__ = [
-    "add_ci_pull_request_yaml",
-    "add_ci_push_yaml",
     "add_coveragerc_toml",
     "add_pytest_toml",
-    "get_cron_job",
     "get_python_package_name",
-    "get_tool_uv",
     "run_ripgrep_and_replace",
-    "yield_python_versions",
 ]
