@@ -12,11 +12,9 @@ from utilities.text import strip_and_dedent
 
 from actions.constants import GITEA_PULL_REQUEST_YAML, GITHUB_PULL_REQUEST_YAML
 from actions.pre_commit.conformalize_repo.lib import (
-    _add_envrc_uv_text,
     add_ci_pull_request_yaml,
     add_ci_push_yaml,
     add_coveragerc_toml,
-    add_envrc,
     add_pyproject_toml,
     add_pytest_toml,
     add_readme_md,
@@ -123,30 +121,6 @@ class TestAddEnvrc:
         with temp_cwd(tmp_path):
             for _ in range(2):
                 add_envrc()
-
-
-class TestAddEnvrcUvText:
-    def test_main(self) -> None:
-        result = _add_envrc_uv_text()
-        expected = strip_and_dedent("""
-            # uv
-            export UV_MANAGED_PYTHON='true'
-            export UV_PRERELEASE='disallow'
-            export UV_PYTHON='3.14'
-            export UV_RESOLUTION='highest'
-            export UV_VENV_CLEAR=1
-            if ! command -v uv >/dev/null 2>&1; then
-            \techo_date "ERROR: 'uv' not found" && exit 1
-            fi
-            activate='.venv/bin/activate'
-            if [ -f $activate ]; then
-            \t. $activate
-            else
-            \tuv venv
-            fi
-            uv sync --all-extras --all-groups --active --locked
-        """)
-        assert result == expected
 
 
 class TestAddPyProjectToml:

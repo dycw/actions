@@ -84,8 +84,6 @@ class Settings:
     )
     coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")
     description: str | None = option(default=None, help="Repo description")
-    envrc: bool = option(default=False, help="Set up '.envrc'")
-    envrc__uv: bool = option(default=False, help="Set up '.envrc' with uv")
     package_name: str | None = option(default=None, help="Package name")
     pyproject: bool = option(default=False, help="Set up 'pyproject.toml'")
     pyproject__project__optional_dependencies__scripts: bool = option(

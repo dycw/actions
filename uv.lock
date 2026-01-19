@@ -268,8 +268,8 @@ requires-dist = [
     { name = "click", marker = "extra == 'cli'", specifier = "==8.3.1" },
     { name = "coloredlogs", specifier = ">=15.0.1" },
     { name = "coloredlogs", marker = "extra == 'cli'", specifier = "==15.0.1" },
-    { name = "dycw-utilities", specifier = ">=0.183.5" },
-    { name = "dycw-utilities", marker = "extra == 'cli'", specifier = "==0.183.5" },
+    { name = "dycw-utilities", specifier = ">=0.184.4" },
+    { name = "dycw-utilities", marker = "extra == 'cli'", specifier = "==0.184.4" },
     { name = "inflect", specifier = ">=7.5.0" },
     { name = "inflect", marker = "extra == 'cli'", specifier = "==7.5.0" },
     { name = "libcst", specifier = ">=1.8.6" },
@@ -301,7 +301,7 @@ provides-extras = ["cli"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.183.5" },
+    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.184.4" },
     { name = "orjson", specifier = ">=3.11.5" },
     { name = "pyright", specifier = ">=1.1.408" },
     { name = "rich", specifier = ">=14.2.0" },
@@ -321,7 +321,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.183.5"
+version = "0.184.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atomicwrites" },
@@ -330,7 +330,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/f6/744bded88c423b51e4d9c09334de99eba6e33bfd95fcd98ee6039f1d2e5f/dycw_utilities-0.183.5-py3-none-any.whl", hash = "sha256:de71a222335fe8e8422f8fdc6b95d9c58b2375547a9f0cd324fcc428e8e19bfc", size = 214143, upload-time = "2026-01-17T23:52:03.263Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/1d/4d59d5560ae81b0ffb38bed99a5ad24a2c61a776b04e4e3c687876be0ca7/dycw_utilities-0.184.4-py3-none-any.whl", hash = "sha256:8842c00ac281e9a53045b2633e9be30ab712ecb5bd410e9bcbbac504793b9be8", size = 215589, upload-time = "2026-01-19T01:50:21.085Z" },
 ]
 
 [package.optional-dependencies]

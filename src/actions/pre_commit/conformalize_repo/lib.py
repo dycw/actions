@@ -1,22 +1,19 @@
 from __future__ import annotations
 
 import sys
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from hashlib import blake2b
-from itertools import product
 from re import MULTILINE, escape, search, sub
 from shlex import join
-from string import Template
-from typing import TYPE_CHECKING, assert_never
+from typing import TYPE_CHECKING
 
-import tomlkit
 from tomlkit import TOMLDocument, table
 from utilities.functions import get_func_name
 from utilities.inflect import counted_noun
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
-from utilities.version import ParseVersionError, Version, parse_version
+from utilities.version import Version
 
 from actions.constants import (
     BUMPVERSION_TOML,
@@ -24,14 +21,11 @@ from actions.constants import (
     ENVRC,
     GITEA_PULL_REQUEST_YAML,
     GITEA_PUSH_YAML,
-    GITHUB,
     GITHUB_PULL_REQUEST_YAML,
     GITHUB_PUSH_YAML,
     MAX_PYTHON_VERSION,
-    PYPROJECT_TOML,
     PYTEST_TOML,
     README_MD,
-    YAML_INSTANCE,
 )
 from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.action_dicts import (
@@ -58,7 +52,6 @@ from actions.pre_commit.utilities import (
     yield_toml_doc,
     yield_yaml_dict,
 )
-from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
@@ -66,7 +59,7 @@ if TYPE_CHECKING:
 
     from tomlkit.items import Table
     from typed_settings import Secret
-    from utilities.types import PathLike, StrDict
+    from utilities.types import StrDict
 
 
 def conformalize_repo(
@@ -107,8 +100,6 @@ def conformalize_repo(
     ci__push__tag__all: bool = SETTINGS.ci__push__tag__all,
     coverage: bool = SETTINGS.coverage,
     description: str | None = SETTINGS.description,
-    envrc: bool = SETTINGS.envrc,
-    envrc__uv: bool = SETTINGS.envrc__uv,
     package_name: str | None = SETTINGS.package_name,
     pyproject: bool = SETTINGS.pyproject,
     pyproject__project__optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
@@ -190,14 +181,6 @@ def conformalize_repo(
         )
     if coverage:
         add_coveragerc_toml(modifications=modifications)
-    if envrc or envrc__uv:
-        add_envrc(
-            modifications=modifications,
-            uv=envrc__uv,
-            uv__native_tls=uv__native_tls,
-            python_version=python_version,
-            script=script,
-        )
     if pyproject:
         add_pyproject_toml(
             modifications=modifications,
@@ -511,81 +494,6 @@ def add_coveragerc_toml(*, modifications: MutableSet[Path] | None = None) -> Non
 ##
 
 
-def add_envrc(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    uv: bool = SETTINGS.envrc__uv,
-    uv__native_tls: bool = SETTINGS.uv__native_tls,
-    python_version: str = SETTINGS.python_version,
-    script: str | None = SETTINGS.script,
-) -> None:
-    with yield_text_file(ENVRC, modifications=modifications) as context:
-        shebang = strip_and_dedent("""
-            #!/usr/bin/env sh
-            # shellcheck source=/dev/null
-        """)
-        if search(escape(shebang), context.output, flags=MULTILINE) is None:
-            context.output += f"\n\n{shebang}"
-
-        echo = strip_and_dedent("""
-            # echo
-            echo_date() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" >&2; }
-        """)
-        if search(escape(echo), context.output, flags=MULTILINE) is None:
-            context.output += f"\n\n{echo}"
-
-        if uv:
-            uv_text = _add_envrc_uv_text(
-                native_tls=uv__native_tls, python_version=python_version, script=script
-            )
-            if search(escape(uv_text), context.output, flags=MULTILINE) is None:
-                context.output += f"\n\n{uv_text}"
-
-
-def _add_envrc_uv_text(
-    *,
-    native_tls: bool = SETTINGS.uv__native_tls,
-    python_version: str = SETTINGS.python_version,
-    script: str | None = SETTINGS.script,
-) -> str:
-    lines: list[str] = [
-        strip_and_dedent("""
-            # uv
-            export UV_MANAGED_PYTHON='true'
-        """)
-    ]
-    if native_tls:
-        lines.append("export UV_NATIVE_TLS='true'")
-    lines.append(
-        strip_and_dedent(f"""
-            export UV_PRERELEASE='disallow'
-            export UV_PYTHON='{python_version}'
-            export UV_RESOLUTION='highest'
-            export UV_VENV_CLEAR=1
-            if ! command -v uv >/dev/null 2>&1; then
-            \techo_date "ERROR: 'uv' not found" && exit 1
-            fi
-            activate='.venv/bin/activate'
-            if [ -f $activate ]; then
-            \t. $activate
-            else
-            \tuv venv
-            fi
-        """)
-    )
-    args: list[str] = ["uv", "sync"]
-    if script is None:
-        args.extend(["--all-extras", "--all-groups"])
-    args.extend(["--active", "--locked"])
-    if script is not None:
-        args.extend(["--script", script])
-    lines.append(join(args))
-    return "\n".join(lines)
-
-
-##
-
-
 def add_pyproject_toml(
     *,
     modifications: MutableSet[Path] | None = None,
@@ -828,7 +736,6 @@ __all__ = [
     "add_ci_pull_request_yaml",
     "add_ci_push_yaml",
     "add_coveragerc_toml",
-    "add_envrc",
     "add_pyproject_toml",
     "add_pytest_toml",
     "add_readme_md",
