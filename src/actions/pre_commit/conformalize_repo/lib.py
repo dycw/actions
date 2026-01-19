@@ -5,7 +5,6 @@ from hashlib import blake2b
 from re import MULTILINE, escape, search, sub
 from typing import TYPE_CHECKING
 
-from tomlkit import table
 from utilities.functions import get_func_name
 from utilities.inflect import counted_noun
 from utilities.re import extract_groups
@@ -35,14 +34,11 @@ from actions.pre_commit.conformalize_repo.action_dicts import (
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
 from actions.pre_commit.utilities import (
     ensure_contains,
-    ensure_contains_partial_str,
-    get_set_aot,
     get_set_array,
     get_set_dict,
     get_set_list_dicts,
     get_set_list_strs,
     get_set_table,
-    yield_pyproject_toml,
     yield_text_file,
     yield_toml_doc,
     yield_yaml_dict,
