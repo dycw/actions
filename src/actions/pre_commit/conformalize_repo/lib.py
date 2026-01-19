@@ -330,8 +330,6 @@ def conformalize_repo(
             python_version=python_version,
             script=script,
         )
-    if gitignore:
-        add_gitignore(modifications=modifications)
     if pyproject:
         add_pyproject_toml(
             modifications=modifications,
