@@ -24,7 +24,6 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
-    coverage: bool = SETTINGS.coverage,
     package_name: str | None = SETTINGS.package_name,
     pytest: bool = SETTINGS.pytest,
     pytest__asyncio: bool = SETTINGS.pytest__asyncio,
@@ -33,8 +32,6 @@ def conformalize_repo(
     python_package_name: str | None = SETTINGS.python_package_name,
 ) -> None:
     modifications: set[Path] = set()
-    if coverage:
-        add_coveragerc_toml(modifications=modifications)
     if (
         pytest
         or pytest__asyncio
@@ -58,25 +55,6 @@ def conformalize_repo(
         )
         sys.exit(1)
     LOGGER.info("Finished running %r", get_func_name(conformalize_repo))
-
-
-##
-
-
-def add_coveragerc_toml(*, modifications: MutableSet[Path] | None = None) -> None:
-    with yield_toml_doc(COVERAGERC_TOML, modifications=modifications) as doc:
-        html = get_set_table(doc, "html")
-        html["directory"] = ".coverage/html"
-        report = get_set_table(doc, "report")
-        exclude_also = get_set_array(report, "exclude_also")
-        ensure_contains(exclude_also, "@overload", "if TYPE_CHECKING:")
-        report["fail_under"] = 100.0
-        report["skip_covered"] = True
-        report["skip_empty"] = True
-        run = get_set_table(doc, "run")
-        run["branch"] = True
-        run["data_file"] = ".coverage/data"
-        run["parallel"] = True
 
 
 ##

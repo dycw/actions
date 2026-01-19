@@ -7,7 +7,6 @@ from actions.utilities import LOADER
 
 @settings
 class Settings:
-    coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")
     description: str | None = option(default=None, help="Repo description")
     package_name: str | None = option(default=None, help="Package name")
     pytest: bool = option(default=False, help="Set up 'pytest.toml'")
