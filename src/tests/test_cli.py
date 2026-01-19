@@ -9,14 +9,6 @@ from utilities.subprocess import run
 
 from actions.clean_dir.constants import CLEAN_DIR_SUB_CMD
 from actions.git_clone_with.constants import GIT_CLONE_WITH_SUB_CMD
-from actions.pre_commit.conformalize_repo.constants import CONFORMALIZE_REPO_SUB_CMD
-from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
-from actions.pre_commit.replace_sequence_strs.constants import (
-    REPLACE_SEQUENCE_STRS_SUB_CMD,
-)
-from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
-from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
-from actions.pre_commit.update_requirements.constants import UPDATE_REQUIREMENTS_SUB_CMD
 from actions.publish_package.constants import PUBLISH_PACKAGE_SUB_CMD
 from actions.random_sleep.constants import RANDOM_SLEEP_SUB_CMD
 from actions.re_encrypt.constants import RE_ENCRYPT_SUB_CMD
@@ -31,26 +23,20 @@ if TYPE_CHECKING:
 
 class TestCLI:
     @mark.parametrize(
-        "args",
+        ("cmd", "args"),
         [
-            param(["pre-commit", CONFORMALIZE_REPO_SUB_CMD]),
-            param(["pre-commit", FORMAT_REQUIREMENTS_SUB_CMD]),
-            param(["pre-commit", REPLACE_SEQUENCE_STRS_SUB_CMD]),
-            param(["pre-commit", TOUCH_EMPTY_PY_SUB_CMD]),
-            param(["pre-commit", TOUCH_PY_TYPED_SUB_CMD]),
-            param(["pre-commit", UPDATE_REQUIREMENTS_SUB_CMD]),
-            param([CLEAN_DIR_SUB_CMD]),
-            param([PUBLISH_PACKAGE_SUB_CMD]),
-            param([RANDOM_SLEEP_SUB_CMD]),
-            param([RUN_HOOKS_SUB_CMD]),
-            param([SETUP_CRONJOB_SUB_CMD]),
-            param([SETUP_SSH_CONFIG_SUB_CMD]),
-            param([TAG_COMMIT_SUB_CMD]),
+            param(CLEAN_DIR_SUB_CMD, []),
+            param(PUBLISH_PACKAGE_SUB_CMD, []),
+            param(RANDOM_SLEEP_SUB_CMD, []),
+            param(RUN_HOOKS_SUB_CMD, []),
+            param(SETUP_CRONJOB_SUB_CMD, []),
+            param(SETUP_SSH_CONFIG_SUB_CMD, []),
+            param(TAG_COMMIT_SUB_CMD, []),
         ],
     )
     @throttle_test(duration=MINUTE)
-    def test_main(self, *, args: list[str]) -> None:
-        run("cli", *args)
+    def test_main(self, *, cmd: str, args: list[str]) -> None:
+        run("cli", cmd, *args)
 
     @throttle_test(duration=MINUTE)
     def test_git_clone_with(self, *, tmp_path: Path) -> None:
