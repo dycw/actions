@@ -14,9 +14,7 @@ from actions.pre_commit.conformalize_repo.lib import (
     add_ci_pull_request_yaml,
     add_ci_push_yaml,
     add_coveragerc_toml,
-    add_pyproject_toml,
     add_pytest_toml,
-    add_readme_md,
     yield_python_versions,
 )
 

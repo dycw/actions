@@ -55,40 +55,6 @@ if TYPE_CHECKING:
 
 def conformalize_repo(
     *,
-    ci__certificates: bool = SETTINGS.ci__certificates,
-    ci__gitea: bool = SETTINGS.ci__gitea,
-    ci__token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
-    ci__token_github: Secret[str] | None = SETTINGS.ci__token_github,
-    ci__pull_request__pre_commit: bool = SETTINGS.ci__pull_request__pre_commit,
-    ci__pull_request__pre_commit__submodules: str
-    | None = SETTINGS.ci__pull_request__pre_commit__submodules,
-    ci__pull_request__pyright: bool = SETTINGS.ci__pull_request__pyright,
-    ci__pull_request__pytest__macos: bool = SETTINGS.ci__pull_request__pytest__macos,
-    ci__pull_request__pytest__ubuntu: bool = SETTINGS.ci__pull_request__pytest__ubuntu,
-    ci__pull_request__pytest__windows: bool = SETTINGS.ci__pull_request__pytest__windows,
-    ci__pull_request__pytest__all_versions: bool = SETTINGS.ci__pull_request__pytest__all_versions,
-    ci__pull_request__pytest__sops_age_key: Secret[str]
-    | None = SETTINGS.ci__pull_request__pytest__sops_age_key,
-    ci__pull_request__ruff: bool = SETTINGS.ci__pull_request__ruff,
-    ci__push__publish__github: bool = SETTINGS.ci__push__publish__github,
-    ci__push__publish__primary: bool = SETTINGS.ci__push__publish__primary,
-    ci__push__publish__primary__job_name: str = SETTINGS.ci__push__publish__primary__job_name,
-    ci__push__publish__primary__username: str
-    | None = SETTINGS.ci__push__publish__primary__username,
-    ci__push__publish__primary__password: Secret[str]
-    | None = SETTINGS.ci__push__publish__primary__password,
-    ci__push__publish__primary__publish_url: str
-    | None = SETTINGS.ci__push__publish__primary__publish_url,
-    ci__push__publish__secondary: bool = SETTINGS.ci__push__publish__secondary,
-    ci__push__publish__secondary__job_name: str = SETTINGS.ci__push__publish__secondary__job_name,
-    ci__push__publish__secondary__username: str
-    | None = SETTINGS.ci__push__publish__secondary__username,
-    ci__push__publish__secondary__password: Secret[str]
-    | None = SETTINGS.ci__push__publish__secondary__password,
-    ci__push__publish__secondary__publish_url: str
-    | None = SETTINGS.ci__push__publish__secondary__publish_url,
-    ci__push__tag: bool = SETTINGS.ci__push__tag,
-    ci__push__tag__all: bool = SETTINGS.ci__push__tag__all,
     coverage: bool = SETTINGS.coverage,
     package_name: str | None = SETTINGS.package_name,
     pytest: bool = SETTINGS.pytest,
@@ -102,67 +68,6 @@ def conformalize_repo(
 ) -> None:
     modifications: set[Path] = set()
     run_ripgrep_and_replace(modifications=modifications, version=python_version)
-    if (
-        ci__pull_request__pre_commit
-        or ci__pull_request__pyright
-        or ci__pull_request__pytest__macos
-        or ci__pull_request__pytest__ubuntu
-        or ci__pull_request__pytest__windows
-        or ci__pull_request__ruff
-    ):
-        add_ci_pull_request_yaml(
-            gitea=ci__gitea,
-            modifications=modifications,
-            certificates=ci__certificates,
-            pre_commit=ci__pull_request__pre_commit,
-            pre_commit__submodules=ci__pull_request__pre_commit__submodules,
-            pyright=ci__pull_request__pyright,
-            pytest__macos=ci__pull_request__pytest__macos,
-            pytest__ubuntu=ci__pull_request__pytest__ubuntu,
-            pytest__windows=ci__pull_request__pytest__windows,
-            pytest__all_versions=ci__pull_request__pytest__all_versions,
-            pytest__sops_age_key=ci__pull_request__pytest__sops_age_key,
-            pytest__timeout=pytest__timeout,
-            python_version=python_version,
-            repo_name=repo_name,
-            token_checkout=ci__token_checkout,
-            token_github=ci__token_github,
-            uv__native_tls=uv__native_tls,
-        )
-    if (
-        ci__push__publish__github
-        or ci__push__publish__primary
-        or (ci__push__publish__primary__username is not None)
-        or (ci__push__publish__primary__password is not None)
-        or (ci__push__publish__primary__publish_url is not None)
-        or ci__push__publish__secondary
-        or (ci__push__publish__secondary__username is not None)
-        or (ci__push__publish__secondary__password is not None)
-        or (ci__push__publish__secondary__publish_url is not None)
-        or ci__push__tag
-        or ci__push__tag__all
-    ):
-        add_ci_push_yaml(
-            gitea=ci__gitea,
-            modifications=modifications,
-            certificates=ci__certificates,
-            publish__github=ci__push__publish__github,
-            publish__primary=ci__push__publish__primary,
-            publish__primary__job_name=ci__push__publish__primary__job_name,
-            publish__primary__username=ci__push__publish__primary__username,
-            publish__primary__password=ci__push__publish__primary__password,
-            publish__primary__publish_url=ci__push__publish__primary__publish_url,
-            publish__secondary=ci__push__publish__secondary,
-            publish__secondary__job_name=ci__push__publish__secondary__job_name,
-            publish__secondary__username=ci__push__publish__secondary__username,
-            publish__secondary__password=ci__push__publish__secondary__password,
-            publish__secondary__publish_url=ci__push__publish__secondary__publish_url,
-            tag=ci__push__tag,
-            tag__all=ci__push__tag__all,
-            token_checkout=ci__token_checkout,
-            token_github=ci__token_github,
-            uv__native_tls=uv__native_tls,
-        )
     if coverage:
         add_coveragerc_toml(modifications=modifications)
     if (
