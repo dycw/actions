@@ -25,8 +25,6 @@ from actions.register_gitea_runner.constants import (
     REGISTER_GITEA_RUNNER_DOCSTRING,
     REGISTER_GITEA_RUNNER_SUB_CMD,
 )
-from actions.run_hooks.cli import run_hooks_sub_cmd
-from actions.run_hooks.constants import RUN_HOOKS_DOCSTRING, RUN_HOOKS_SUB_CMD
 from actions.setup_cronjob.cli import setup_cronjob_sub_cmd
 from actions.setup_cronjob.constants import (
     SETUP_CRONJOB_DOCSTRING,
@@ -54,9 +52,6 @@ _ = _main.command(
 _ = _main.command(
     name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)
-_ = _main.command(name=RUN_HOOKS_SUB_CMD, help=RUN_HOOKS_DOCSTRING, **CONTEXT_SETTINGS)(
-    run_hooks_sub_cmd
-)
 _ = _main.command(
     name=RANDOM_SLEEP_SUB_CMD, help=RANDOM_SLEEP_DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)
