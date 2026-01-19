@@ -10,62 +10,19 @@ from utilities.hypothesis import temp_paths, text_ascii
 from utilities.pathlib import temp_cwd
 from utilities.text import strip_and_dedent
 
-from actions.constants import (
-    BUMPVERSION_TOML,
-    GITEA_PULL_REQUEST_YAML,
-    GITHUB_PULL_REQUEST_YAML,
-    YAML_INSTANCE,
-)
+from actions.constants import GITEA_PULL_REQUEST_YAML, GITHUB_PULL_REQUEST_YAML
 from actions.pre_commit.conformalize_repo.lib import (
-    _add_envrc_uv_text,
-    _add_pre_commit_config_repo,
-    add_bumpversion_toml,
     add_ci_pull_request_yaml,
     add_ci_push_yaml,
     add_coveragerc_toml,
-    add_envrc,
-    add_gitignore,
-    add_pre_commit_config_yaml,
     add_pyproject_toml,
-    add_pyrightconfig_json,
     add_pytest_toml,
     add_readme_md,
-    add_ruff_toml,
     yield_python_versions,
 )
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-
-class TestAddBumpversionToml:
-    @given(
-        root=temp_paths(),
-        pyproject=booleans(),
-        package_name=text_ascii() | none(),
-        python_package_name=text_ascii() | none(),
-    )
-    def test_main(
-        self,
-        *,
-        root: Path,
-        pyproject: bool,
-        package_name: str | None,
-        python_package_name: str | None,
-    ) -> None:
-        def run() -> None:
-            add_bumpversion_toml(
-                pyproject=pyproject,
-                package_name=package_name,
-                python_package_name=python_package_name,
-            )
-
-        with temp_cwd(root):
-            run()
-            assert BUMPVERSION_TOML.is_file()
-            current = BUMPVERSION_TOML.read_text()
-            run()
-            assert BUMPVERSION_TOML.read_text() == current
 
 
 class TestAddCIPullRequestYaml:
@@ -166,74 +123,11 @@ class TestAddEnvrc:
                 add_envrc()
 
 
-class TestAddEnvrcUvText:
-    def test_main(self) -> None:
-        result = _add_envrc_uv_text()
-        expected = strip_and_dedent("""
-            # uv
-            export UV_MANAGED_PYTHON='true'
-            export UV_PRERELEASE='disallow'
-            export UV_PYTHON='3.14'
-            export UV_RESOLUTION='highest'
-            export UV_VENV_CLEAR=1
-            if ! command -v uv >/dev/null 2>&1; then
-            \techo_date "ERROR: 'uv' not found" && exit 1
-            fi
-            activate='.venv/bin/activate'
-            if [ -f $activate ]; then
-            \t. $activate
-            else
-            \tuv venv
-            fi
-            uv sync --all-extras --all-groups --active --locked
-        """)
-        assert result == expected
-
-
-class TestAddPreCommitConfigRepo:
-    def test_main(self) -> None:
-        text = strip_and_dedent("""
-            repos:
-              - repo: url
-                rev: rev
-                hooks:
-                  - id: id
-                    args:
-                      - --arg
-        """)
-        pre_commit_dict = YAML_INSTANCE.load(text)
-        _add_pre_commit_config_repo(
-            pre_commit_dict, "url", "id", args=("add", ["--arg"])
-        )
-        assert pre_commit_dict == YAML_INSTANCE.load(text)
-
-
-class TestAddGitIgnore:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_gitignore()
-
-
-class TestAddPreCommitConfigYaml:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_pre_commit_config_yaml()
-
-
 class TestAddPyProjectToml:
     def test_main(self, *, tmp_path: Path) -> None:
         with temp_cwd(tmp_path):
             for _ in range(2):
                 add_pyproject_toml()
-
-
-class TestAddPyrightConfigJson:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_pyrightconfig_json()
 
 
 class TestAddPytestToml:
@@ -248,13 +142,6 @@ class TestAddReadMeMd:
         with temp_cwd(tmp_path):
             for _ in range(2):
                 add_readme_md()
-
-
-class TestAddRuffToml:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_ruff_toml()
 
 
 class TestYieldPythonVersions:

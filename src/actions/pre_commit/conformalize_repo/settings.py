@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
-from actions.pre_commit.conformalize_repo.constants import RUN_VERSION_BUMP
 from actions.utilities import LOADER
 
 
@@ -85,37 +84,12 @@ class Settings:
     )
     coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")
     description: str | None = option(default=None, help="Repo description")
-    envrc: bool = option(default=False, help="Set up '.envrc'")
-    envrc__uv: bool = option(default=False, help="Set up '.envrc' with uv")
-    gitignore: bool = option(default=False, help="Set up '.gitignore'")
     package_name: str | None = option(default=None, help="Package name")
-    pre_commit__dockerfmt: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' dockerfmt"
-    )
-    pre_commit__prettier: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' prettier"
-    )
-    pre_commit__python: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' python"
-    )
-    pre_commit__ruff: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' ruff"
-    )
-    pre_commit__shell: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' shell"
-    )
-    pre_commit__taplo: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' taplo"
-    )
-    pre_commit__uv: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' uv"
-    )
     pyproject: bool = option(default=False, help="Set up 'pyproject.toml'")
     pyproject__project__optional_dependencies__scripts: bool = option(
         default=False,
         help="Set up 'pyproject.toml' [project.optional-dependencies.scripts]",
     )
-    pyright: bool = option(default=False, help="Set up 'pyrightconfig.json'")
     pytest: bool = option(default=False, help="Set up 'pytest.toml'")
     pytest__asyncio: bool = option(default=False, help="Set up 'pytest.toml' asyncio_*")
     pytest__ignore_warnings: bool = option(
@@ -130,8 +104,6 @@ class Settings:
     python_version: str = option(default="3.14", help="Python version")
     readme: bool = option(default=False, help="Set up 'README.md'")
     repo_name: str | None = option(default=None, help="Repo name")
-    ruff: bool = option(default=False, help="Set up 'ruff.toml'")
-    run_version_bump: bool = option(default=RUN_VERSION_BUMP, help="Run version bump")
     uv__indexes: list[tuple[str, str]] = option(
         factory=list, help="Set up 'uv' with index indexes"
     )
