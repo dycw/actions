@@ -11,7 +11,6 @@ from utilities.pathlib import temp_cwd
 from utilities.text import strip_and_dedent
 
 from actions.constants import (
-    BUMPVERSION_TOML,
     GITEA_PULL_REQUEST_YAML,
     GITHUB_PULL_REQUEST_YAML,
     YAML_INSTANCE,

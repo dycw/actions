@@ -7,22 +7,18 @@ from itertools import product
 from re import MULTILINE, escape, search, sub
 from shlex import join
 from string import Template
-from subprocess import CalledProcessError
-from typing import TYPE_CHECKING, Literal, assert_never
+from typing import TYPE_CHECKING, assert_never
 
 import tomlkit
 from tomlkit import TOMLDocument, table
-from tomlkit.exceptions import NonExistentKey
 from utilities.functions import get_func_name
 from utilities.inflect import counted_noun
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
 from utilities.text import repr_str, strip_and_dedent
-from utilities.throttle import throttle
 from utilities.version import ParseVersionError, Version, parse_version
 
 from actions.constants import (
-    ACTIONS_URL,
     BUMPVERSION_TOML,
     COVERAGERC_TOML,
     ENVRC,
@@ -31,14 +27,10 @@ from actions.constants import (
     GITHUB,
     GITHUB_PULL_REQUEST_YAML,
     GITHUB_PUSH_YAML,
-    GITIGNORE,
     MAX_PYTHON_VERSION,
-    PRE_COMMIT_CONFIG_YAML,
     PYPROJECT_TOML,
-    PYRIGHTCONFIG_JSON,
     PYTEST_TOML,
     README_MD,
-    RUFF_TOML,
     YAML_INSTANCE,
 )
 from actions.logging import LOGGER
@@ -51,42 +43,16 @@ from actions.pre_commit.conformalize_repo.action_dicts import (
     action_tag_commit_dict,
     update_ca_certificates_dict,
 )
-from actions.pre_commit.conformalize_repo.constants import (
-    BUILTIN,
-    CONFORMALIZE_REPO_SUB_CMD,
-    DOCKERFMT_URL,
-    FORMATTER_PRIORITY,
-    LINTER_PRIORITY,
-    PATH_CONFIGS,
-    PRE_COMMIT_HOOKS_URL,
-    RUFF_URL,
-    SHELLCHECK_URL,
-    SHFMT_URL,
-    TAPLO_URL,
-    UV_URL,
-)
 from actions.pre_commit.conformalize_repo.settings import SETTINGS
-from actions.pre_commit.constants import THROTTLE_DURATION
-from actions.pre_commit.format_requirements.constants import FORMAT_REQUIREMENTS_SUB_CMD
-from actions.pre_commit.replace_sequence_strs.constants import (
-    REPLACE_SEQUENCE_STRS_SUB_CMD,
-)
-from actions.pre_commit.touch_empty_py.constants import TOUCH_EMPTY_PY_SUB_CMD
-from actions.pre_commit.touch_py_typed.constants import TOUCH_PY_TYPED_SUB_CMD
-from actions.pre_commit.update_requirements.constants import UPDATE_REQUIREMENTS_SUB_CMD
 from actions.pre_commit.utilities import (
     ensure_contains,
-    ensure_contains_partial_dict,
     ensure_contains_partial_str,
-    ensure_not_contains,
     get_set_aot,
     get_set_array,
     get_set_dict,
     get_set_list_dicts,
     get_set_list_strs,
     get_set_table,
-    path_throttle_cache,
-    yield_json_dict,
     yield_pyproject_toml,
     yield_text_file,
     yield_toml_doc,

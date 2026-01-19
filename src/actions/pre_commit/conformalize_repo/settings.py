@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typed_settings import Secret, load_settings, option, secret, settings
 
-from actions.pre_commit.conformalize_repo.constants import RUN_VERSION_BUMP
 from actions.utilities import LOADER
 
 
