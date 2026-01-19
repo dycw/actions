@@ -535,26 +535,6 @@ def add_pytest_toml(
 ##
 
 
-def add_readme_md(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    name: str | None = SETTINGS.package_name,
-    description: str | None = SETTINGS.description,
-) -> None:
-    with yield_text_file(README_MD, modifications=modifications) as context:
-        lines: list[str] = []
-        if name is not None:
-            lines.append(f"# `{name}`")
-        if description is not None:
-            lines.append(description)
-        text = "\n\n".join(lines)
-        if search(escape(text), context.output, flags=MULTILINE) is None:
-            context.output += f"\n\n{text}"
-
-
-##
-
-
 def get_cron_job(*, repo_name: str | None = SETTINGS.repo_name) -> str:
     if repo_name is None:
         minute = hour = 0
@@ -646,7 +626,6 @@ __all__ = [
     "add_ci_push_yaml",
     "add_coveragerc_toml",
     "add_pytest_toml",
-    "add_readme_md",
     "get_cron_job",
     "get_python_package_name",
     "get_tool_uv",
