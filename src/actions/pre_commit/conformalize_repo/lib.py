@@ -126,7 +126,6 @@ def conformalize_repo(
 ) -> None:
     modifications: set[Path] = set()
     run_ripgrep_and_replace(modifications=modifications, version=python_version)
-    update_action_versions(modifications=modifications)
     if (
         ci__pull_request__pre_commit
         or ci__pull_request__pyright
@@ -238,48 +237,6 @@ def conformalize_repo(
         )
         sys.exit(1)
     LOGGER.info("Finished running %r", get_func_name(conformalize_repo))
-
-
-##
-
-
-def add_bumpversion_toml(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    pyproject: bool = SETTINGS.pyproject,
-    package_name: str | None = SETTINGS.package_name,
-    python_package_name: str | None = SETTINGS.python_package_name,
-) -> None:
-    with yield_bumpversion_toml(modifications=modifications) as doc:
-        tool = get_set_table(doc, "tool")
-        bumpversion = get_set_table(tool, "bumpversion")
-        if pyproject:
-            files = get_set_aot(bumpversion, "files")
-            ensure_contains(
-                files,
-                _add_bumpversion_toml_file(PYPROJECT_TOML, 'version = "${version}"'),
-            )
-    if (
-        python_package_name_use := get_python_package_name(
-            package_name=package_name, python_package_name=python_package_name
-        )
-    ) is not None:
-        files = get_set_aot(bumpversion, "files")
-        ensure_contains(
-            files,
-            _add_bumpversion_toml_file(
-                f"src/{python_package_name_use}/__init__.py",
-                '__version__ = "${version}"',
-            ),
-        )
-
-
-def _add_bumpversion_toml_file(path: PathLike, template: str, /) -> Table:
-    tab = table()
-    tab["filename"] = str(path)
-    tab["search"] = Template(template).substitute(version="{current_version}")
-    tab["replace"] = Template(template).substitute(version="{new_version}")
-    return tab
 
 
 ##
@@ -803,40 +760,6 @@ def get_tool_uv(doc: TOMLDocument, /) -> Table:
 ##
 
 
-def get_version_from_bumpversion_toml(
-    *, obj: TOMLDocument | str | None = None
-) -> Version:
-    match obj:
-        case TOMLDocument() as doc:
-            tool = get_set_table(doc, "tool")
-            bumpversion = get_set_table(tool, "bumpversion")
-            return parse_version(str(bumpversion["current_version"]))
-        case str() as text:
-            return get_version_from_bumpversion_toml(obj=tomlkit.parse(text))
-        case None:
-            with yield_bumpversion_toml() as doc:
-                return get_version_from_bumpversion_toml(obj=doc)
-        case never:
-            assert_never(never)
-
-
-def get_version_from_git_show() -> Version:
-    text = logged_run("git", "show", f"origin/master:{BUMPVERSION_TOML}", return_=True)
-    return get_version_from_bumpversion_toml(obj=text.rstrip("\n"))
-
-
-def get_version_from_git_tag() -> Version:
-    text = logged_run("git", "tag", "--points-at", "origin/master", return_=True)
-    for line in text.splitlines():
-        with suppress(ParseVersionError):
-            return parse_version(line)
-    msg = "No valid version from 'git tag'"
-    raise ValueError(msg)
-
-
-##
-
-
 def run_ripgrep_and_replace(
     *,
     version: str = SETTINGS.python_version,
@@ -858,32 +781,6 @@ def run_ripgrep_and_replace(
                 context.input,
                 flags=MULTILINE,
             )
-
-
-##
-
-
-def update_action_versions(*, modifications: MutableSet[Path] | None = None) -> None:
-    try:
-        paths = list(GITHUB.rglob("**/*.yaml"))
-    except FileNotFoundError:
-        return
-    versions = {
-        "actions/checkout": "v6",
-        "actions/setup-python": "v6",
-        "astral-sh/ruff-action": "v3",
-        "astral-sh/setup-uv": "v7",
-    }
-    for path, (action, version) in product(paths, versions.items()):
-        text = sub(
-            rf"^(\s*- uses: {action})@.+$",
-            rf"\1@{version}",
-            path.read_text(),
-            flags=MULTILINE,
-        )
-        with yield_yaml_dict(path, modifications=modifications) as dict_:
-            dict_.clear()
-            dict_.update(YAML_INSTANCE.load(text))
 
 
 ##
@@ -938,11 +835,7 @@ __all__ = [
     "get_cron_job",
     "get_python_package_name",
     "get_tool_uv",
-    "get_version_from_bumpversion_toml",
-    "get_version_from_git_show",
-    "get_version_from_git_tag",
     "run_ripgrep_and_replace",
-    "update_action_versions",
     "yield_bumpversion_toml",
     "yield_python_versions",
 ]

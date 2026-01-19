@@ -10,23 +10,16 @@ from utilities.hypothesis import temp_paths, text_ascii
 from utilities.pathlib import temp_cwd
 from utilities.text import strip_and_dedent
 
-from actions.constants import (
-    GITEA_PULL_REQUEST_YAML,
-    GITHUB_PULL_REQUEST_YAML,
-    YAML_INSTANCE,
-)
+from actions.constants import GITEA_PULL_REQUEST_YAML, GITHUB_PULL_REQUEST_YAML
 from actions.pre_commit.conformalize_repo.lib import (
     _add_envrc_uv_text,
-    _add_pre_commit_config_repo,
     add_ci_pull_request_yaml,
     add_ci_push_yaml,
     add_coveragerc_toml,
     add_envrc,
     add_pyproject_toml,
-    add_pyrightconfig_json,
     add_pytest_toml,
     add_readme_md,
-    add_ruff_toml,
     yield_python_versions,
 )
 
@@ -156,36 +149,11 @@ class TestAddEnvrcUvText:
         assert result == expected
 
 
-class TestAddPreCommitConfigRepo:
-    def test_main(self) -> None:
-        text = strip_and_dedent("""
-            repos:
-              - repo: url
-                rev: rev
-                hooks:
-                  - id: id
-                    args:
-                      - --arg
-        """)
-        pre_commit_dict = YAML_INSTANCE.load(text)
-        _add_pre_commit_config_repo(
-            pre_commit_dict, "url", "id", args=("add", ["--arg"])
-        )
-        assert pre_commit_dict == YAML_INSTANCE.load(text)
-
-
 class TestAddPyProjectToml:
     def test_main(self, *, tmp_path: Path) -> None:
         with temp_cwd(tmp_path):
             for _ in range(2):
                 add_pyproject_toml()
-
-
-class TestAddPyrightConfigJson:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_pyrightconfig_json()
 
 
 class TestAddPytestToml:
@@ -200,13 +168,6 @@ class TestAddReadMeMd:
         with temp_cwd(tmp_path):
             for _ in range(2):
                 add_readme_md()
-
-
-class TestAddRuffToml:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_ruff_toml()
 
 
 class TestYieldPythonVersions:
