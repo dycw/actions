@@ -107,8 +107,6 @@ class Settings:
     python_version: str = option(default="3.14", help="Python version")
     readme: bool = option(default=False, help="Set up 'README.md'")
     repo_name: str | None = option(default=None, help="Repo name")
-    ruff: bool = option(default=False, help="Set up 'ruff.toml'")
-    run_version_bump: bool = option(default=RUN_VERSION_BUMP, help="Run version bump")
     uv__indexes: list[tuple[str, str]] = option(
         factory=list, help="Set up 'uv' with index indexes"
     )

@@ -154,16 +154,12 @@ def conformalize_repo(
     python_version: str = SETTINGS.python_version,
     readme: bool = SETTINGS.readme,
     repo_name: str | None = SETTINGS.repo_name,
-    ruff: bool = SETTINGS.ruff,
-    run_version_bump: bool = SETTINGS.run_version_bump,
     script: str | None = SETTINGS.script,
     uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     modifications: set[Path] = set()
-    run_pre_commit_update(modifications=modifications)
     run_ripgrep_and_replace(modifications=modifications, version=python_version)
-    update_action_file_extensions(modifications=modifications)
     update_action_versions(modifications=modifications)
     if (
         ci__pull_request__pre_commit
@@ -188,7 +184,6 @@ def conformalize_repo(
             pytest__timeout=pytest__timeout,
             python_version=python_version,
             repo_name=repo_name,
-            ruff=ruff,
             script=script,
             token_checkout=ci__token_checkout,
             token_github=ci__token_github,
@@ -249,10 +244,6 @@ def conformalize_repo(
             python_package_name=python_package_name,
             uv__indexes=uv__indexes,
         )
-    if pyright:
-        add_pyrightconfig_json(
-            modifications=modifications, python_version=python_version, script=script
-        )
     if (
         pytest
         or pytest__asyncio
@@ -273,8 +264,6 @@ def conformalize_repo(
         add_readme_md(
             modifications=modifications, name=repo_name, description=description
         )
-    if run_version_bump:
-        run_bump_my_version(modifications=modifications)
     if len(modifications) >= 1:
         LOGGER.info(
             "Exiting due to %s: %s",
