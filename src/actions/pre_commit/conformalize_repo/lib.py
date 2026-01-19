@@ -144,13 +144,6 @@ def conformalize_repo(
     envrc: bool = SETTINGS.envrc,
     envrc__uv: bool = SETTINGS.envrc__uv,
     package_name: str | None = SETTINGS.package_name,
-    pre_commit__dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
-    pre_commit__prettier: bool = SETTINGS.pre_commit__prettier,
-    pre_commit__python: bool = SETTINGS.pre_commit__python,
-    pre_commit__ruff: bool = SETTINGS.pre_commit__ruff,
-    pre_commit__shell: bool = SETTINGS.pre_commit__shell,
-    pre_commit__taplo: bool = SETTINGS.pre_commit__taplo,
-    pre_commit__uv: bool = SETTINGS.pre_commit__uv,
     pyproject: bool = SETTINGS.pyproject,
     pyproject__project__optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
     pyright: bool = SETTINGS.pyright,
@@ -173,19 +166,6 @@ def conformalize_repo(
     run_ripgrep_and_replace(modifications=modifications, version=python_version)
     update_action_file_extensions(modifications=modifications)
     update_action_versions(modifications=modifications)
-    add_pre_commit_config_yaml(
-        modifications=modifications,
-        dockerfmt=pre_commit__dockerfmt,
-        prettier=pre_commit__prettier,
-        python=pre_commit__python,
-        ruff=pre_commit__ruff,
-        shell=pre_commit__shell,
-        taplo=pre_commit__taplo,
-        uv=pre_commit__uv,
-        script=script,
-        uv__indexes=uv__indexes,
-        uv__native_tls=uv__native_tls,
-    )
     if (
         ci__pull_request__pre_commit
         or ci__pull_request__pyright
@@ -692,16 +672,6 @@ def _add_envrc_uv_text(
         args.extend(["--script", script])
     lines.append(join(args))
     return "\n".join(lines)
-
-
-##
-
-
-def add_gitignore(*, modifications: MutableSet[Path] | None = None) -> None:
-    with yield_text_file(GITIGNORE, modifications=modifications) as context:
-        text = (PATH_CONFIGS / "gitignore").read_text()
-        if search(escape(text), context.output, flags=MULTILINE) is None:
-            context.output += f"\n\n{text}"
 
 
 ##
@@ -1466,8 +1436,6 @@ __all__ = [
     "add_ci_push_yaml",
     "add_coveragerc_toml",
     "add_envrc",
-    "add_gitignore",
-    "add_pre_commit_config_yaml",
     "add_pyproject_toml",
     "add_pyrightconfig_json",
     "add_pytest_toml",

@@ -23,8 +23,6 @@ from actions.pre_commit.conformalize_repo.lib import (
     add_ci_push_yaml,
     add_coveragerc_toml,
     add_envrc,
-    add_gitignore,
-    add_pre_commit_config_yaml,
     add_pyproject_toml,
     add_pyrightconfig_json,
     add_pytest_toml,
@@ -175,20 +173,6 @@ class TestAddPreCommitConfigRepo:
             pre_commit_dict, "url", "id", args=("add", ["--arg"])
         )
         assert pre_commit_dict == YAML_INSTANCE.load(text)
-
-
-class TestAddGitIgnore:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_gitignore()
-
-
-class TestAddPreCommitConfigYaml:
-    def test_main(self, *, tmp_path: Path) -> None:
-        with temp_cwd(tmp_path):
-            for _ in range(2):
-                add_pre_commit_config_yaml()
 
 
 class TestAddPyProjectToml:

@@ -88,33 +88,11 @@ class Settings:
     envrc: bool = option(default=False, help="Set up '.envrc'")
     envrc__uv: bool = option(default=False, help="Set up '.envrc' with uv")
     package_name: str | None = option(default=None, help="Package name")
-    pre_commit__dockerfmt: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' dockerfmt"
-    )
-    pre_commit__prettier: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' prettier"
-    )
-    pre_commit__python: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' python"
-    )
-    pre_commit__ruff: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' ruff"
-    )
-    pre_commit__shell: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' shell"
-    )
-    pre_commit__taplo: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' taplo"
-    )
-    pre_commit__uv: bool = option(
-        default=False, help="Set up '.pre-commit-config.yaml' uv"
-    )
     pyproject: bool = option(default=False, help="Set up 'pyproject.toml'")
     pyproject__project__optional_dependencies__scripts: bool = option(
         default=False,
         help="Set up 'pyproject.toml' [project.optional-dependencies.scripts]",
     )
-    pyright: bool = option(default=False, help="Set up 'pyrightconfig.json'")
     pytest: bool = option(default=False, help="Set up 'pytest.toml'")
     pytest__asyncio: bool = option(default=False, help="Set up 'pytest.toml' asyncio_*")
     pytest__ignore_warnings: bool = option(
