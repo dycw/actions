@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typed_settings import Secret, load_settings, option, secret, settings
+from typed_settings import load_settings, option, settings
 
 from actions.utilities import LOADER
 
@@ -21,7 +21,6 @@ class Settings:
     python_package_name: str | None = option(
         default=None, help="Python package name override"
     )
-    python_version: str = option(default="3.14", help="Python version")
 
     @property
     def python_package_name_use(self) -> str | None:
