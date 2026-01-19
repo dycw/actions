@@ -12,7 +12,6 @@ from actions.git_clone_with.constants import GIT_CLONE_WITH_SUB_CMD
 from actions.publish_package.constants import PUBLISH_PACKAGE_SUB_CMD
 from actions.random_sleep.constants import RANDOM_SLEEP_SUB_CMD
 from actions.re_encrypt.constants import RE_ENCRYPT_SUB_CMD
-from actions.run_hooks.constants import RUN_HOOKS_SUB_CMD
 from actions.setup_cronjob.constants import SETUP_CRONJOB_SUB_CMD
 from actions.setup_ssh_config.constants import SETUP_SSH_CONFIG_SUB_CMD
 from actions.tag_commit.constants import TAG_COMMIT_SUB_CMD
@@ -28,7 +27,6 @@ class TestCLI:
             param(CLEAN_DIR_SUB_CMD, []),
             param(PUBLISH_PACKAGE_SUB_CMD, []),
             param(RANDOM_SLEEP_SUB_CMD, []),
-            param(RUN_HOOKS_SUB_CMD, []),
             param(SETUP_CRONJOB_SUB_CMD, []),
             param(SETUP_SSH_CONFIG_SUB_CMD, []),
             param(TAG_COMMIT_SUB_CMD, []),
