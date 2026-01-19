@@ -4,7 +4,6 @@ import sys
 from contextlib import contextmanager
 from hashlib import blake2b
 from re import MULTILINE, escape, search, sub
-from shlex import join
 from typing import TYPE_CHECKING
 
 from tomlkit import TOMLDocument, table
@@ -12,13 +11,11 @@ from utilities.functions import get_func_name
 from utilities.inflect import counted_noun
 from utilities.re import extract_groups
 from utilities.subprocess import ripgrep
-from utilities.text import repr_str, strip_and_dedent
-from utilities.version import Version
+from utilities.text import repr_str
 
 from actions.constants import (
     BUMPVERSION_TOML,
     COVERAGERC_TOML,
-    ENVRC,
     GITEA_PULL_REQUEST_YAML,
     GITEA_PUSH_YAML,
     GITHUB_PULL_REQUEST_YAML,
@@ -694,21 +691,6 @@ def run_ripgrep_and_replace(
 ##
 
 
-@contextmanager
-def yield_bumpversion_toml(
-    *, modifications: MutableSet[Path] | None = None
-) -> Iterator[TOMLDocument]:
-    with yield_toml_doc(BUMPVERSION_TOML, modifications=modifications) as doc:
-        tool = get_set_table(doc, "tool")
-        bumpversion = get_set_table(tool, "bumpversion")
-        bumpversion["allow_dirty"] = True
-        bumpversion.setdefault("current_version", str(Version(0, 1, 0)))
-        yield doc
-
-
-##
-
-
 def yield_python_versions(
     version: str, /, *, max_: str = MAX_PYTHON_VERSION
 ) -> Iterator[str]:
@@ -743,6 +725,5 @@ __all__ = [
     "get_python_package_name",
     "get_tool_uv",
     "run_ripgrep_and_replace",
-    "yield_bumpversion_toml",
     "yield_python_versions",
 ]
