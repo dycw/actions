@@ -19,7 +19,6 @@ from actions.constants import (
 from actions.pre_commit.conformalize_repo.lib import (
     _add_envrc_uv_text,
     _add_pre_commit_config_repo,
-    add_bumpversion_toml,
     add_ci_pull_request_yaml,
     add_ci_push_yaml,
     add_coveragerc_toml,
@@ -36,36 +35,6 @@ from actions.pre_commit.conformalize_repo.lib import (
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-
-class TestAddBumpversionToml:
-    @given(
-        root=temp_paths(),
-        pyproject=booleans(),
-        package_name=text_ascii() | none(),
-        python_package_name=text_ascii() | none(),
-    )
-    def test_main(
-        self,
-        *,
-        root: Path,
-        pyproject: bool,
-        package_name: str | None,
-        python_package_name: str | None,
-    ) -> None:
-        def run() -> None:
-            add_bumpversion_toml(
-                pyproject=pyproject,
-                package_name=package_name,
-                python_package_name=python_package_name,
-            )
-
-        with temp_cwd(root):
-            run()
-            assert BUMPVERSION_TOML.is_file()
-            current = BUMPVERSION_TOML.read_text()
-            run()
-            assert BUMPVERSION_TOML.read_text() == current
 
 
 class TestAddCIPullRequestYaml:

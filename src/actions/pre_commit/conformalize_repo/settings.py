@@ -87,7 +87,6 @@ class Settings:
     description: str | None = option(default=None, help="Repo description")
     envrc: bool = option(default=False, help="Set up '.envrc'")
     envrc__uv: bool = option(default=False, help="Set up '.envrc' with uv")
-    gitignore: bool = option(default=False, help="Set up '.gitignore'")
     package_name: str | None = option(default=None, help="Package name")
     pre_commit__dockerfmt: bool = option(
         default=False, help="Set up '.pre-commit-config.yaml' dockerfmt"
