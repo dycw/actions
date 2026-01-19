@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from hashlib import blake2b
-from re import MULTILINE, escape, search, sub
+from re import MULTILINE, sub
 from typing import TYPE_CHECKING
 
 from utilities.functions import get_func_name
@@ -19,7 +19,6 @@ from actions.constants import (
     GITHUB_PUSH_YAML,
     MAX_PYTHON_VERSION,
     PYTEST_TOML,
-    README_MD,
 )
 from actions.logging import LOGGER
 from actions.pre_commit.conformalize_repo.action_dicts import (
@@ -91,7 +90,6 @@ def conformalize_repo(
     ci__push__tag: bool = SETTINGS.ci__push__tag,
     ci__push__tag__all: bool = SETTINGS.ci__push__tag__all,
     coverage: bool = SETTINGS.coverage,
-    description: str | None = SETTINGS.description,
     package_name: str | None = SETTINGS.package_name,
     pytest: bool = SETTINGS.pytest,
     pytest__asyncio: bool = SETTINGS.pytest__asyncio,
@@ -99,9 +97,7 @@ def conformalize_repo(
     pytest__timeout: int | None = SETTINGS.pytest__timeout,
     python_package_name: str | None = SETTINGS.python_package_name,
     python_version: str = SETTINGS.python_version,
-    readme: bool = SETTINGS.readme,
     repo_name: str | None = SETTINGS.repo_name,
-    script: str | None = SETTINGS.script,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     modifications: set[Path] = set()
@@ -129,7 +125,6 @@ def conformalize_repo(
             pytest__timeout=pytest__timeout,
             python_version=python_version,
             repo_name=repo_name,
-            script=script,
             token_checkout=ci__token_checkout,
             token_github=ci__token_github,
             uv__native_tls=uv__native_tls,
@@ -184,11 +179,6 @@ def conformalize_repo(
             coverage=coverage,
             package_name=package_name,
             python_package_name=python_package_name,
-            script=script,
-        )
-    if readme:
-        add_readme_md(
-            modifications=modifications, name=repo_name, description=description
         )
     if len(modifications) >= 1:
         LOGGER.info(
@@ -222,7 +212,6 @@ def add_ci_pull_request_yaml(
     python_version: str = SETTINGS.python_version,
     repo_name: str | None = SETTINGS.repo_name,
     ruff: bool = SETTINGS.ci__pull_request__ruff,
-    script: str | None = SETTINGS.script,
     token_checkout: Secret[str] | None = SETTINGS.ci__token_checkout,
     token_github: Secret[str] | None = SETTINGS.ci__token_github,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
@@ -265,7 +254,6 @@ def add_ci_pull_request_yaml(
                     token_checkout=token_checkout,
                     token_github=token_github,
                     python_version=python_version,
-                    with_requirements=script,
                     native_tls=uv__native_tls,
                 ),
             )
@@ -289,7 +277,6 @@ def add_ci_pull_request_yaml(
                     sops_age_key=pytest__sops_age_key,
                     resolution="${{matrix.resolution}}",
                     native_tls=uv__native_tls,
-                    with_requirements=script,
                 ),
             )
             strategy_dict = get_set_dict(pytest_dict, "strategy")
@@ -481,7 +468,6 @@ def add_pytest_toml(
     coverage: bool = SETTINGS.coverage,
     package_name: str | None = SETTINGS.package_name,
     python_package_name: str | None = SETTINGS.python_package_name,
-    script: str | None = SETTINGS.script,
 ) -> None:
     with yield_toml_doc(PYTEST_TOML, modifications=modifications) as doc:
         pytest = get_set_table(doc, "pytest")
@@ -515,7 +501,7 @@ def add_pytest_toml(
         pytest["minversion"] = "9.0"
         pytest["strict"] = True
         testpaths = get_set_array(pytest, "testpaths")
-        ensure_contains(testpaths, "src/tests" if script is None else "tests")
+        ensure_contains(testpaths, "src/tests")
         pytest["xfail_strict"] = True
         if asyncio:
             pytest["asyncio_default_fixture_loop_scope"] = "function"
