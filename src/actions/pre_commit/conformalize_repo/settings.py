@@ -85,11 +85,6 @@ class Settings:
     coverage: bool = option(default=False, help="Set up '.coveragerc.toml'")
     description: str | None = option(default=None, help="Repo description")
     package_name: str | None = option(default=None, help="Package name")
-    pyproject: bool = option(default=False, help="Set up 'pyproject.toml'")
-    pyproject__project__optional_dependencies__scripts: bool = option(
-        default=False,
-        help="Set up 'pyproject.toml' [project.optional-dependencies.scripts]",
-    )
     pytest: bool = option(default=False, help="Set up 'pytest.toml'")
     pytest__asyncio: bool = option(default=False, help="Set up 'pytest.toml' asyncio_*")
     pytest__ignore_warnings: bool = option(
@@ -104,9 +99,6 @@ class Settings:
     python_version: str = option(default="3.14", help="Python version")
     readme: bool = option(default=False, help="Set up 'README.md'")
     repo_name: str | None = option(default=None, help="Repo name")
-    uv__indexes: list[tuple[str, str]] = option(
-        factory=list, help="Set up 'uv' with index indexes"
-    )
     uv__native_tls: bool = option(default=False, help="Setup 'uv' with native TLS")
     script: str | None = option(
         default=None, help="Set up a script instead of a package"

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import sys
-from contextlib import contextmanager
 from hashlib import blake2b
 from re import MULTILINE, escape, search, sub
 from typing import TYPE_CHECKING
 
-from tomlkit import TOMLDocument, table
+from tomlkit import table
 from utilities.functions import get_func_name
 from utilities.inflect import counted_noun
 from utilities.re import extract_groups
@@ -14,7 +13,6 @@ from utilities.subprocess import ripgrep
 from utilities.text import repr_str
 
 from actions.constants import (
-    BUMPVERSION_TOML,
     COVERAGERC_TOML,
     GITEA_PULL_REQUEST_YAML,
     GITEA_PUSH_YAML,
@@ -54,6 +52,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
     from pathlib import Path
 
+    from tomlkit import TOMLDocument
     from tomlkit.items import Table
     from typed_settings import Secret
     from utilities.types import StrDict
@@ -98,8 +97,6 @@ def conformalize_repo(
     coverage: bool = SETTINGS.coverage,
     description: str | None = SETTINGS.description,
     package_name: str | None = SETTINGS.package_name,
-    pyproject: bool = SETTINGS.pyproject,
-    pyproject__project__optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
     pytest: bool = SETTINGS.pytest,
     pytest__asyncio: bool = SETTINGS.pytest__asyncio,
     pytest__ignore_warnings: bool = SETTINGS.pytest__ignore_warnings,
@@ -109,7 +106,6 @@ def conformalize_repo(
     readme: bool = SETTINGS.readme,
     repo_name: str | None = SETTINGS.repo_name,
     script: str | None = SETTINGS.script,
-    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
     uv__native_tls: bool = SETTINGS.uv__native_tls,
 ) -> None:
     modifications: set[Path] = set()
@@ -178,17 +174,6 @@ def conformalize_repo(
         )
     if coverage:
         add_coveragerc_toml(modifications=modifications)
-    if pyproject:
-        add_pyproject_toml(
-            modifications=modifications,
-            python_version=python_version,
-            description=description,
-            package_name=package_name,
-            readme=readme,
-            optional_dependencies__scripts=pyproject__project__optional_dependencies__scripts,
-            python_package_name=python_package_name,
-            uv__indexes=uv__indexes,
-        )
     if (
         pytest
         or pytest__asyncio
@@ -491,60 +476,6 @@ def add_coveragerc_toml(*, modifications: MutableSet[Path] | None = None) -> Non
 ##
 
 
-def add_pyproject_toml(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    python_version: str = SETTINGS.python_version,
-    description: str | None = SETTINGS.description,
-    package_name: str | None = SETTINGS.package_name,
-    readme: bool = SETTINGS.readme,
-    optional_dependencies__scripts: bool = SETTINGS.pyproject__project__optional_dependencies__scripts,
-    python_package_name: str | None = SETTINGS.python_package_name,
-    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
-) -> None:
-    with yield_pyproject_toml(modifications=modifications) as doc:
-        build_system = get_set_table(doc, "build-system")
-        build_system["build-backend"] = "uv_build"
-        build_system["requires"] = ["uv_build"]
-        project = get_set_table(doc, "project")
-        project["requires-python"] = f">= {python_version}"
-        if description is not None:
-            project["description"] = description
-        if package_name is not None:
-            project["name"] = package_name
-        if readme:
-            project["readme"] = "README.md"
-        project.setdefault("version", "0.1.0")
-        dependency_groups = get_set_table(doc, "dependency-groups")
-        dev = get_set_array(dependency_groups, "dev")
-        _ = ensure_contains_partial_str(dev, "dycw-utilities[test]")
-        _ = ensure_contains_partial_str(dev, "pyright")
-        _ = ensure_contains_partial_str(dev, "rich")
-        if optional_dependencies__scripts:
-            optional_dependencies = get_set_table(project, "optional-dependencies")
-            scripts = get_set_array(optional_dependencies, "scripts")
-            _ = ensure_contains_partial_str(scripts, "click")
-        if python_package_name is not None:
-            uv = get_tool_uv(doc)
-            build_backend = get_set_table(uv, "build-backend")
-            build_backend["module-name"] = get_python_package_name(
-                package_name=package_name, python_package_name=python_package_name
-            )
-            build_backend["module-root"] = "src"
-        if len(uv__indexes) >= 1:
-            uv = get_tool_uv(doc)
-            indexes = get_set_aot(uv, "index")
-            for name, url in uv__indexes:
-                index = table()
-                index["explicit"] = True
-                index["name"] = name
-                index["url"] = url
-                ensure_contains(indexes, index)
-
-
-##
-
-
 def add_pytest_toml(
     *,
     modifications: MutableSet[Path] | None = None,
@@ -718,7 +649,6 @@ __all__ = [
     "add_ci_pull_request_yaml",
     "add_ci_push_yaml",
     "add_coveragerc_toml",
-    "add_pyproject_toml",
     "add_pytest_toml",
     "add_readme_md",
     "get_cron_job",

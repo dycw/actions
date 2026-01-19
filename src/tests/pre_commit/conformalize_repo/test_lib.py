@@ -8,7 +8,6 @@ from pytest import mark, param, raises
 from typed_settings import Secret
 from utilities.hypothesis import temp_paths, text_ascii
 from utilities.pathlib import temp_cwd
-from utilities.text import strip_and_dedent
 
 from actions.constants import GITEA_PULL_REQUEST_YAML, GITHUB_PULL_REQUEST_YAML
 from actions.pre_commit.conformalize_repo.lib import (
