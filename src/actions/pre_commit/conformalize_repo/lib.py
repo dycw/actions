@@ -4,7 +4,6 @@ import sys
 from contextlib import contextmanager, suppress
 from hashlib import blake2b
 from itertools import product
-from pathlib import Path
 from re import MULTILINE, escape, search, sub
 from shlex import join
 from string import Template
@@ -97,6 +96,7 @@ from actions.utilities import logged_run
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, MutableSet
+    from pathlib import Path
 
     from tomlkit.items import Table
     from typed_settings import Secret
@@ -273,8 +273,6 @@ def conformalize_repo(
         add_readme_md(
             modifications=modifications, name=repo_name, description=description
         )
-    if ruff:
-        add_ruff_toml(modifications=modifications, python_version=python_version)
     if run_version_bump:
         run_bump_my_version(modifications=modifications)
     if len(modifications) >= 1:
@@ -676,270 +674,6 @@ def _add_envrc_uv_text(
 ##
 
 
-def add_pre_commit_config_yaml(
-    *,
-    modifications: MutableSet[Path] | None = None,
-    dockerfmt: bool = SETTINGS.pre_commit__dockerfmt,
-    prettier: bool = SETTINGS.pre_commit__prettier,
-    python: bool = SETTINGS.pre_commit__python,
-    ruff: bool = SETTINGS.pre_commit__ruff,
-    shell: bool = SETTINGS.pre_commit__shell,
-    taplo: bool = SETTINGS.pre_commit__taplo,
-    uv: bool = SETTINGS.pre_commit__uv,
-    script: str | None = SETTINGS.script,
-    uv__indexes: list[tuple[str, str]] = SETTINGS.uv__indexes,
-    uv__native_tls: bool = SETTINGS.uv__native_tls,
-) -> None:
-    with yield_yaml_dict(PRE_COMMIT_CONFIG_YAML, modifications=modifications) as dict_:
-        _add_pre_commit_config_repo(
-            dict_,
-            ACTIONS_URL,
-            CONFORMALIZE_REPO_SUB_CMD,
-            rev=True,
-            priority=FORMATTER_PRIORITY,
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-added-large-files", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-case-conflict", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-executables-have-shebangs", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-json", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-json5", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-merge-conflict", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-symlinks", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-toml", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-xml", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "check-yaml", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "detect-private-key", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "end-of-file-fixer", priority=FORMATTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "fix-byte-order-marker", priority=FORMATTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_,
-            BUILTIN,
-            "mixed-line-ending",
-            args=("add", ["--fix=lf"]),
-            priority=FORMATTER_PRIORITY,
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "no-commit-to-branch", priority=LINTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_, BUILTIN, "trailing-whitespace", priority=FORMATTER_PRIORITY
-        )
-        _add_pre_commit_config_repo(
-            dict_,
-            PRE_COMMIT_HOOKS_URL,
-            "check-illegal-windows-names",
-            rev=True,
-            priority=LINTER_PRIORITY,
-        )
-        _add_pre_commit_config_repo(
-            dict_,
-            PRE_COMMIT_HOOKS_URL,
-            "destroyed-symlinks",
-            rev=True,
-            priority=LINTER_PRIORITY,
-        )
-        _add_pre_commit_config_repo(
-            dict_,
-            PRE_COMMIT_HOOKS_URL,
-            "pretty-format-json",
-            rev=True,
-            args=("add", ["--autofix"]),
-            priority=FORMATTER_PRIORITY,
-        )
-        if dockerfmt:
-            _add_pre_commit_config_repo(
-                dict_,
-                DOCKERFMT_URL,
-                "dockerfmt",
-                rev=True,
-                args=("add", ["--newline", "--write"]),
-                priority=FORMATTER_PRIORITY,
-            )
-        if prettier:
-            _add_pre_commit_config_repo(
-                dict_,
-                "local",
-                "prettier",
-                name="prettier",
-                entry="npx prettier --write",
-                language="system",
-                types_or=["markdown", "yaml"],
-                priority=FORMATTER_PRIORITY,
-            )
-        if python:
-            _add_pre_commit_config_repo(
-                dict_,
-                ACTIONS_URL,
-                FORMAT_REQUIREMENTS_SUB_CMD,
-                rev=True,
-                priority=FORMATTER_PRIORITY,
-            )
-            _add_pre_commit_config_repo(
-                dict_,
-                ACTIONS_URL,
-                REPLACE_SEQUENCE_STRS_SUB_CMD,
-                rev=True,
-                priority=FORMATTER_PRIORITY,
-            )
-            _add_pre_commit_config_repo(
-                dict_,
-                ACTIONS_URL,
-                TOUCH_EMPTY_PY_SUB_CMD,
-                rev=True,
-                priority=FORMATTER_PRIORITY,
-            )
-            _add_pre_commit_config_repo(
-                dict_,
-                ACTIONS_URL,
-                TOUCH_PY_TYPED_SUB_CMD,
-                rev=True,
-                priority=FORMATTER_PRIORITY,
-            )
-            args: list[str] = []
-            if len(uv__indexes) >= 1:
-                args.extend(["--index", ",".join(v for _, v in uv__indexes)])
-            if uv__native_tls:
-                args.append("--native-tls")
-            _add_pre_commit_config_repo(
-                dict_,
-                ACTIONS_URL,
-                UPDATE_REQUIREMENTS_SUB_CMD,
-                rev=True,
-                args=("add", args) if len(args) >= 1 else None,
-                priority=FORMATTER_PRIORITY,
-            )
-        if ruff:
-            _add_pre_commit_config_repo(
-                dict_,
-                RUFF_URL,
-                "ruff-check",
-                rev=True,
-                args=("add", ["--fix"]),
-                priority=LINTER_PRIORITY,
-            )
-            _add_pre_commit_config_repo(
-                dict_, RUFF_URL, "ruff-format", rev=True, priority=FORMATTER_PRIORITY
-            )
-        if shell:
-            _add_pre_commit_config_repo(
-                dict_, SHFMT_URL, "shfmt", rev=True, priority=FORMATTER_PRIORITY
-            )
-            _add_pre_commit_config_repo(
-                dict_, SHELLCHECK_URL, "shellcheck", rev=True, priority=LINTER_PRIORITY
-            )
-        if taplo:
-            _add_pre_commit_config_repo(
-                dict_,
-                TAPLO_URL,
-                "taplo-format",
-                rev=True,
-                args=(
-                    "exact",
-                    [
-                        "--option",
-                        "indent_tables=true",
-                        "--option",
-                        "indent_entries=true",
-                        "--option",
-                        "reorder_keys=true",
-                    ],
-                ),
-                priority=FORMATTER_PRIORITY,
-            )
-        if uv:
-            args: list[str] = [
-                "--upgrade",
-                "--resolution",
-                "highest",
-                "--prerelease",
-                "disallow",
-            ]
-            if script is not None:
-                args.extend(["--script", script])
-            _add_pre_commit_config_repo(
-                dict_,
-                UV_URL,
-                "uv-lock",
-                rev=True,
-                files=None if script is None else rf"^{escape(script)}$",
-                args=("add", args),
-                priority=FORMATTER_PRIORITY,
-            )
-
-
-def _add_pre_commit_config_repo(
-    pre_commit_dict: StrDict,
-    url: str,
-    id_: str,
-    /,
-    *,
-    rev: bool = False,
-    name: str | None = None,
-    entry: str | None = None,
-    language: str | None = None,
-    files: str | None = None,
-    types_or: list[str] | None = None,
-    args: tuple[Literal["add", "exact"], list[str]] | None = None,
-    priority: int | None = None,
-) -> None:
-    repos_list = get_set_list_dicts(pre_commit_dict, "repos")
-    repo_dict = ensure_contains_partial_dict(
-        repos_list, {"repo": url}, extra={"rev": "master"} if rev else {}
-    )
-    hooks_list = get_set_list_dicts(repo_dict, "hooks")
-    hook_dict = ensure_contains_partial_dict(hooks_list, {"id": id_})
-    if name is not None:
-        hook_dict["name"] = name
-    if entry is not None:
-        hook_dict["entry"] = entry
-    if language is not None:
-        hook_dict["language"] = language
-    if files is not None:
-        hook_dict["files"] = files
-    if types_or is not None:
-        hook_dict["types_or"] = types_or
-    if args is not None:
-        match args:
-            case "add", list() as args_i:
-                hook_args = get_set_list_strs(hook_dict, "args")
-                ensure_contains(hook_args, *args_i)
-            case "exact", list() as args_i:
-                hook_dict["args"] = args_i
-            case never:
-                assert_never(never)
-    if priority is not None:
-        hook_dict["priority"] = priority
-
-
-##
-
-
 def add_pyproject_toml(
     *,
     modifications: MutableSet[Path] | None = None,
@@ -1148,45 +882,6 @@ def get_version_from_git_tag() -> Version:
 ##
 
 
-def run_bump_my_version(*, modifications: MutableSet[Path] | None = None) -> None:
-    def run_set_version(version: Version, /) -> None:
-        LOGGER.info("Setting version to %s...", version)
-        set_version(version)
-        if modifications is not None:
-            modifications.add(BUMPVERSION_TOML)
-
-    try:
-        prev = get_version_from_git_tag()
-    except (CalledProcessError, ValueError):
-        try:
-            prev = get_version_from_git_show()
-        except (CalledProcessError, ParseVersionError, NonExistentKey):
-            run_set_version(Version(0, 1, 0))
-            return
-    current = get_version_from_bumpversion_toml()
-    patched = prev.bump_patch()
-    if current not in {patched, prev.bump_minor(), prev.bump_major()}:
-        run_set_version(patched)
-
-
-##
-
-
-def _run_prek_autoupdate(*, modifications: MutableSet[Path] | None = None) -> None:
-    current = PRE_COMMIT_CONFIG_YAML.read_text()
-    logged_run("prek", "autoupdate", print=True)
-    if (modifications is not None) and (PRE_COMMIT_CONFIG_YAML.read_text() != current):
-        modifications.add(PRE_COMMIT_CONFIG_YAML)
-
-
-run_pre_commit_update = throttle(
-    duration=THROTTLE_DURATION, path=path_throttle_cache(_run_prek_autoupdate)
-)(_run_prek_autoupdate)
-
-
-##
-
-
 def run_ripgrep_and_replace(
     *,
     version: str = SETTINGS.python_version,
@@ -1208,37 +903,6 @@ def run_ripgrep_and_replace(
                 context.input,
                 flags=MULTILINE,
             )
-
-
-##
-
-
-def set_version(version: Version, /) -> None:
-    logged_run(
-        "bump-my-version",
-        "replace",
-        "--new-version",
-        str(version),
-        str(BUMPVERSION_TOML),
-    )
-
-
-##
-
-
-def update_action_file_extensions(
-    *, modifications: MutableSet[Path] | None = None
-) -> None:
-    try:
-        paths = list(Path(".github").rglob("**/*.yml"))
-    except FileNotFoundError:
-        return
-    for path in paths:
-        new = path.with_suffix(".yaml")
-        LOGGER.info("Renaming '%s' -> '%s'...", path, new)
-        _ = path.rename(new)
-        if modifications is not None:
-            modifications.add(path)
 
 
 ##
@@ -1322,11 +986,7 @@ __all__ = [
     "get_version_from_bumpversion_toml",
     "get_version_from_git_show",
     "get_version_from_git_tag",
-    "run_bump_my_version",
-    "run_pre_commit_update",
     "run_ripgrep_and_replace",
-    "set_version",
-    "update_action_file_extensions",
     "update_action_versions",
     "yield_bumpversion_toml",
     "yield_python_versions",
