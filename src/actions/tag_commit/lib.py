@@ -5,7 +5,7 @@ from subprocess import CalledProcessError
 
 from utilities.functions import get_func_name
 from utilities.tabulate import func_param_desc
-from utilities.version import parse_version
+from utilities.version import Version3
 
 from actions import __version__
 from actions.logging import LOGGER
@@ -34,7 +34,7 @@ def tag_commit(
     )
     logged_run("git", "config", "--global", "user.name", user_name)
     logged_run("git", "config", "--global", "user.email", user_email)
-    version = parse_version(
+    version = Version3.parse(
         logged_run("bump-my-version", "show", "current_version", return_=True)
     )
     _tag(str(version))

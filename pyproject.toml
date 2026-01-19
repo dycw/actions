@@ -4,10 +4,10 @@
 
 [dependency-groups]
   dev = [
+    "dycw-utilities[test]>=0.184.4",
     "orjson>=3.11.5",
     "pyright>=1.1.408",
     "rich>=14.2.0",
-    "dycw-utilities[test]>=0.183.5",
   ]
 
 [project]
@@ -15,7 +15,7 @@
     "attrs>=25.4.0",
     "click>=8.3.1",
     "coloredlogs>=15.0.1",
-    "dycw-utilities>=0.183.5",
+    "dycw-utilities>=0.184.4",
     "inflect>=7.5.0",
     "libcst>=1.8.6",
     "ordered-set>=4.1.0",
@@ -34,7 +34,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.15.8"
+  version = "0.16.0"
 
   [project.scripts]
     cli = "actions.cli:_main"
@@ -44,7 +44,7 @@
       "attrs==25.4.0",
       "click==8.3.1",
       "coloredlogs==15.0.1",
-      "dycw-utilities==0.183.5",
+      "dycw-utilities==0.184.4",
       "inflect==7.5.0",
       "libcst==1.8.6",
       "ordered-set==4.1.0",
