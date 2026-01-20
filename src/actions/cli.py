@@ -6,11 +6,6 @@ from utilities.click import CONTEXT_SETTINGS
 from actions import __version__
 from actions.clean_dir.cli import clean_dir_sub_cmd
 from actions.clean_dir.constants import CLEAN_DIR_DOCSTRING, CLEAN_DIR_SUB_CMD
-from actions.git_clone_with.cli import git_clone_with_sub_cmd
-from actions.git_clone_with.constants import (
-    GIT_CLONE_WITH_DOCSTRING,
-    GIT_CLONE_WITH_SUB_CMD,
-)
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.publish_package.constants import (
     PUBLISH_PACKAGE_DOCSTRING,
@@ -46,6 +41,8 @@ def _main() -> None: ...
 _ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
     clean_dir_sub_cmd
 )
+
+
 _ = _main.command(
     name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)
