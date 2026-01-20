@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 
 def register_gitea_runner(
     *,
+    runner_token: str = SETTINGS.runner_token,
     ssh_user: str = SETTINGS.ssh_user,
     ssh_host: str = SETTINGS.ssh_host,
     gitea_container_user: str = SETTINGS.gitea_container_user,
