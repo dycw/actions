@@ -47,9 +47,6 @@ _ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SE
     clean_dir_sub_cmd
 )
 _ = _main.command(
-    name=GIT_CLONE_WITH_SUB_CMD, help=GIT_CLONE_WITH_DOCSTRING, **CONTEXT_SETTINGS
-)(git_clone_with_sub_cmd)
-_ = _main.command(
     name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)
 _ = _main.command(
