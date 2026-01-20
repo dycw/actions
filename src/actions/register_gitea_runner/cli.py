@@ -16,6 +16,7 @@ def register_gitea_runner_sub_cmd(settings: Settings, /) -> None:
         return
     basic_config(obj=LOGGER)
     register_gitea_runner(
+        runner_token=settings.runner_token,
         ssh_user=settings.ssh_user,
         ssh_host=settings.ssh_host,
         gitea_container_user=settings.gitea_container_user,

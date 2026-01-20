@@ -6,11 +6,6 @@ from utilities.click import CONTEXT_SETTINGS
 from actions import __version__
 from actions.clean_dir.cli import clean_dir_sub_cmd
 from actions.clean_dir.constants import CLEAN_DIR_DOCSTRING, CLEAN_DIR_SUB_CMD
-from actions.git_clone_with.cli import git_clone_with_sub_cmd
-from actions.git_clone_with.constants import (
-    GIT_CLONE_WITH_DOCSTRING,
-    GIT_CLONE_WITH_SUB_CMD,
-)
 from actions.publish_package.cli import publish_package_sub_cmd
 from actions.publish_package.constants import (
     PUBLISH_PACKAGE_DOCSTRING,
@@ -30,11 +25,6 @@ from actions.setup_cronjob.constants import (
     SETUP_CRONJOB_DOCSTRING,
     SETUP_CRONJOB_SUB_CMD,
 )
-from actions.setup_ssh_config.cli import setup_ssh_config_sub_cmd
-from actions.setup_ssh_config.constants import (
-    SETUP_SSH_CONFIG_DOCSTRING,
-    SETUP_SSH_CONFIG_SUB_CMD,
-)
 from actions.tag_commit.cli import tag_commit_sub_cmd
 from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CMD
 
@@ -46,9 +36,6 @@ def _main() -> None: ...
 _ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
     clean_dir_sub_cmd
 )
-_ = _main.command(
-    name=GIT_CLONE_WITH_SUB_CMD, help=GIT_CLONE_WITH_DOCSTRING, **CONTEXT_SETTINGS
-)(git_clone_with_sub_cmd)
 _ = _main.command(
     name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)
@@ -66,9 +53,6 @@ _ = _main.command(
 _ = _main.command(
     name=SETUP_CRONJOB_SUB_CMD, help=SETUP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
 )(setup_cronjob_sub_cmd)
-_ = _main.command(
-    name=SETUP_SSH_CONFIG_SUB_CMD, help=SETUP_SSH_CONFIG_DOCSTRING, **CONTEXT_SETTINGS
-)(setup_ssh_config_sub_cmd)
 _ = _main.command(
     name=TAG_COMMIT_SUB_CMD, help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS
 )(tag_commit_sub_cmd)

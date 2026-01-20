@@ -48,6 +48,7 @@ def register_gitea_runner(
         func_param_desc(
             register_gitea_runner,
             __version__,
+            f"{runner_token=}",
             f"{ssh_user=}",
             f"{ssh_host=}",
             f"{gitea_container_user=}",

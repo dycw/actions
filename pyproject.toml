@@ -16,12 +16,8 @@
     "click>=8.3.1",
     "coloredlogs>=15.0.1",
     "dycw-utilities>=0.184.4",
-    "inflect>=7.5.0",
-    "libcst>=1.8.6",
-    "ordered-set>=4.1.0",
     "packaging>=25.0",
     "pydantic>=2.12.5",
-    "pyyaml>=6.0.3",
     "requests>=2.32.5",
     "rich>=14.2.0",
     "ruamel-yaml>=0.19.1",
@@ -34,7 +30,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.16.1"
+  version = "0.16.2"
 
   [project.scripts]
     cli = "actions.cli:_main"
@@ -45,12 +41,8 @@
       "click==8.3.1",
       "coloredlogs==15.0.1",
       "dycw-utilities==0.184.4",
-      "inflect==7.5.0",
-      "libcst==1.8.6",
-      "ordered-set==4.1.0",
       "packaging==25.0",
       "pydantic==2.12.5",
-      "pyyaml==6.0.3",
       "requests==2.32.5",
       "rich==14.2.0",
       "ruamel-yaml==0.19.1",
