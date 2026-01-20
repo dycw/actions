@@ -21,7 +21,6 @@
     "ordered-set>=4.1.0",
     "packaging>=25.0",
     "pydantic>=2.12.5",
-    "pyyaml>=6.0.3",
     "requests>=2.32.5",
     "rich>=14.2.0",
     "ruamel-yaml>=0.19.1",
