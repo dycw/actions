@@ -18,6 +18,7 @@ _RUNNER_INSTANCE_NAME = "--".join(_RUNNER_INSTANCE_NAME_PARTS).lower()
 
 @settings
 class Settings:
+    runner_token: str = option(default=None, help="Registration token")
     ssh_user: str = option(default="nonroot", help="SSH username")
     ssh_host: str = option(default=_DEFAULT_HOST, help="SSH host")
     gitea_container_user: str = option(default="git", help="Gitea container user name")

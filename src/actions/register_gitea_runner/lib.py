@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 
 def register_gitea_runner(
     *,
+    runner_token: str = SETTINGS.runner_token,
     ssh_user: str = SETTINGS.ssh_user,
     ssh_host: str = SETTINGS.ssh_host,
     gitea_container_user: str = SETTINGS.gitea_container_user,
@@ -60,15 +61,20 @@ def register_gitea_runner(
             f"{runner_instance_name=}",
         )
     )
-    token = ssh(
-        ssh_user,
-        ssh_host,
-        *_docker_exec_generate(user=gitea_container_user, name=gitea_container_name),
-        return_=True,
-    )
-    LOGGER.info("Got token %r", token)
+    if runner_token is None:
+        runner_token_use = ssh(
+            ssh_user,
+            ssh_host,
+            *_docker_exec_generate(
+                user=gitea_container_user, name=gitea_container_name
+            ),
+            return_=True,
+        )
+        LOGGER.info("Got token %r", runner_token_use)
+    else:
+        runner_token_use = runner_token
     _start_runner(
-        token,
+        runner_token_use,
         runner_certificate=runner_certificate,
         runner_capacity=runner_capacity,
         runner_labels=runner_labels,
