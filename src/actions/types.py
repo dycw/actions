@@ -8,9 +8,6 @@ from typed_settings import Secret
 from utilities.packaging import Requirement
 from utilities.types import StrDict
 
-type ArrayLike = AoT | list[str] | list[StrDict]
-type ContainerLike = Container | Table
-type FuncRequirement = Callable[[Requirement], Requirement]
 type SecretLike = str | Secret[str]
 
 
