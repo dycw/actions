@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from ruamel.yaml import YAML
 from utilities.importlib import files
 from xdg_base_dirs import xdg_cache_home
