@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 import click
 from click import argument
 from typed_settings import click_options
+from utilities.core import is_pytest
 from utilities.logging import basic_config
-from utilities.os import is_pytest
 
 from actions.logging import LOGGER
 from actions.re_encrypt.lib import re_encrypt
