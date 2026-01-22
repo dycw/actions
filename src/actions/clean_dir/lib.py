@@ -4,7 +4,7 @@ from pathlib import Path
 from shutil import rmtree
 from typing import TYPE_CHECKING
 
-from utilities.functions import get_func_name
+from utilities.core import get_func_name
 from utilities.tabulate import func_param_desc
 
 from actions import __version__

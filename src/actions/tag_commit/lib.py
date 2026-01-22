@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import suppress
 from subprocess import CalledProcessError
 
-from utilities.functions import get_func_name
+from utilities.core import get_func_name
 from utilities.tabulate import func_param_desc
 from utilities.version import Version3
 
