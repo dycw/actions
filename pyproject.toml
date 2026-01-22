@@ -4,7 +4,7 @@
 
 [dependency-groups]
   dev = [
-    "dycw-utilities[test]>=0.185.2",
+    "dycw-utilities[test]>=0.185.8",
     "orjson>=3.11.5",
     "pyright>=1.1.408",
     "rich>=14.2.0",
@@ -15,7 +15,7 @@
     "attrs>=25.4.0",
     "click>=8.3.1",
     "coloredlogs>=15.0.1",
-    "dycw-utilities>=0.185.2",
+    "dycw-utilities>=0.185.8",
     "packaging>=26.0",
     "pydantic>=2.12.5",
     "requests>=2.32.5",
@@ -30,7 +30,7 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.16.3"
+  version = "0.16.4"
 
   [project.scripts]
     cli = "actions.cli:cli"
@@ -40,7 +40,7 @@
       "attrs==25.4.0",
       "click==8.3.1",
       "coloredlogs==15.0.1",
-      "dycw-utilities==0.185.2",
+      "dycw-utilities==0.185.8",
       "packaging==26.0",
       "pydantic==2.12.5",
       "requests==2.32.5",
