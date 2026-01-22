@@ -1,29 +1,21 @@
 from __future__ import annotations
 
 from io import StringIO
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, assert_never, overload
 
 from typed_settings import EnvLoader, Secret
-from utilities.atomicwrites import writer
 from utilities.subprocess import run
 
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSet
-
-    from utilities.types import PathLike, StrStrMapping
+    from utilities.types import StrStrMapping
 
     from actions.types import SecretLike
 
 
 LOADER = EnvLoader("")
-
-
-def are_equal_modulo_new_line(x: str, y: str, /) -> bool:
-    return ensure_new_line(x) == ensure_new_line(y)
 
 
 def convert_list_strs(
@@ -68,10 +60,6 @@ def convert_str(x: str | None, /) -> str | None:
             return None
         case never:
             assert_never(never)
-
-
-def ensure_new_line(text: str, /) -> str:
-    return text.strip("\n") + "\n"
 
 
 @overload
@@ -123,16 +111,6 @@ def logged_run(
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 
 
-def write_text(
-    path: PathLike, text: str, /, *, modifications: MutableSet[Path] | None = None
-) -> None:
-    LOGGER.info("Writing '%s'...", str(path))
-    with writer(path, overwrite=True) as temp:
-        _ = temp.write_text(ensure_new_line(text))
-    if modifications is not None:
-        modifications.add(Path(path))
-
-
 def yaml_dump(obj: Any, /) -> str:
     stream = StringIO()
     YAML_INSTANCE.dump(obj, stream)
@@ -144,12 +122,9 @@ def yaml_dump(obj: Any, /) -> str:
 
 __all__ = [
     "LOADER",
-    "are_equal_modulo_new_line",
     "convert_list_strs",
     "convert_secret_str",
     "convert_str",
-    "ensure_new_line",
     "logged_run",
-    "write_text",
     "yaml_dump",
 ]

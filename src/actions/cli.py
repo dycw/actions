@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from click import group
+from click import group, version_option
 from utilities.click import CONTEXT_SETTINGS
 
 from actions import __version__
@@ -29,34 +29,35 @@ from actions.tag_commit.cli import tag_commit_sub_cmd
 from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CMD
 
 
-@group(help=f"'actions' {__version__}", **CONTEXT_SETTINGS)
-def _main() -> None: ...
+@group(**CONTEXT_SETTINGS)
+@version_option(version=__version__)
+def cli() -> None: ...
 
 
-_ = _main.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
+_ = cli.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
     clean_dir_sub_cmd
 )
-_ = _main.command(
+_ = cli.command(
     name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
 )(publish_package_sub_cmd)
-_ = _main.command(
+_ = cli.command(
     name=RANDOM_SLEEP_SUB_CMD, help=RANDOM_SLEEP_DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)
-_ = _main.command(
-    name=RE_ENCRYPT_SUB_CMD, help=RE_ENCRYPT_DOCSTRING, **CONTEXT_SETTINGS
-)(re_encrypt_sub_cmd)
-_ = _main.command(
+_ = cli.command(name=RE_ENCRYPT_SUB_CMD, help=RE_ENCRYPT_DOCSTRING, **CONTEXT_SETTINGS)(
+    re_encrypt_sub_cmd
+)
+_ = cli.command(
     name=REGISTER_GITEA_RUNNER_SUB_CMD,
     help=REGISTER_GITEA_RUNNER_DOCSTRING,
     **CONTEXT_SETTINGS,
 )(register_gitea_runner_sub_cmd)
-_ = _main.command(
+_ = cli.command(
     name=SETUP_CRONJOB_SUB_CMD, help=SETUP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
 )(setup_cronjob_sub_cmd)
-_ = _main.command(
-    name=TAG_COMMIT_SUB_CMD, help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS
-)(tag_commit_sub_cmd)
+_ = cli.command(name=TAG_COMMIT_SUB_CMD, help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS)(
+    tag_commit_sub_cmd
+)
 
 
 if __name__ == "__main__":
-    _main()
+    cli()

@@ -3,8 +3,8 @@ from __future__ import annotations
 from string import Template
 from typing import TYPE_CHECKING
 
-from utilities.functions import get_func_name
-from utilities.platform import SYSTEM
+from utilities.constants import SYSTEM
+from utilities.core import get_func_name
 from utilities.subprocess import chmod, chown, tee
 from utilities.tabulate import func_param_desc
 

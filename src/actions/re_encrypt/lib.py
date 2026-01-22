@@ -6,11 +6,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, assert_never
 
 from typed_settings import Secret
-from utilities.atomicwrites import writer
-from utilities.os import temp_environ
+from utilities.core import TemporaryFile, write_text, yield_temp_environ
 from utilities.subprocess import run
 from utilities.tabulate import func_param_desc
-from utilities.tempfile import TemporaryFile
 from xdg_base_dirs import xdg_config_home
 
 from actions import __version__
@@ -71,8 +69,7 @@ def re_encrypt(
             str(temp),
             return_=True,
         )
-    with writer(path, overwrite=True) as temp:
-        _ = temp.write_text(encrypted)
+    write_text(path, encrypted, overwrite=True)
     LOGGER.info("Finished re-encrypting '%s'", path)
 
 
@@ -84,14 +81,14 @@ def _yield_env(
 ) -> Iterator[None]:
     match key_file, key:
         case Path() | str(), _:
-            with temp_environ(SOPS_AGE_KEY_FILE=str(key_file)):
+            with yield_temp_environ(SOPS_AGE_KEY_FILE=str(key_file)):
                 yield
         case None, Secret():
-            with temp_environ(SOPS_AGE_KEY=key.get_secret_value()):
+            with yield_temp_environ(SOPS_AGE_KEY=key.get_secret_value()):
                 yield
         case None, None:
             path = xdg_config_home() / "sops/age/keys.txt"
-            with temp_environ(SOPS_AGE_KEY_FILE=str(path)):
+            with yield_temp_environ(SOPS_AGE_KEY_FILE=str(path)):
                 yield
         case never:
             assert_never(never)

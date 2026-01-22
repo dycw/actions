@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from utilities.functions import get_func_name
+from utilities.core import TemporaryDirectory, get_func_name
 from utilities.tabulate import func_param_desc
-from utilities.tempfile import TemporaryDirectory
 
 from actions import __version__
 from actions.logging import LOGGER

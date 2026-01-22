@@ -4,9 +4,8 @@ from math import ceil, floor
 from random import choice
 from time import sleep
 
-from utilities.functions import get_func_name
+from utilities.core import get_func_name, get_now
 from utilities.tabulate import func_param_desc
-from utilities.whenever import get_now
 from whenever import TimeDelta, ZonedDateTime
 
 from actions import __version__

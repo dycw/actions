@@ -6,10 +6,8 @@ from string import Template
 from typing import TYPE_CHECKING
 
 from requests import get
-from utilities.atomicwrites import writer
-from utilities.functions import get_func_name
-from utilities.iterables import always_iterable
-from utilities.subprocess import chmod, rm_cmd, ssh, sudo_cmd
+from utilities.core import always_iterable, get_func_name, write_bytes, write_text
+from utilities.subprocess import rm_cmd, ssh, sudo_cmd
 from utilities.tabulate import func_param_desc
 
 from actions import __version__
@@ -282,8 +280,7 @@ def _write_config(
     text = _get_config_contents(
         capacity=capacity, certificate=certificate, labels=labels
     )
-    with writer(dest, overwrite=True) as temp:
-        _ = temp.write_text(text)
+    write_text(dest, text, overwrite=True)
 
 
 def _write_entrypoint(
@@ -291,19 +288,15 @@ def _write_entrypoint(
 ) -> None:
     dest = _get_entrypoint_path(host=host, port=port)
     text = _get_entrypoint_contents(host=host, port=port)
-    with writer(dest, overwrite=True) as temp:
-        _ = temp.write_text(text)
-        chmod(temp, "u=rwx,g=rx,o=rx")
+    write_text(dest, text, overwrite=True, perms="u=rwx,g=rx,o=rx")
 
 
 def _write_wait_for_it() -> None:
     if PATH_WAIT_FOR_IT.is_file():
         return
-    with writer(PATH_WAIT_FOR_IT, overwrite=True) as temp:
-        resp = get(URL_WAIT_FOR_IT, timeout=60)
-        resp.raise_for_status()
-        _ = temp.write_bytes(resp.content)
-        chmod(temp, "u=rwx,g=rx,o=rx")
+    resp = get(URL_WAIT_FOR_IT, timeout=60)
+    resp.raise_for_status()
+    write_bytes(PATH_WAIT_FOR_IT, resp.content, overwrite=True, perms="u=rwx,g=rx,o=rx")
 
 
 __all__ = ["register_against_local"]
