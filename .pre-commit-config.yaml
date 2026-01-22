@@ -1,11 +1,12 @@
 repos:
   - repo: https://github.com/dycw/pre-commit-hooks
-    rev: 0.14.109
+    rev: 0.14.110
     hooks:
       - id: add-hooks
         args:
           - --ci-github
           - --description=Library of actions
+          - --just
           - --prettier
           - --python
           - --python-package-name-external=dycw-actions
@@ -52,6 +53,8 @@ repos:
         args:
           - --python
         priority: 20
+      - id: setup-just
+        priority: 20
       - id: setup-pre-commit
         priority: 10
       - id: setup-pyproject
@@ -61,7 +64,7 @@ repos:
           - --python-package-name-internal=actions
         priority: 20
       - id: setup-pyright
-        args:
+        args: null
         priority: 20
       - id: setup-pytest
         args:

@@ -6,6 +6,3 @@ set positional-arguments := true
 
 @cli *args:
   cli {{args}}
-
-@pre-commit *args:
-  cli pre-commit {{args}}
