@@ -249,8 +249,8 @@ requires-dist = [
     { name = "click", marker = "extra == 'cli'", specifier = "==8.3.1" },
     { name = "coloredlogs", specifier = ">=15.0.1" },
     { name = "coloredlogs", marker = "extra == 'cli'", specifier = "==15.0.1" },
-    { name = "dycw-utilities", specifier = ">=0.185.1" },
-    { name = "dycw-utilities", marker = "extra == 'cli'", specifier = "==0.185.1" },
+    { name = "dycw-utilities", specifier = ">=0.185.2" },
+    { name = "dycw-utilities", marker = "extra == 'cli'", specifier = "==0.185.2" },
     { name = "packaging", specifier = ">=26.0" },
     { name = "packaging", marker = "extra == 'cli'", specifier = "==26.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
@@ -274,7 +274,7 @@ provides-extras = ["cli"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.185.1" },
+    { name = "dycw-utilities", extras = ["test"], specifier = ">=0.185.2" },
     { name = "orjson", specifier = ">=3.11.5" },
     { name = "pyright", specifier = ">=1.1.408" },
     { name = "rich", specifier = ">=14.2.0" },
@@ -294,7 +294,7 @@ wheels = [
 
 [[package]]
 name = "dycw-utilities"
-version = "0.185.1"
+version = "0.185.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions" },
@@ -303,7 +303,7 @@ dependencies = [
     { name = "whenever" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d9/55/6c38e884a4123d27d031a95dcb8ea295ba72ed4d4199bb3ec7b5910f0f83/dycw_utilities-0.185.1-py3-none-any.whl", hash = "sha256:498a31ac44bfdce40605d5e319d1cc9237532adca3cf474f72e7e4ace1a94fa7", size = 206079, upload-time = "2026-01-22T01:40:19.224Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/df/8062bad0cf77347ccdf03ea1d05800101253ea8bf26d0a2d422bacf31237/dycw_utilities-0.185.2-py3-none-any.whl", hash = "sha256:4beefc3fd4453c694dd458d1bbfaf49ea40cd0e1294f4b0a0bee6e9a14f475d3", size = 205541, upload-time = "2026-01-22T05:30:57.138Z" },
 ]
 
 [package.optional-dependencies]

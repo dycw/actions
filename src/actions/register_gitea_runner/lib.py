@@ -296,7 +296,7 @@ def _write_wait_for_it() -> None:
         return
     resp = get(URL_WAIT_FOR_IT, timeout=60)
     resp.raise_for_status()
-    write_bytes(PATH_WAIT_FOR_IT, resp.content, overwrite=True, chmod="u=rwx,g=rx,o=rx")
+    write_bytes(PATH_WAIT_FOR_IT, resp.content, overwrite=True, perms="u=rwx,g=rx,o=rx")
 
 
 __all__ = ["register_against_local"]
