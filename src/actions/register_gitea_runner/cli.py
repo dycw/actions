@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import utilities.click
 from click import option
 from utilities.click import ListStrs, Str
@@ -22,6 +24,9 @@ from actions.register_gitea_runner.constants import (
 )
 from actions.register_gitea_runner.lib import register_gitea_runner
 
+if TYPE_CHECKING:
+    from utilities.types import MaybeSequenceStr, PathLike
+
 
 @option("--runner_token", type=Str(), default=None, help="")
 @option("--ssh-user", type=Str(), default=SSH_USER, help="")
@@ -30,7 +35,7 @@ from actions.register_gitea_runner.lib import register_gitea_runner
 @option("--gitea-container-name", type=Str(), default=GITEA_CONTAINER_NAME, help="")
 @option(
     "--runner-certificate",
-    type=utilities.click.Path(exists="existing file"),
+    type=utilities.click.Path(exist="existing file"),
     default=RUNNER_CERTIFICATE,
     help="",
 )
