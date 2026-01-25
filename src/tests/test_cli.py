@@ -13,6 +13,7 @@ from actions.cli import cli
 from actions.publish_package.constants import PUBLISH_PACKAGE_SUB_CMD
 from actions.random_sleep.constants import RANDOM_SLEEP_SUB_CMD
 from actions.re_encrypt.constants import RE_ENCRYPT_SUB_CMD
+from actions.register_gitea_runner.constants import REGISTER_GITEA_RUNNER_SUB_CMD
 from actions.setup_cronjob.constants import SETUP_CRONJOB_SUB_CMD
 from actions.tag_commit.constants import TAG_COMMIT_SUB_CMD
 
@@ -31,6 +32,7 @@ class TestCLI:
             param([PUBLISH_PACKAGE_SUB_CMD]),
             param([PUBLISH_PACKAGE_SUB_CMD, "--username", "username"]),
             param([RANDOM_SLEEP_SUB_CMD]),
+            param([REGISTER_GITEA_RUNNER_SUB_CMD]),
             param([SETUP_CRONJOB_SUB_CMD, "name", "command"]),
             param([TAG_COMMIT_SUB_CMD]),
         ],
