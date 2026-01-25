@@ -8,7 +8,7 @@ from actions.logging import LOGGER
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
-    from actions.types import SecretLike
+    from utilities.pydantic import SecretLike
 
 
 def publish_package(

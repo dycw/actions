@@ -11,7 +11,7 @@ from actions.logging import LOGGER
 from actions.publish_package.lib import publish_package
 
 if TYPE_CHECKING:
-    from actions.types import SecretLike
+    from utilities.pydantic import SecretLike
 
 
 @option("--username", type=Str(), default=None, help="The username of the upload")
