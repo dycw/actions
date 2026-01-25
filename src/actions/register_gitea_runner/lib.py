@@ -6,20 +6,28 @@ from string import Template
 from typing import TYPE_CHECKING
 
 from requests import get
-from utilities.core import always_iterable, get_func_name, write_bytes, write_text
+from utilities.core import always_iterable, write_bytes, write_text
 from utilities.subprocess import rm_cmd, ssh, sudo_cmd
-from utilities.tabulate import func_param_desc
 
-from actions import __version__
 from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 from actions.register_gitea_runner.constants import (
+    GITEA_CONTAINER_NAME,
+    GITEA_CONTAINER_USER,
+    GITEA_HOST,
+    GITEA_PORT,
     PATH_CACHE,
     PATH_CONFIGS,
     PATH_WAIT_FOR_IT,
+    RUNNER_CAPACITY,
+    RUNNER_CERTIFICATE,
+    RUNNER_CONTAINER_NAME,
+    RUNNER_INSTANCE_NAME,
+    RUNNER_LABELS,
+    SSH_HOST,
+    SSH_USER,
     URL_WAIT_FOR_IT,
 )
-from actions.register_gitea_runner.settings import SETTINGS
 from actions.utilities import logged_run, yaml_dump
 
 if TYPE_CHECKING:
@@ -28,38 +36,21 @@ if TYPE_CHECKING:
 
 def register_gitea_runner(
     *,
-    runner_token: str = SETTINGS.runner_token,
-    ssh_user: str = SETTINGS.ssh_user,
-    ssh_host: str = SETTINGS.ssh_host,
-    gitea_container_user: str = SETTINGS.gitea_container_user,
-    gitea_container_name: str = SETTINGS.gitea_container_name,
-    runner_certificate: PathLike = SETTINGS.runner_certificate,
-    runner_capacity: int = SETTINGS.runner_capacity,
-    runner_labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
-    runner_container_name: str = SETTINGS.runner_container_name,
-    gitea_host: str = SETTINGS.gitea_host,
-    gitea_port: int = SETTINGS.gitea_port,
-    runner_instance_name: str = SETTINGS.runner_instance_name,
+    runner_token: str | None = None,
+    ssh_user: str = SSH_USER,
+    ssh_host: str = SSH_HOST,
+    gitea_container_user: str = GITEA_CONTAINER_USER,
+    gitea_container_name: str = GITEA_CONTAINER_NAME,
+    runner_certificate: PathLike = RUNNER_CERTIFICATE,
+    runner_capacity: int = RUNNER_CAPACITY,
+    runner_labels: MaybeSequenceStr | None = RUNNER_LABELS,
+    runner_container_name: str = RUNNER_CONTAINER_NAME,
+    gitea_host: str = GITEA_HOST,
+    gitea_port: int = GITEA_PORT,
+    runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     """Register against a remote instance of Gitea."""
-    LOGGER.info(
-        func_param_desc(
-            register_gitea_runner,
-            __version__,
-            f"{runner_token=}",
-            f"{ssh_user=}",
-            f"{ssh_host=}",
-            f"{gitea_container_user=}",
-            f"{gitea_container_name=}",
-            f"{runner_certificate=}",
-            f"{runner_capacity=}",
-            f"{runner_labels=}",
-            f"{runner_container_name=}",
-            f"{gitea_host=}",
-            f"{gitea_port=}",
-            f"{runner_instance_name=}",
-        )
-    )
+    LOGGER.info("Registering Gitea runner...")
     if runner_token is None:
         runner_token_use = ssh(
             ssh_user,
@@ -82,19 +73,19 @@ def register_gitea_runner(
         gitea_port=gitea_port,
         runner_instance_name=runner_instance_name,
     )
-    LOGGER.info("Finished running %r", get_func_name(register_gitea_runner))
+    LOGGER.info("Finished registering Gitea runner")
 
 
 def register_against_local(
     *,
-    gitea_container_user: str = SETTINGS.gitea_container_user,
-    gitea_container_name: str = SETTINGS.gitea_container_name,
-    runner_certificate: PathLike = SETTINGS.runner_certificate,
-    runner_capacity: int = SETTINGS.runner_capacity,
-    runner_container_name: str = SETTINGS.runner_container_name,
-    gitea_host: str = SETTINGS.gitea_host,
-    gitea_port: int = SETTINGS.gitea_port,
-    runner_instance_name: str = SETTINGS.runner_instance_name,
+    gitea_container_user: str = GITEA_CONTAINER_USER,
+    gitea_container_name: str = GITEA_CONTAINER_NAME,
+    runner_certificate: PathLike = RUNNER_CERTIFICATE,
+    runner_capacity: int = RUNNER_CAPACITY,
+    runner_container_name: str = RUNNER_CONTAINER_NAME,
+    gitea_host: str = GITEA_HOST,
+    gitea_port: int = GITEA_PORT,
+    runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     """Register against a local instance of Gitea."""
     LOGGER.info("Registering against %s:%d...", gitea_host, gitea_port)
@@ -113,7 +104,7 @@ def register_against_local(
     )
 
 
-def _check_certificate(*, certificate: PathLike = SETTINGS.runner_certificate) -> None:
+def _check_certificate(*, certificate: PathLike = RUNNER_CERTIFICATE) -> None:
     if not Path(certificate).is_file():
         msg = f"Missing certificate {str(certificate)!r}"
         raise FileNotFoundError(msg)
@@ -126,9 +117,7 @@ def _check_token(text: str, /) -> None:
 
 
 def _docker_exec_generate(
-    *,
-    user: str = SETTINGS.gitea_container_user,
-    name: str = SETTINGS.gitea_container_name,
+    *, user: str = GITEA_CONTAINER_USER, name: str = GITEA_CONTAINER_NAME
 ) -> list[str]:
     return [
         "docker",
@@ -146,11 +135,11 @@ def _docker_run_act_runner_args(
     token: str,
     /,
     *,
-    host: str = SETTINGS.gitea_host,
-    port: int = SETTINGS.gitea_port,
-    runner_certificate: PathLike = SETTINGS.runner_certificate,
-    instance_name: str = SETTINGS.runner_instance_name,
-    container_name: str = SETTINGS.runner_container_name,
+    host: str = GITEA_HOST,
+    port: int = GITEA_PORT,
+    runner_certificate: PathLike = RUNNER_CERTIFICATE,
+    instance_name: str = RUNNER_INSTANCE_NAME,
+    container_name: str = RUNNER_CONTAINER_NAME,
 ) -> list[str]:
     config_host = _get_config_path(token)
     config_cont = "/config.yml"
@@ -190,17 +179,15 @@ def _docker_run_act_runner_args(
     ]
 
 
-def _docker_stop_runner_args(
-    *, name: str = SETTINGS.runner_container_name
-) -> list[str]:
+def _docker_stop_runner_args(*, name: str = RUNNER_CONTAINER_NAME) -> list[str]:
     return ["docker", "rm", "--force", name]
 
 
 def _get_config_contents(
     *,
-    capacity: int = SETTINGS.runner_capacity,
-    certificate: PathLike = SETTINGS.runner_certificate,
-    labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
+    capacity: int = RUNNER_CAPACITY,
+    certificate: PathLike = RUNNER_CERTIFICATE,
+    labels: MaybeSequenceStr | None = RUNNER_LABELS,
 ) -> str:
     src = PATH_CONFIGS / "config.yml"
     text = Template(src.read_text()).safe_substitute(
@@ -219,16 +206,12 @@ def _get_config_path(token: str, /) -> Path:
     return PATH_CACHE / f"configs/{token}.yml"
 
 
-def _get_entrypoint_contents(
-    *, host: str = SETTINGS.gitea_host, port: int = SETTINGS.gitea_port
-) -> str:
+def _get_entrypoint_contents(*, host: str = GITEA_HOST, port: int = GITEA_PORT) -> str:
     src = PATH_CONFIGS / "entrypoint.sh"
     return Template(src.read_text()).safe_substitute(GITEA_HOST=host, GITEA_PORT=port)
 
 
-def _get_entrypoint_path(
-    *, host: str = SETTINGS.gitea_host, port: int = SETTINGS.gitea_port
-) -> Path:
+def _get_entrypoint_path(*, host: str = GITEA_HOST, port: int = GITEA_PORT) -> Path:
     return PATH_CACHE / f"entrypoints/{host}-{port}"
 
 
@@ -236,13 +219,13 @@ def _start_runner(
     token: str,
     /,
     *,
-    runner_certificate: PathLike = SETTINGS.runner_certificate,
-    runner_capacity: int = SETTINGS.runner_capacity,
-    runner_labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
-    runner_container_name: str = SETTINGS.runner_container_name,
-    gitea_host: str = SETTINGS.gitea_host,
-    gitea_port: int = SETTINGS.gitea_port,
-    runner_instance_name: str = SETTINGS.runner_instance_name,
+    runner_certificate: PathLike = RUNNER_CERTIFICATE,
+    runner_capacity: int = RUNNER_CAPACITY,
+    runner_labels: MaybeSequenceStr | None = RUNNER_LABELS,
+    runner_container_name: str = RUNNER_CONTAINER_NAME,
+    gitea_host: str = GITEA_HOST,
+    gitea_port: int = GITEA_PORT,
+    runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     _check_certificate(certificate=runner_certificate)
     _check_token(token)
@@ -272,9 +255,9 @@ def _write_config(
     token: str,
     /,
     *,
-    capacity: int = SETTINGS.runner_capacity,
-    certificate: PathLike = SETTINGS.runner_certificate,
-    labels: MaybeSequenceStr | None = SETTINGS.runner_labels,
+    capacity: int = RUNNER_CAPACITY,
+    certificate: PathLike = RUNNER_CERTIFICATE,
+    labels: MaybeSequenceStr | None = RUNNER_LABELS,
 ) -> None:
     dest = _get_config_path(token)
     text = _get_config_contents(
@@ -283,9 +266,7 @@ def _write_config(
     write_text(dest, text, overwrite=True)
 
 
-def _write_entrypoint(
-    *, host: str = SETTINGS.gitea_host, port: int = SETTINGS.gitea_port
-) -> None:
+def _write_entrypoint(*, host: str = GITEA_HOST, port: int = GITEA_PORT) -> None:
     dest = _get_entrypoint_path(host=host, port=port)
     text = _get_entrypoint_contents(host=host, port=port)
     write_text(dest, text, overwrite=True, perms="u=rwx,g=rx,o=rx")

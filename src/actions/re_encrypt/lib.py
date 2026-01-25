@@ -5,19 +5,18 @@ from os import environ
 from pathlib import Path
 from typing import TYPE_CHECKING, assert_never
 
-from typed_settings import Secret
+from pydantic import SecretStr
 from utilities.core import TemporaryFile, write_text, yield_temp_environ
+from utilities.pydantic import extract_secret
 from utilities.subprocess import run
-from utilities.tabulate import func_param_desc
 from xdg_base_dirs import xdg_config_home
 
-from actions import __version__
 from actions.logging import LOGGER
-from actions.re_encrypt.settings import SETTINGS
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+    from utilities.pydantic import SecretLike
     from utilities.types import PathLike
 
 
@@ -25,23 +24,13 @@ def re_encrypt(
     path: PathLike,
     /,
     *,
-    key_file: PathLike | None = SETTINGS.key_file,
-    key: Secret[str] | None = SETTINGS.key,
-    new_key_file: PathLike | None = SETTINGS.new_key_file,
-    new_key: Secret[str] | None = SETTINGS.new_key,
+    key_file: PathLike | None = None,
+    key: SecretLike | None = None,
+    new_key_file: PathLike | None = None,
+    new_key: SecretLike | None = None,
 ) -> None:
     """Re-encrypt a JSON file."""
-    LOGGER.info(
-        func_param_desc(
-            re_encrypt,
-            __version__,
-            f"{path=}",
-            f"{key_file=}",
-            f"{key=}",
-            f"{new_key_file=}",
-            f"{new_key=}",
-        )
-    )
+    LOGGER.info("Re-encrypting...")
     with _yield_env(key_file=key_file, key=key):
         decrypted = run(
             "sops",
@@ -70,21 +59,19 @@ def re_encrypt(
             return_=True,
         )
     write_text(path, encrypted, overwrite=True)
-    LOGGER.info("Finished re-encrypting '%s'", path)
+    LOGGER.info("Finished re-encrypting")
 
 
 @contextmanager
 def _yield_env(
-    *,
-    key_file: PathLike | None = SETTINGS.key_file,
-    key: Secret[str] | None = SETTINGS.key,
+    *, key_file: PathLike | None = None, key: SecretLike | None = None
 ) -> Iterator[None]:
     match key_file, key:
         case Path() | str(), _:
             with yield_temp_environ(SOPS_AGE_KEY_FILE=str(key_file)):
                 yield
-        case None, Secret():
-            with yield_temp_environ(SOPS_AGE_KEY=key.get_secret_value()):
+        case None, SecretStr() | str():
+            with yield_temp_environ(SOPS_AGE_KEY=extract_secret(key)):
                 yield
         case None, None:
             path = xdg_config_home() / "sops/age/keys.txt"

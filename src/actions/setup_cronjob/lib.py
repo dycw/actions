@@ -3,15 +3,17 @@ from __future__ import annotations
 from string import Template
 from typing import TYPE_CHECKING
 
-from utilities.constants import SYSTEM
-from utilities.core import get_func_name
+from utilities.constants import SYSTEM, USER
 from utilities.subprocess import chmod, chown, tee
-from utilities.tabulate import func_param_desc
 
-from actions import __version__
 from actions.logging import LOGGER
-from actions.setup_cronjob.constants import PATH_CONFIGS
-from actions.setup_cronjob.settings import SETTINGS
+from actions.setup_cronjob.constants import (
+    KILL_AFTER,
+    LOGS_KEEP,
+    PATH_CONFIGS,
+    SCHEDULE,
+    TIMEOUT,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -20,65 +22,49 @@ if TYPE_CHECKING:
 
 
 def setup_cronjob(
-    *,
-    name: str = SETTINGS.name,
-    prepend_path: Sequence[PathLike] | None = SETTINGS.prepend_path,
-    schedule: str = SETTINGS.schedule,
-    user: str = SETTINGS.user,
-    timeout: int = SETTINGS.timeout,
-    kill_after: int = SETTINGS.kill_after,
-    command: PathLike = SETTINGS.command,
-    args: list[str] | None = SETTINGS.args,
-    logs_keep: int = SETTINGS.logs_keep,
+    name: str,
+    command: str,
+    /,
+    *args: str,
+    prepend_path: Sequence[PathLike] | None = None,
+    schedule: str = SCHEDULE,
+    user: str = USER,
+    timeout: int = TIMEOUT,
+    kill_after: int = KILL_AFTER,
+    logs_keep: int = LOGS_KEEP,
 ) -> None:
     """Set up a cronjob & logrotate."""
-    LOGGER.info(
-        func_param_desc(
-            setup_cronjob,
-            __version__,
-            f"{name=}",
-            f"{prepend_path=}",
-            f"{schedule=}",
-            f"{user=}",
-            f"{timeout=}",
-            f"{kill_after=}",
-            f"{command=}",
-            f"{args=}",
-            f"{logs_keep=}",
-        )
-    )
+    LOGGER.info("Setting up cronjob...")
     if SYSTEM != "linux":
         msg = f"System must be 'linux'; got {SYSTEM!r}"
         raise TypeError(msg)
-    _tee_and_perms(
-        f"/etc/cron.d/{name}",
-        _get_crontab(
-            prepend_path=prepend_path,
-            schedule=schedule,
-            user=user,
-            name=name,
-            timeout=timeout,
-            kill_after=kill_after,
-            command=command,
-            args=args,
-        ),
+    text = _get_crontab(
+        name,
+        command,
+        *args,
+        prepend_path=prepend_path,
+        schedule=schedule,
+        user=user,
+        timeout=timeout,
+        kill_after=kill_after,
     )
+    _tee_and_perms(f"/etc/cron.d/{name}", text)
     _tee_and_perms(
-        f"/etc/logrotate.d/{name}", _get_logrotate(name=name, logs_keep=logs_keep)
+        f"/etc/logrotate.d/{name}", _get_logrotate(name, logs_keep=logs_keep)
     )
-    LOGGER.info("Finished running %r", get_func_name(setup_cronjob))
+    LOGGER.info("Finished setting up cronjob")
 
 
 def _get_crontab(
-    *,
-    prepend_path: Sequence[PathLike] | None = SETTINGS.prepend_path,
-    schedule: str = SETTINGS.schedule,
-    user: str = SETTINGS.user,
-    name: str = SETTINGS.name,
-    timeout: int = SETTINGS.timeout,
-    kill_after: int = SETTINGS.kill_after,
-    command: PathLike | None = SETTINGS.command,
-    args: list[str] | None = SETTINGS.args,
+    name: str,
+    command: PathLike,
+    /,
+    *args: str,
+    prepend_path: Sequence[PathLike] | None = None,
+    schedule: str = SCHEDULE,
+    user: str = USER,
+    timeout: int = TIMEOUT,
+    kill_after: int = KILL_AFTER,
 ) -> str:
     return Template((PATH_CONFIGS / "cron.tmpl").read_text()).substitute(
         PREPEND_PATH=""
@@ -95,9 +81,7 @@ def _get_crontab(
     )
 
 
-def _get_logrotate(
-    *, name: str = SETTINGS.name, logs_keep: int = SETTINGS.logs_keep
-) -> str:
+def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
     return Template((PATH_CONFIGS / "logrotate.tmpl").read_text()).substitute(
         NAME=name, ROTATE=logs_keep
     )

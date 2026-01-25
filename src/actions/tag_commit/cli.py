@@ -1,26 +1,32 @@
 from __future__ import annotations
 
-from typed_settings import click_options
+from click import option
+from utilities.click import Str
 from utilities.core import is_pytest
 from utilities.logging import basic_config
 
 from actions.logging import LOGGER
+from actions.tag_commit.constants import USER_EMAIL, USER_NAME
 from actions.tag_commit.lib import tag_commit
-from actions.tag_commit.settings import Settings
-from actions.utilities import LOADER
 
 
-@click_options(Settings, [LOADER], show_envvars_in_help=True)
-def tag_commit_sub_cmd(settings: Settings, /) -> None:
+@option("--user_name", type=Str(), default=USER_NAME, help="'git' user name")
+@option("--user_email", type=Str(), default=USER_EMAIL, help="'git' user email")
+@option("--major_minor", is_flag=True, default=False, help="Add the 'major.minor' tag")
+@option("--major", is_flag=True, default=False, help="Add the 'major' tag")
+@option("--latest", is_flag=True, default=False, help="Add the 'latest' tag")
+def tag_commit_sub_cmd(
+    *, user_name: str, user_email: str, major_minor: bool, major: bool, latest: bool
+) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
     tag_commit(
-        user_name=settings.user_name,
-        user_email=settings.user_email,
-        major_minor=settings.major_minor,
-        major=settings.major,
-        latest=settings.latest,
+        user_name=user_name,
+        user_email=user_email,
+        major_minor=major_minor,
+        major=major,
+        latest=latest,
     )
 
 

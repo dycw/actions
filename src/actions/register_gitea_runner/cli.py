@@ -1,33 +1,101 @@
 from __future__ import annotations
 
-from typed_settings import click_options
+from typing import TYPE_CHECKING
+
+import utilities.click
+from click import option
+from utilities.click import ListStrs, Str
 from utilities.core import is_pytest
 from utilities.logging import basic_config
 
 from actions.logging import LOGGER
+from actions.register_gitea_runner.constants import (
+    GITEA_CONTAINER_NAME,
+    GITEA_CONTAINER_USER,
+    GITEA_HOST,
+    GITEA_PORT,
+    RUNNER_CAPACITY,
+    RUNNER_CERTIFICATE,
+    RUNNER_CONTAINER_NAME,
+    RUNNER_INSTANCE_NAME,
+    RUNNER_LABELS,
+    SSH_HOST,
+    SSH_USER,
+)
 from actions.register_gitea_runner.lib import register_gitea_runner
-from actions.register_gitea_runner.settings import Settings
-from actions.utilities import LOADER
+
+if TYPE_CHECKING:
+    from utilities.types import MaybeSequenceStr, PathLike
 
 
-@click_options(Settings, [LOADER], show_envvars_in_help=True)
-def register_gitea_runner_sub_cmd(settings: Settings, /) -> None:
+@option("--runner_token", type=Str(), default=None, help="Registration token")
+@option("--ssh-user", type=Str(), default=SSH_USER, help="SSH username")
+@option("--ssh-host", type=Str(), default=SSH_HOST, help="SSH host")
+@option(
+    "--gitea-container-user",
+    type=Str(),
+    default=GITEA_CONTAINER_USER,
+    help="Gitea container user name",
+)
+@option(
+    "--gitea-container-name",
+    type=Str(),
+    default=GITEA_CONTAINER_NAME,
+    help="Gitea container name",
+)
+@option(
+    "--runner-certificate",
+    type=utilities.click.Path(exist="existing file"),
+    default=RUNNER_CERTIFICATE,
+    help="Runner root certificate",
+)
+@option("--runner-capacity", type=int, default=RUNNER_CAPACITY, help="Runner capacity")
+@option("--runner-labels", type=ListStrs(), default=RUNNER_LABELS, help="Runner labels")
+@option(
+    "--runner-container-name",
+    type=Str(),
+    default=RUNNER_CONTAINER_NAME,
+    help="Runner container name",
+)
+@option("--gitea-host", type=Str(), default=GITEA_HOST, help="Gitea host")
+@option("--gitea-port", type=int, default=GITEA_PORT, help="Gitea port")
+@option(
+    "--runner-instance-name",
+    type=Str(),
+    default=RUNNER_INSTANCE_NAME,
+    help="Runner instance name",
+)
+def register_gitea_runner_sub_cmd(
+    *,
+    runner_token: str | None,
+    ssh_user: str,
+    ssh_host: str,
+    gitea_container_user: str,
+    gitea_container_name: str,
+    runner_certificate: PathLike,
+    runner_capacity: int,
+    runner_labels: MaybeSequenceStr | None,
+    runner_container_name: str,
+    gitea_host: str,
+    gitea_port: int,
+    runner_instance_name: str,
+) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
     register_gitea_runner(
-        runner_token=settings.runner_token,
-        ssh_user=settings.ssh_user,
-        ssh_host=settings.ssh_host,
-        gitea_container_user=settings.gitea_container_user,
-        gitea_container_name=settings.gitea_container_name,
-        runner_certificate=settings.runner_certificate,
-        runner_capacity=settings.runner_capacity,
-        runner_labels=settings.runner_labels,
-        runner_container_name=settings.runner_container_name,
-        gitea_host=settings.gitea_host,
-        gitea_port=settings.gitea_port,
-        runner_instance_name=settings.runner_instance_name,
+        runner_token=runner_token,
+        ssh_user=ssh_user,
+        ssh_host=ssh_host,
+        gitea_container_user=gitea_container_user,
+        gitea_container_name=gitea_container_name,
+        runner_certificate=runner_certificate,
+        runner_capacity=runner_capacity,
+        runner_labels=runner_labels,
+        runner_container_name=runner_container_name,
+        gitea_host=gitea_host,
+        gitea_port=gitea_port,
+        runner_instance_name=runner_instance_name,
     )
 
 
