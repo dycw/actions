@@ -9,4 +9,18 @@ SETUP_CRONJOB_SUB_CMD = "setup-cronjob"
 SETUP_CRONJOB_DOCSTRING = "Setup a cronjob"
 
 
-__all__ = ["PATH_CONFIGS", "SETUP_CRONJOB_DOCSTRING", "SETUP_CRONJOB_SUB_CMD"]
+KILL_AFTER = 10
+LOGS_KEEP = 7
+SCHEDULE = "* * * * *"
+TIMEOUT = 60
+
+
+__all__ = [
+    "KILL_AFTER",
+    "LOGS_KEEP",
+    "PATH_CONFIGS",
+    "SCHEDULE",
+    "SETUP_CRONJOB_DOCSTRING",
+    "SETUP_CRONJOB_SUB_CMD",
+    "TIMEOUT",
+]
