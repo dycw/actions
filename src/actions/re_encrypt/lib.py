@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, assert_never
 
 from pydantic import SecretStr
 from utilities.core import TemporaryFile, write_text, yield_temp_environ
+from utilities.pydantic import extract_secret
 from utilities.subprocess import run
 from xdg_base_dirs import xdg_config_home
 
@@ -70,7 +71,7 @@ def _yield_env(
             with yield_temp_environ(SOPS_AGE_KEY_FILE=str(key_file)):
                 yield
         case None, SecretStr() | str():
-            with yield_temp_environ(SOPS_AGE_KEY=key.get_secret_value()):
+            with yield_temp_environ(SOPS_AGE_KEY=extract_secret(key)):
                 yield
         case None, None:
             path = xdg_config_home() / "sops/age/keys.txt"
