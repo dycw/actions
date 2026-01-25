@@ -9,7 +9,6 @@ from whenever import TimeDelta, ZonedDateTime
 
 from actions.logging import LOGGER
 from actions.random_sleep.constants import LOG_FREQ, MAX, MIN, STEP
-from actions.random_sleep.settings import SETTINGS
 
 
 def random_sleep(
@@ -35,7 +34,7 @@ def _intermediate(
     end: ZonedDateTime,
     /,
     *,
-    log_freq: int = SETTINGS.log_freq,
+    log_freq: int = LOG_FREQ,
 ) -> None:
     elapsed = TimeDelta(seconds=floor((now - start).in_seconds()))
     remaining = TimeDelta(seconds=ceil((end - now).in_seconds()))

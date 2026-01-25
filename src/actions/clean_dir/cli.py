@@ -16,7 +16,10 @@ if TYPE_CHECKING:
 
 
 @option(
-    "--path", type=utilities.click.Path(), default=PWD, help="The directory to clean"
+    "--path",
+    type=utilities.click.Path(exist="dir"),
+    default=PWD,
+    help="The directory to clean",
 )
 def clean_dir_sub_cmd(*, path: PathLike) -> None:
     if is_pytest():
