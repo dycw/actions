@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from utilities.constants import PWD
 
-from actions.clean_dir.settings import SETTINGS
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
@@ -23,11 +22,11 @@ def clean_dir(*, path: PathLike = PWD) -> None:
         msg = f"{str(path)!r} is a not a directory"
         raise NotADirectoryError(msg)
     while True:
-        files = list(_yield_files(dir_=path))
+        files = list(_yield_files(path=path))
         if len(files) >= 1:
             for f in files:
                 f.unlink(missing_ok=True)
-        dirs = list(_yield_dirs(dir_=path))
+        dirs = list(_yield_dirs(path=path))
         if len(dirs) >= 1:
             for d in dirs:
                 rmtree(d, ignore_errors=True)
@@ -36,16 +35,16 @@ def clean_dir(*, path: PathLike = PWD) -> None:
     LOGGER.info("Finished cleaning directory")
 
 
-def _yield_dirs(*, dir_: PathLike = SETTINGS.dir) -> Iterator[Path]:
-    for path in Path(dir_).rglob("**/*"):
-        if path.is_dir() and (len(list(path.iterdir())) == 0):
-            yield path
+def _yield_dirs(*, path: PathLike = PWD) -> Iterator[Path]:
+    for p in Path(path).rglob("**/*"):
+        if p.is_dir() and (len(list(p.iterdir())) == 0):
+            yield p
 
 
-def _yield_files(*, dir_: PathLike = SETTINGS.dir) -> Iterator[Path]:
-    dir_ = Path(dir_)
-    yield from dir_.rglob("**/*.pyc")
-    yield from dir_.rglob("**/*.pyo")
+def _yield_files(*, path: PathLike = PWD) -> Iterator[Path]:
+    path = Path(path)
+    yield from path.rglob("**/*.pyc")
+    yield from path.rglob("**/*.pyo")
 
 
 __all__ = ["clean_dir"]
