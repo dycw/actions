@@ -8,15 +8,16 @@ from utilities.core import get_now
 from whenever import TimeDelta, ZonedDateTime
 
 from actions.logging import LOGGER
+from actions.random_sleep.constants import LOG_FREQ, MAX, MIN, STEP
 from actions.random_sleep.settings import SETTINGS
 
 
 def random_sleep(
     *,
-    min: int = SETTINGS.min,  # noqa: A002
-    max: int = SETTINGS.max,  # noqa: A002
-    step: int = SETTINGS.step,
-    log_freq: int = SETTINGS.log_freq,
+    min: int = MIN,  # noqa: A002
+    max: int = MAX,  # noqa: A002
+    step: int = STEP,
+    log_freq: int = LOG_FREQ,
 ) -> None:
     LOGGER.info("Sleeping...")
     start = get_now()
