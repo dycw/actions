@@ -13,6 +13,7 @@ from actions.cli import cli
 from actions.publish_package.constants import PUBLISH_PACKAGE_SUB_CMD
 from actions.random_sleep.constants import RANDOM_SLEEP_SUB_CMD
 from actions.re_encrypt.constants import RE_ENCRYPT_SUB_CMD
+from actions.register_gitea_runner.constants import REGISTER_GITEA_RUNNER_SUB_CMD
 from actions.setup_cronjob.constants import SETUP_CRONJOB_SUB_CMD
 from actions.tag_commit.constants import TAG_COMMIT_SUB_CMD
 
@@ -55,7 +56,7 @@ class TestCLI:
         path.touch()
         runner = CliRunner()
         result = runner.invoke(
-            cli, [RE_ENCRYPT_SUB_CMD, "--runner-certificate", str(path)]
+            cli, [REGISTER_GITEA_RUNNER_SUB_CMD, "--runner-certificate", str(path)]
         )
         assert result.exit_code == 0, result.stderr
 
