@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from click import option
+from utilities.click import Str
 from utilities.core import is_pytest
 from utilities.logging import basic_config
 
@@ -9,8 +10,8 @@ from actions.tag_commit.constants import USER_EMAIL, USER_NAME
 from actions.tag_commit.lib import tag_commit
 
 
-@option("--user_name", type=str, default=USER_NAME, help="'git' user name")
-@option("--user_email", type=str, default=USER_EMAIL, help="'git' user email")
+@option("--user_name", type=Str(), default=USER_NAME, help="'git' user name")
+@option("--user_email", type=Str(), default=USER_EMAIL, help="'git' user email")
 @option("--major_minor", is_flag=True, default=False, help="Add the 'major.minor' tag")
 @option("--major", is_flag=True, default=False, help="Add the 'major' tag")
 @option("--latest", is_flag=True, default=False, help="Add the 'latest' tag")

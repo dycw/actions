@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from click import argument, option
-from utilities.click import ListStrs
+from utilities.click import ListStrs, Str
 from utilities.constants import USER
 from utilities.core import is_pytest
 from utilities.logging import basic_config
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 @argument("args", nargs=-1, type=str)
 @option("--prepend-path", type=ListStrs(), default=None, help="Paths to preprend")
 @option("--schedule", type=ListStrs(), default=None, help="Cron job schedule")
-@option("--user", type=str, default=USER, help="Cron job user")
+@option("--user", type=Str(), default=USER, help="Cron job user")
 @option(
     "--timeout", type=int, default=TIMEOUT, help="Seconds until timing-out the cron job"
 )

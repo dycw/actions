@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from click.testing import CliRunner
 from pytest import mark, param
-from utilities.constants import MINUTE
+from utilities.constants import MINUTE, TEMP_DIR
 from utilities.pytest import skipif_ci, throttle_test
 from utilities.subprocess import run
 
@@ -27,7 +27,9 @@ class TestCLI:
         "commands",
         [
             param([CLEAN_DIR_SUB_CMD]),
+            param([CLEAN_DIR_SUB_CMD, "--path", str(TEMP_DIR)]),
             param([PUBLISH_PACKAGE_SUB_CMD]),
+            param([PUBLISH_PACKAGE_SUB_CMD, "--username", "username"]),
             param([RANDOM_SLEEP_SUB_CMD]),
             param([SETUP_CRONJOB_SUB_CMD]),
             param([TAG_COMMIT_SUB_CMD]),
