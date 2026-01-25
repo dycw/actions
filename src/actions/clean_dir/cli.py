@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 @option(
     "--path",
-    type=utilities.click.Path(exist="dir"),
+    type=utilities.click.Path(exist="existing dir"),
     default=PWD,
     help="The directory to clean",
 )
