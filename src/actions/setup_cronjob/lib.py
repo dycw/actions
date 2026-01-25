@@ -14,7 +14,6 @@ from actions.setup_cronjob.constants import (
     SCHEDULE,
     TIMEOUT,
 )
-from actions.setup_cronjob.settings import SETTINGS
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -51,7 +50,7 @@ def setup_cronjob(
     )
     _tee_and_perms(f"/etc/cron.d/{name}", text)
     _tee_and_perms(
-        f"/etc/logrotate.d/{name}", _get_logrotate(name=name, logs_keep=logs_keep)
+        f"/etc/logrotate.d/{name}", _get_logrotate(name, logs_keep=logs_keep)
     )
     LOGGER.info("Finished setting up cronjob")
 
@@ -82,9 +81,7 @@ def _get_crontab(
     )
 
 
-def _get_logrotate(
-    *, name: str = SETTINGS.name, logs_keep: int = SETTINGS.logs_keep
-) -> str:
+def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
     return Template((PATH_CONFIGS / "logrotate.tmpl").read_text()).substitute(
         NAME=name, ROTATE=logs_keep
     )
