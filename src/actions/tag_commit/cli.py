@@ -10,9 +10,9 @@ from actions.tag_commit.constants import USER_EMAIL, USER_NAME
 from actions.tag_commit.lib import tag_commit
 
 
-@option("--user_name", type=Str(), default=USER_NAME, help="'git' user name")
-@option("--user_email", type=Str(), default=USER_EMAIL, help="'git' user email")
-@option("--major_minor", is_flag=True, default=False, help="Add the 'major.minor' tag")
+@option("--user-name", type=Str(), default=USER_NAME, help="'git' user name")
+@option("--user-email", type=Str(), default=USER_EMAIL, help="'git' user email")
+@option("--major-minor", is_flag=True, default=False, help="Add the 'major.minor' tag")
 @option("--major", is_flag=True, default=False, help="Add the 'major' tag")
 @option("--latest", is_flag=True, default=False, help="Add the 'latest' tag")
 def tag_commit_sub_cmd(
