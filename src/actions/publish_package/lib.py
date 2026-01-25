@@ -2,39 +2,24 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from utilities.core import TemporaryDirectory, get_func_name
-from utilities.tabulate import func_param_desc
+from utilities.core import TemporaryDirectory
 
-from actions import __version__
 from actions.logging import LOGGER
-from actions.publish_package.settings import SETTINGS
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
-    from typed_settings import Secret
-
     from actions.types import SecretLike
 
 
 def publish_package(
     *,
-    username: str | None = SETTINGS.username,
-    password: Secret[str] | None = SETTINGS.password,
-    publish_url: str | None = SETTINGS.publish_url,
-    trusted_publishing: bool = SETTINGS.trusted_publishing,
-    native_tls: bool = SETTINGS.native_tls,
+    username: str | None = None,
+    password: SecretLike | None = None,
+    publish_url: str | None = None,
+    trusted_publishing: bool = False,
+    native_tls: bool = False,
 ) -> None:
-    LOGGER.info(
-        func_param_desc(
-            publish_package,
-            __version__,
-            f"{username=}",
-            f"{password=}",
-            f"{publish_url=}",
-            f"{trusted_publishing=}",
-            f"{native_tls=}",
-        )
-    )
+    LOGGER.info("Publishing package...")
     build_head: list[str] = ["uv", "build", "--out-dir"]
     build_tail: list[str] = ["--wheel", "--clear"]
     publish: list[SecretLike] = ["uv", "publish"]
@@ -51,7 +36,7 @@ def publish_package(
     with TemporaryDirectory() as temp:
         logged_run(*build_head, str(temp), *build_tail)
         logged_run(*publish, f"{temp}/*")
-    LOGGER.info("Finished running %r", get_func_name(publish_package))
+    LOGGER.info("Finished publishing package")
 
 
 __all__ = ["publish_package"]

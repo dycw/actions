@@ -1,26 +1,53 @@
 from __future__ import annotations
 
-from typed_settings import click_options
+from typing import TYPE_CHECKING
+
+from click import option
+from utilities.click import Str
 from utilities.core import is_pytest
 from utilities.logging import basic_config
 
 from actions.logging import LOGGER
 from actions.publish_package.lib import publish_package
-from actions.publish_package.settings import Settings
-from actions.utilities import LOADER
+
+if TYPE_CHECKING:
+    from actions.types import SecretLike
 
 
-@click_options(Settings, [LOADER], show_envvars_in_help=True)
-def publish_package_sub_cmd(settings: Settings, /) -> None:
+@option("--username", type=Str(), default=None, help="The username of the upload")
+@option("--password", type=Str(), default=None, help="The password for the upload")
+@option(
+    "--publish-url", type=Str(), default=None, help="The URL of the upload endpoint"
+)
+@option(
+    "--trusted-publishing",
+    is_flag=True,
+    default=False,
+    help="Configure trusted publishing",
+)
+@option(
+    "--native-tls",
+    is_flag=True,
+    default=False,
+    help="Whether to load TLS certificates from the platform's native certificate store",
+)
+def publish_package_sub_cmd(
+    *,
+    username: str | None = None,
+    password: SecretLike | None = None,
+    publish_url: str | None = None,
+    trusted_publishing: bool = False,
+    native_tls: bool = False,
+) -> None:
     if is_pytest():
         return
     basic_config(obj=LOGGER)
     publish_package(
-        username=settings.username,
-        password=settings.password,
-        publish_url=settings.publish_url,
-        trusted_publishing=settings.trusted_publishing,
-        native_tls=settings.native_tls,
+        username=username,
+        password=password,
+        publish_url=publish_url,
+        trusted_publishing=trusted_publishing,
+        native_tls=native_tls,
     )
 
 
