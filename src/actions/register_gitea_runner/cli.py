@@ -28,23 +28,43 @@ if TYPE_CHECKING:
     from utilities.types import MaybeSequenceStr, PathLike
 
 
-@option("--runner_token", type=Str(), default=None, help="")
-@option("--ssh-user", type=Str(), default=SSH_USER, help="")
-@option("--ssh-host", type=Str(), default=SSH_HOST, help="")
-@option("--gitea-container-user", type=Str(), default=GITEA_CONTAINER_USER, help="")
-@option("--gitea-container-name", type=Str(), default=GITEA_CONTAINER_NAME, help="")
+@option("--runner_token", type=Str(), default=None, help="Registration token")
+@option("--ssh-user", type=Str(), default=SSH_USER, help="SSH username")
+@option("--ssh-host", type=Str(), default=SSH_HOST, help="SSH host")
+@option(
+    "--gitea-container-user",
+    type=Str(),
+    default=GITEA_CONTAINER_USER,
+    help="Gitea container user name",
+)
+@option(
+    "--gitea-container-name",
+    type=Str(),
+    default=GITEA_CONTAINER_NAME,
+    help="Gitea container name",
+)
 @option(
     "--runner-certificate",
     type=utilities.click.Path(exist="existing file"),
     default=RUNNER_CERTIFICATE,
-    help="",
+    help="Runner root certificate",
 )
-@option("--runner-capacity", type=int, default=RUNNER_CAPACITY, help="")
-@option("--runner-labels", type=ListStrs(), default=RUNNER_LABELS, help="")
-@option("--runner-container-name", type=Str(), default=RUNNER_CONTAINER_NAME, help="")
-@option("--gitea-host", type=Str(), default=GITEA_HOST, help="")
-@option("--gitea-port", type=int, default=GITEA_PORT, help="")
-@option("--runner-instance-name", type=Str(), default=RUNNER_INSTANCE_NAME, help="")
+@option("--runner-capacity", type=int, default=RUNNER_CAPACITY, help="Runner capacity")
+@option("--runner-labels", type=ListStrs(), default=RUNNER_LABELS, help="Runner labels")
+@option(
+    "--runner-container-name",
+    type=Str(),
+    default=RUNNER_CONTAINER_NAME,
+    help="Runner container name",
+)
+@option("--gitea-host", type=Str(), default=GITEA_HOST, help="Gitea host")
+@option("--gitea-port", type=int, default=GITEA_PORT, help="Gitea port")
+@option(
+    "--runner-instance-name",
+    type=Str(),
+    default=RUNNER_INSTANCE_NAME,
+    help="Runner instance name",
+)
 def register_gitea_runner_sub_cmd(
     *,
     runner_token: str | None,

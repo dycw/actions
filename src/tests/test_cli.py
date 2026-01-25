@@ -31,7 +31,7 @@ class TestCLI:
             param([PUBLISH_PACKAGE_SUB_CMD]),
             param([PUBLISH_PACKAGE_SUB_CMD, "--username", "username"]),
             param([RANDOM_SLEEP_SUB_CMD]),
-            param([SETUP_CRONJOB_SUB_CMD]),
+            param([SETUP_CRONJOB_SUB_CMD, "name", "command"]),
             param([TAG_COMMIT_SUB_CMD]),
         ],
     )
