@@ -34,7 +34,7 @@ def _get_runner_instance_name() -> str:
     return "--".join(parts).lower()
 
 
-RUNNER_CAPACITY = max(round(CPU_COUNT / 2), 1)
+RUNNER_CAPACITY = max(round(3 * CPU_COUNT / 4), 1)
 RUNNER_CERTIFICATE = Path("root.pem")
 RUNNER_CONTAINER_NAME = "runner"
 RUNNER_INSTANCE_NAME = _get_runner_instance_name()
