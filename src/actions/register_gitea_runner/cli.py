@@ -5,10 +5,8 @@ from typing import TYPE_CHECKING
 import utilities.click
 from click import option
 from utilities.click import ListStrs, Str
-from utilities.core import is_pytest
-from utilities.logging import basic_config
+from utilities.core import is_pytest, set_up_logging
 
-from actions.logging import LOGGER
 from actions.register_gitea_runner.constants import (
     GITEA_CONTAINER_NAME,
     GITEA_CONTAINER_USER,
@@ -82,7 +80,7 @@ def register_gitea_runner_sub_cmd(
 ) -> None:
     if is_pytest():
         return
-    basic_config(obj=LOGGER)
+    set_up_logging(__name__, root=True)
     register_gitea_runner(
         runner_token=runner_token,
         ssh_user=ssh_user,

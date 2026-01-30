@@ -5,10 +5,8 @@ from typing import TYPE_CHECKING
 from click import argument, option
 from utilities.click import ListStrs, Str
 from utilities.constants import USER
-from utilities.core import is_pytest
-from utilities.logging import basic_config
+from utilities.core import is_pytest, set_up_logging
 
-from actions.logging import LOGGER
 from actions.setup_cronjob.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
 from actions.setup_cronjob.lib import setup_cronjob
 
@@ -48,7 +46,7 @@ def setup_cronjob_sub_cmd(
 ) -> None:
     if is_pytest():
         return
-    basic_config(obj=LOGGER)
+    set_up_logging(__name__, root=True)
     setup_cronjob(
         name,
         command,

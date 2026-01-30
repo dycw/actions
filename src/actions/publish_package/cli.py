@@ -4,10 +4,8 @@ from typing import TYPE_CHECKING
 
 from click import option
 from utilities.click import Str
-from utilities.core import is_pytest
-from utilities.logging import basic_config
+from utilities.core import is_pytest, set_up_logging
 
-from actions.logging import LOGGER
 from actions.publish_package.lib import publish_package
 
 if TYPE_CHECKING:
@@ -41,7 +39,7 @@ def publish_package_sub_cmd(
 ) -> None:
     if is_pytest():
         return
-    basic_config(obj=LOGGER)
+    set_up_logging(__name__, root=True)
     publish_package(
         username=username,
         password=password,

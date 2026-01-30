@@ -5,10 +5,8 @@ from typing import TYPE_CHECKING
 import utilities.click
 from click import argument, option
 from utilities.click import Str
-from utilities.core import is_pytest
-from utilities.logging import basic_config
+from utilities.core import is_pytest, set_up_logging
 
-from actions.logging import LOGGER
 from actions.re_encrypt.lib import re_encrypt
 
 if TYPE_CHECKING:
@@ -43,7 +41,7 @@ def re_encrypt_sub_cmd(
 ) -> None:
     if is_pytest():
         return
-    basic_config(obj=LOGGER)
+    set_up_logging(__name__, root=True)
     re_encrypt(
         path, key_file=key_file, key=key, new_key_file=new_key_file, new_key=new_key
     )
