@@ -3,11 +3,13 @@ from __future__ import annotations
 from contextlib import suppress
 from subprocess import CalledProcessError
 
+from utilities.core import to_logger
 from utilities.version import Version3
 
-from actions.logging import LOGGER
 from actions.tag_commit.constants import USER_EMAIL, USER_NAME
 from actions.utilities import logged_run
+
+_LOGGER = to_logger(__name__)
 
 
 def tag_commit(
@@ -18,7 +20,7 @@ def tag_commit(
     major: bool = False,
     latest: bool = False,
 ) -> None:
-    LOGGER.info("Tagging commit...")
+    _LOGGER.info("Tagging commit...")
     logged_run("git", "config", "--global", "user.name", user_name)
     logged_run("git", "config", "--global", "user.email", user_email)
     version = Version3.parse(
@@ -31,7 +33,7 @@ def tag_commit(
         _tag(str(version.major))
     if latest:
         _tag("latest")
-    LOGGER.info("Finished tagging commit")
+    _LOGGER.info("Finished tagging commit")
 
 
 def _tag(version: str, /) -> None:

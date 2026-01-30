@@ -4,9 +4,9 @@ from string import Template
 from typing import TYPE_CHECKING
 
 from utilities.constants import SYSTEM, USER
+from utilities.core import to_logger
 from utilities.subprocess import chmod, chown, tee
 
-from actions.logging import LOGGER
 from actions.setup_cronjob.constants import (
     KILL_AFTER,
     LOGS_KEEP,
@@ -19,6 +19,9 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from utilities.types import PathLike
+
+
+_LOGGER = to_logger(__name__)
 
 
 def setup_cronjob(
@@ -34,7 +37,7 @@ def setup_cronjob(
     logs_keep: int = LOGS_KEEP,
 ) -> None:
     """Set up a cronjob & logrotate."""
-    LOGGER.info("Setting up cronjob...")
+    _LOGGER.info("Setting up cronjob...")
     if SYSTEM != "linux":
         msg = f"System must be 'linux'; got {SYSTEM!r}"
         raise TypeError(msg)
@@ -52,7 +55,7 @@ def setup_cronjob(
     _tee_and_perms(
         f"/etc/logrotate.d/{name}", _get_logrotate(name, logs_keep=logs_keep)
     )
-    LOGGER.info("Finished setting up cronjob")
+    _LOGGER.info("Finished setting up cronjob")
 
 
 def _get_crontab(

@@ -5,8 +5,7 @@ from shutil import rmtree
 from typing import TYPE_CHECKING
 
 from utilities.constants import PWD
-
-from actions.logging import LOGGER
+from utilities.core import to_logger
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -14,9 +13,12 @@ if TYPE_CHECKING:
     from utilities.types import PathLike
 
 
+_LOGGER = to_logger(__name__)
+
+
 def clean_dir(*, path: PathLike = PWD) -> None:
     """Clean a directory."""
-    LOGGER.info("Cleaning directory...")
+    _LOGGER.info("Cleaning directory...")
     path = Path(path)
     if not path.is_dir():
         msg = f"{str(path)!r} is a not a directory"
@@ -32,7 +34,7 @@ def clean_dir(*, path: PathLike = PWD) -> None:
                 rmtree(d, ignore_errors=True)
         else:
             break
-    LOGGER.info("Finished cleaning directory")
+    _LOGGER.info("Finished cleaning directory")
 
 
 def _yield_dirs(*, path: PathLike = PWD) -> Iterator[Path]:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from io import StringIO
 from typing import TYPE_CHECKING, Any, Literal, overload
 
+from utilities.core import to_logger
 from utilities.pydantic import extract_secret
 from utilities.subprocess import run
 
@@ -10,8 +11,10 @@ from actions.constants import YAML_INSTANCE
 from actions.logging import LOGGER
 
 if TYPE_CHECKING:
-    from utilities.pydantic import SecretLike
-    from utilities.types import StrStrMapping
+    from utilities.types import SecretLike, StrStrMapping
+
+
+_LOGGER = to_logger(__name__)
 
 
 @overload
@@ -50,7 +53,7 @@ def logged_run(
     return_: bool = False,
 ) -> str | None:
     cmds_and_args = [cmd, *cmds_or_args]
-    LOGGER.info("Running '%s'...", " ".join(map(str, cmds_and_args)))
+    _LOGGER.info("Running '%s'...", " ".join(map(str, cmds_and_args)))
     unwrapped: list[str] = list(map(extract_secret, cmds_and_args))
     return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
 

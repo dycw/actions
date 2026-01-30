@@ -6,18 +6,18 @@ from pathlib import Path
 from typing import TYPE_CHECKING, assert_never
 
 from pydantic import SecretStr
-from utilities.core import TemporaryFile, write_text, yield_temp_environ
+from utilities.core import TemporaryFile, to_logger, write_text, yield_temp_environ
 from utilities.pydantic import extract_secret
 from utilities.subprocess import run
 from xdg_base_dirs import xdg_config_home
 
-from actions.logging import LOGGER
-
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from utilities.pydantic import SecretLike
-    from utilities.types import PathLike
+    from utilities.types import PathLike, SecretLike
+
+
+_LOGGER = to_logger(__name__)
 
 
 def re_encrypt(
@@ -30,7 +30,7 @@ def re_encrypt(
     new_key: SecretLike | None = None,
 ) -> None:
     """Re-encrypt a JSON file."""
-    LOGGER.info("Re-encrypting...")
+    _LOGGER.info("Re-encrypting...")
     with _yield_env(key_file=key_file, key=key):
         decrypted = run(
             "sops",
@@ -59,7 +59,7 @@ def re_encrypt(
             return_=True,
         )
     write_text(path, encrypted, overwrite=True)
-    LOGGER.info("Finished re-encrypting")
+    _LOGGER.info("Finished re-encrypting")
 
 
 @contextmanager

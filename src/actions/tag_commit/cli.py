@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from click import option
 from utilities.click import Str
-from utilities.core import is_pytest
-from utilities.logging import basic_config
+from utilities.core import is_pytest, set_up_logging
 
-from actions.logging import LOGGER
 from actions.tag_commit.constants import USER_EMAIL, USER_NAME
 from actions.tag_commit.lib import tag_commit
 
@@ -20,7 +18,7 @@ def tag_commit_sub_cmd(
 ) -> None:
     if is_pytest():
         return
-    basic_config(obj=LOGGER)
+    set_up_logging(__name__, root=True)
     tag_commit(
         user_name=user_name,
         user_email=user_email,
