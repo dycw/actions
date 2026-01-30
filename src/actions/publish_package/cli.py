@@ -9,7 +9,7 @@ from utilities.core import is_pytest, set_up_logging
 from actions.publish_package.lib import publish_package
 
 if TYPE_CHECKING:
-    from utilities.pydantic import SecretLike
+    from utilities.types import SecretLike
 
 
 @option("--username", type=Str(), default=None, help="The username of the upload")

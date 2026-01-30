@@ -10,8 +10,7 @@ from utilities.core import is_pytest, set_up_logging
 from actions.re_encrypt.lib import re_encrypt
 
 if TYPE_CHECKING:
-    from utilities.pydantic import SecretLike
-    from utilities.types import PathLike
+    from utilities.types import PathLike, SecretLike
 
 
 @argument("path", type=utilities.click.Path(exist="existing file"))

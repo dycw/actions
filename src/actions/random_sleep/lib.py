@@ -4,11 +4,12 @@ from math import ceil, floor
 from random import choice
 from time import sleep
 
-from utilities.core import get_now
+from utilities.core import get_now, to_logger
 from whenever import TimeDelta, ZonedDateTime
 
-from actions.logging import LOGGER
 from actions.random_sleep.constants import LOG_FREQ, MAX, MIN, STEP
+
+_LOGGER = to_logger(__name__)
 
 
 def random_sleep(
@@ -18,14 +19,14 @@ def random_sleep(
     step: int = STEP,
     log_freq: int = LOG_FREQ,
 ) -> None:
-    LOGGER.info("Sleeping...")
+    _LOGGER.info("Sleeping...")
     start = get_now()
     duration = TimeDelta(seconds=choice(range(min, max, step)))
-    LOGGER.info("Sleeping for %s...", duration)
+    _LOGGER.info("Sleeping for %s...", duration)
     end = (start + duration).round(mode="ceil")
     while (now := get_now()) < end:
         _intermediate(start, now, end, log_freq=log_freq)
-    LOGGER.info("Finished sleeping")
+    _LOGGER.info("Finished sleeping")
 
 
 def _intermediate(
@@ -39,7 +40,7 @@ def _intermediate(
     elapsed = TimeDelta(seconds=floor((now - start).in_seconds()))
     remaining = TimeDelta(seconds=ceil((end - now).in_seconds()))
     this_sleep = min(remaining, TimeDelta(seconds=log_freq))
-    LOGGER.info(
+    _LOGGER.info(
         "Sleeping for %s... (elapsed = %s, remaining = %s)",
         this_sleep,
         elapsed,

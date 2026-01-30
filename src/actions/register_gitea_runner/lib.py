@@ -6,11 +6,10 @@ from string import Template
 from typing import TYPE_CHECKING
 
 from requests import get
-from utilities.core import always_iterable, write_bytes, write_text
+from utilities.core import always_iterable, to_logger, write_bytes, write_text
 from utilities.subprocess import rm_cmd, ssh, sudo_cmd
 
 from actions.constants import YAML_INSTANCE
-from actions.logging import LOGGER
 from actions.register_gitea_runner.constants import (
     GITEA_CONTAINER_NAME,
     GITEA_CONTAINER_USER,
@@ -34,6 +33,9 @@ if TYPE_CHECKING:
     from utilities.types import MaybeSequenceStr, PathLike, StrDict
 
 
+_LOGGER = to_logger(__name__)
+
+
 def register_gitea_runner(
     *,
     runner_token: str | None = None,
@@ -50,7 +52,7 @@ def register_gitea_runner(
     runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     """Register against a remote instance of Gitea."""
-    LOGGER.info("Registering Gitea runner...")
+    _LOGGER.info("Registering Gitea runner...")
     if runner_token is None:
         runner_token_use = ssh(
             ssh_user,
@@ -60,7 +62,7 @@ def register_gitea_runner(
             ),
             return_=True,
         )
-        LOGGER.info("Got token %r", runner_token_use)
+        _LOGGER.info("Got token %r", runner_token_use)
     else:
         runner_token_use = runner_token
     _start_runner(
@@ -73,7 +75,7 @@ def register_gitea_runner(
         gitea_port=gitea_port,
         runner_instance_name=runner_instance_name,
     )
-    LOGGER.info("Finished registering Gitea runner")
+    _LOGGER.info("Finished registering Gitea runner")
 
 
 def register_against_local(
@@ -88,7 +90,7 @@ def register_against_local(
     runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     """Register against a local instance of Gitea."""
-    LOGGER.info("Registering against %s:%d...", gitea_host, gitea_port)
+    _LOGGER.info("Registering against %s:%d...", gitea_host, gitea_port)
     token = logged_run(
         *_docker_exec_generate(user=gitea_container_user, name=gitea_container_name),
         return_=True,

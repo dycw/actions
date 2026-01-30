@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from utilities.core import TemporaryDirectory
+from utilities.core import TemporaryDirectory, to_logger
 
-from actions.logging import LOGGER
 from actions.utilities import logged_run
 
 if TYPE_CHECKING:
-    from utilities.pydantic import SecretLike
+    from utilities.types import SecretLike
+
+
+_LOGGER = to_logger(__name__)
 
 
 def publish_package(
@@ -19,7 +21,7 @@ def publish_package(
     trusted_publishing: bool = False,
     native_tls: bool = False,
 ) -> None:
-    LOGGER.info("Publishing package...")
+    _LOGGER.info("Publishing package...")
     build_head: list[str] = ["uv", "build", "--out-dir"]
     build_tail: list[str] = ["--wheel", "--clear"]
     publish: list[SecretLike] = ["uv", "publish"]
@@ -36,7 +38,7 @@ def publish_package(
     with TemporaryDirectory() as temp:
         logged_run(*build_head, str(temp), *build_tail)
         logged_run(*publish, f"{temp}/*")
-    LOGGER.info("Finished publishing package")
+    _LOGGER.info("Finished publishing package")
 
 
 __all__ = ["publish_package"]
