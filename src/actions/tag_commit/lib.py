@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
-from subprocess import CalledProcessError
-
 from utilities.core import to_logger
 from utilities.version import Version3
 
@@ -37,10 +34,8 @@ def tag_commit(
 
 
 def _tag(version: str, /) -> None:
-    with suppress(CalledProcessError):
-        logged_run("git", "tag", "--delete", version)
-    with suppress(CalledProcessError):
-        logged_run("git", "push", "--delete", "origin", version)
+    logged_run("git", "tag", "--delete", version, suppress=True)
+    logged_run("git", "push", "--delete", "origin", version, suppress=True)
     logged_run("git", "tag", "-a", version, "HEAD", "-m", version)
     logged_run("git", "push", "--tags", "--force", "--set-upstream", "origin")
 

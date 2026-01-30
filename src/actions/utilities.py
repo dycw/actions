@@ -8,7 +8,6 @@ from utilities.pydantic import extract_secret
 from utilities.subprocess import run
 
 from actions.constants import YAML_INSTANCE
-from actions.logging import LOGGER
 
 if TYPE_CHECKING:
     from utilities.types import SecretLike, StrStrMapping
@@ -24,6 +23,7 @@ def logged_run(
     *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,
+    suppress: bool = False,
     return_: Literal[True],
 ) -> str: ...
 @overload
@@ -33,6 +33,7 @@ def logged_run(
     *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,
+    suppress: bool = False,
     return_: Literal[False] = False,
 ) -> None: ...
 @overload
@@ -42,6 +43,7 @@ def logged_run(
     *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,
+    suppress: bool = False,
     return_: bool = False,
 ) -> str | None: ...
 def logged_run(
@@ -50,12 +52,20 @@ def logged_run(
     *cmds_or_args: SecretLike,
     env: StrStrMapping | None = None,
     print: bool = False,  # noqa: A002
+    suppress: bool = False,
     return_: bool = False,
 ) -> str | None:
     cmds_and_args = [cmd, *cmds_or_args]
     _LOGGER.info("Running '%s'...", " ".join(map(str, cmds_and_args)))
     unwrapped: list[str] = list(map(extract_secret, cmds_and_args))
-    return run(*unwrapped, env=env, print=print, return_=return_, logger=LOGGER)
+    return run(
+        *unwrapped,
+        env=env,
+        print=print,
+        suppress=suppress,
+        return_=return_,
+        logger=_LOGGER,
+    )
 
 
 ##
