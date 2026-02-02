@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from click import option
-from utilities.click import Str
+from utilities.click import SecretStr, Str
 from utilities.core import is_pytest, set_up_logging
 
 from actions.publish_package.lib import publish_package
@@ -13,7 +13,9 @@ if TYPE_CHECKING:
 
 
 @option("--username", type=Str(), default=None, help="The username of the upload")
-@option("--password", type=Str(), default=None, help="The password for the upload")
+@option(
+    "--password", type=SecretStr(), default=None, help="The password for the upload"
+)
 @option(
     "--publish-url", type=Str(), default=None, help="The URL of the upload endpoint"
 )
