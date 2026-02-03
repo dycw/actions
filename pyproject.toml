@@ -3,12 +3,12 @@
   requires = ["uv_build"]
 
 [dependency-groups]
-  dev = ["dycw-utilities[test]>=0.188.15", "orjson>=3.11.6", "pyright>=1.1.408"]
+  dev = ["dycw-utilities[test]>=0.188.18", "orjson>=3.11.7", "pyright>=1.1.408"]
 
 [project]
   dependencies = [
     "click>=8.3.1",
-    "dycw-utilities>=0.188.15",
+    "dycw-utilities>=0.188.18",
     "pydantic>=2.12.5",
     "requests>=2.32.5",
     "ruamel-yaml>=0.19.1",
@@ -18,12 +18,12 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.16.14"
+  version = "0.16.15"
 
   [project.optional-dependencies]
     cli = [
       "click==8.3.1",
-      "dycw-utilities==0.188.15",
+      "dycw-utilities==0.188.18",
       "pydantic==2.12.5",
       "requests==2.32.5",
       "ruamel-yaml==0.19.1",
