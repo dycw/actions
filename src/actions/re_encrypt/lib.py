@@ -43,7 +43,10 @@ def re_encrypt(
             str(path),
             return_=True,
         )
-    with _yield_env(key_file=new_key_file, key=new_key):
+    with _yield_env(
+        key_file=key_file if new_key_file is None else new_key_file,
+        key=key if new_key is None else new_key,
+    ):
         identity = _get_recipient()
     with TemporaryFile(text=decrypted) as temp:
         encrypted = run(
