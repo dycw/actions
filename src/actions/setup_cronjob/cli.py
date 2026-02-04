@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from click import argument, option
-from utilities.click import ListStrs, Str
+from click import argument
+from utilities.click import ListStrs, Str, flag, option
 from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 
@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     default=KILL_AFTER,
     help="Seconds until killing the cron job (after timeout)",
 )
+@flag("--sudo", default=False, help="Run as 'sudo'")
 @option("--logs-keep", type=int, default=LOGS_KEEP, help="Number of logs to keep")
 def setup_cronjob_sub_cmd(
     *,
@@ -42,6 +43,7 @@ def setup_cronjob_sub_cmd(
     user: str,
     timeout: int,
     kill_after: int,
+    sudo: bool,
     logs_keep: int,
 ) -> None:
     if is_pytest():
@@ -56,6 +58,7 @@ def setup_cronjob_sub_cmd(
         user=user,
         timeout=timeout,
         kill_after=kill_after,
+        sudo=sudo,
         logs_keep=logs_keep,
     )
 
