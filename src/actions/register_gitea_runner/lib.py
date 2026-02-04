@@ -2,11 +2,16 @@ from __future__ import annotations
 
 from pathlib import Path
 from re import search
-from string import Template
 from typing import TYPE_CHECKING
 
 from requests import get
-from utilities.core import always_iterable, to_logger, write_bytes, write_text
+from utilities.core import (
+    always_iterable,
+    substitute,
+    to_logger,
+    write_bytes,
+    write_text,
+)
 from utilities.subprocess import rm_cmd, ssh, sudo_cmd
 
 from actions.constants import YAML_INSTANCE
@@ -191,9 +196,11 @@ def _get_config_contents(
     certificate: PathLike = RUNNER_CERTIFICATE,
     labels: MaybeSequenceStr | None = RUNNER_LABELS,
 ) -> str:
-    src = PATH_CONFIGS / "config.yml"
-    text = Template(src.read_text()).safe_substitute(
-        CAPACITY=capacity, CERTIFICATE=certificate
+    text = substitute(
+        PATH_CONFIGS / "config.yml",
+        safe=True,
+        CAPACITY=capacity,
+        CERTIFICATE=certificate,
     )
     if labels is None:
         return text
@@ -209,8 +216,9 @@ def _get_config_path(token: str, /) -> Path:
 
 
 def _get_entrypoint_contents(*, host: str = GITEA_HOST, port: int = GITEA_PORT) -> str:
-    src = PATH_CONFIGS / "entrypoint.sh"
-    return Template(src.read_text()).safe_substitute(GITEA_HOST=host, GITEA_PORT=port)
+    return substitute(
+        PATH_CONFIGS / "entrypoint.sh", safe=True, GITEA_HOST=host, GITEA_PORT=port
+    )
 
 
 def _get_entrypoint_path(*, host: str = GITEA_HOST, port: int = GITEA_PORT) -> Path:

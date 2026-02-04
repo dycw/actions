@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from string import Template
 from typing import TYPE_CHECKING
 
 from utilities.constants import SYSTEM, USER
@@ -99,9 +98,7 @@ def _get_crontab(
 
 
 def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
-    return Template((PATH_CONFIGS / "logrotate.tmpl").read_text()).substitute(
-        NAME=name, ROTATE=logs_keep
-    )
+    return substitute(PATH_CONFIGS / "logrotate.tmpl", NAME=name, ROTATE=logs_keep)
 
 
 def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
