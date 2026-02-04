@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from utilities.click import ListStrs, Str, argument, flag, option
+from click import argument
+from utilities.click import ListStrs, Str, flag, option
 from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 
