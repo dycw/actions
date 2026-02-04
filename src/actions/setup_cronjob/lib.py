@@ -18,7 +18,7 @@ from actions.setup_cronjob.constants import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from utilities.types import PathLike
+    from utilities.types import PathLike, StrStrMapping
 
 
 _LOGGER = to_logger(__name__)
@@ -30,6 +30,7 @@ def setup_cronjob(
     /,
     *args: str,
     prepend_path: Sequence[PathLike] | None = None,
+    env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
     timeout: int = TIMEOUT,
@@ -47,6 +48,7 @@ def setup_cronjob(
         command,
         *args,
         prepend_path=prepend_path,
+        env_vars=env_vars,
         schedule=schedule,
         user=user,
         timeout=timeout,
@@ -65,6 +67,7 @@ def _get_crontab(
     /,
     *args: str,
     prepend_path: Sequence[PathLike] | None = None,
+    env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
     timeout: int = TIMEOUT,
@@ -74,6 +77,10 @@ def _get_crontab(
         PREPEND_PATH=""
         if prepend_path is None
         else "".join(f"{p}:" for p in prepend_path),
+        NEW_LINE="" if env_vars is None else "\n",
+        ENV_VARS=""
+        if env_vars is None
+        else "\n".join(f"{k}={v}" for k, v in env_vars.items()),
         SCHEDULE=schedule,
         USER=user,
         NAME=name,

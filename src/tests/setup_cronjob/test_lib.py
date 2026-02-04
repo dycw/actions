@@ -24,6 +24,29 @@ PATH=/foo/bin:/usr/local/bin:/usr/bin:/bin
 """
         assert result == expected
 
+    def test_env_vars_one(self) -> None:
+        result = _get_crontab("name", "command", env_vars={"KEY": "value"})
+        expected = f"""\
+PATH=/usr/local/bin:/usr/bin:/bin
+KEY=value
+
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+"""
+        assert result == expected
+
+    def test_env_vars_multiple(self) -> None:
+        result = _get_crontab(
+            "name", "command", env_vars={"KEY1": "value1", "KEY2": "value2"}
+        )
+        expected = f"""\
+PATH=/usr/local/bin:/usr/bin:/bin
+KEY1=value1
+KEY2=value2
+
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+"""
+        assert result == expected
+
     def test_schedule(self) -> None:
         result = _get_crontab("name", "command", schedule="*/5 * * * *")
         expected = f"""\
