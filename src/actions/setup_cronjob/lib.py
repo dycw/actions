@@ -34,6 +34,7 @@ def setup_cronjob(
     user: str = USER,
     timeout: int = TIMEOUT,
     kill_after: int = KILL_AFTER,
+    sudo: bool = False,
     logs_keep: int = LOGS_KEEP,
 ) -> None:
     """Set up a cronjob & logrotate."""
@@ -51,9 +52,9 @@ def setup_cronjob(
         timeout=timeout,
         kill_after=kill_after,
     )
-    _tee_and_perms(f"/etc/cron.d/{name}", text)
+    _tee_and_perms(f"/etc/cron.d/{name}", text, sudo=sudo)
     _tee_and_perms(
-        f"/etc/logrotate.d/{name}", _get_logrotate(name, logs_keep=logs_keep)
+        f"/etc/logrotate.d/{name}", _get_logrotate(name, logs_keep=logs_keep), sudo=sudo
     )
     _LOGGER.info("Finished setting up cronjob")
 
@@ -90,10 +91,10 @@ def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
     )
 
 
-def _tee_and_perms(path: PathLike, text: str, /) -> None:
-    tee(path, text, sudo=True)
-    chown(path, sudo=True, user="root", group="root")
-    chmod(path, "u=rw,g=r,o=r", sudo=True)
+def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
+    tee(path, text, sudo=sudo)
+    chown(path, sudo=sudo, user="root", group="root")
+    chmod(path, "u=rw,g=r,o=r", sudo=sudo)
 
 
 __all__ = ["setup_cronjob"]
