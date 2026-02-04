@@ -11,7 +11,7 @@ class TestGetCronTab:
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -20,7 +20,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
         expected = f"""\
 PATH=/foo/bin:/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -30,7 +30,7 @@ PATH=/foo/bin:/usr/local/bin:/usr/bin:/bin
 PATH=/usr/local/bin:/usr/bin:/bin
 KEY=value
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -43,7 +43,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
 KEY1=value1
 KEY2=value2
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -52,7 +52,7 @@ KEY2=value2
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-*/5 * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+*/5 * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -61,7 +61,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
         expected = """\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * user (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * user (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -70,7 +70,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 120s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 120s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -79,7 +79,16 @@ PATH=/usr/local/bin:/usr/bin:/bin
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=20s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=20s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
+"""
+        assert result == expected
+
+    def test_sudo(self) -> None:
+        result = _get_crontab("name", "command", sudo=True)
+        expected = f"""\
+PATH=/usr/local/bin:/usr/bin:/bin
+
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
 """
         assert result == expected
 
@@ -88,6 +97,6 @@ PATH=/usr/local/bin:/usr/bin:/bin
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command --dry-run; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | sudo tee -a /var/log/name.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command --dry-run; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/name.log
 """
         assert result == expected

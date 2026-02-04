@@ -1,3 +1,3 @@
-PATH=${PREPEND_PATH}/usr/local/bin:/usr/bin:/bin${NEW_LINE}${ENV_VARS}
+PATH=${PREPEND_PATH}/usr/local/bin:/usr/bin:/bin${PATH_ENV_VARS_NEW_LINE}${ENV_VARS}
 
-${SCHEDULE} ${USER} (echo "[$$(date '+\%Y-\%m-\%d \%H:\%M:\%S') | $$$$] Starting '${NAME}'..."; flock --nonblock --verbose /tmp/cron-${NAME}.lock timeout --kill-after=${KILL_AFTER}s --verbose ${TIMEOUT}s ${COMMAND}${SPACE}${ARGS}; echo "[$$(date '+\%Y-\%m-\%d \%H:\%M:\%S') | $$$$] Finished '${NAME}' with exit code $$?") 2>&1 | sudo tee -a /var/log/${NAME}.log
+${SCHEDULE} ${USER} (echo "[$$(date '+\%Y-\%m-\%d \%H:\%M:\%S') | $$$$] Starting '${NAME}'..."; flock --nonblock --verbose /tmp/cron-${NAME}.lock timeout --kill-after=${KILL_AFTER}s --verbose ${TIMEOUT}s ${COMMAND}${COMMAND_ARGS_SPACE}${ARGS}; echo "[$$(date '+\%Y-\%m-\%d \%H:\%M:\%S') | $$$$] Finished '${NAME}' with exit code $$?") 2>&1 | ${SUDO}${SUDO_TEE_SPACE}tee -a /var/log/${NAME}.log
