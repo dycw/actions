@@ -4,7 +4,7 @@ from string import Template
 from typing import TYPE_CHECKING
 
 from utilities.constants import SYSTEM, USER
-from utilities.core import to_logger
+from utilities.core import substitute, to_logger
 from utilities.subprocess import chmod, chown, tee
 
 from actions.setup_cronjob.constants import (
@@ -76,7 +76,8 @@ def _get_crontab(
     kill_after: int = KILL_AFTER,
     sudo: bool = SUDO,
 ) -> str:
-    return Template((PATH_CONFIGS / "cron.tmpl").read_text()).substitute(
+    return substitute(
+        (PATH_CONFIGS / "cron.tmpl"),
         PREPEND_PATH=""
         if prepend_path is None
         else "".join(f"{p}:" for p in prepend_path),
