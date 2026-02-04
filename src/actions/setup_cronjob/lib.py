@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from string import Template
 from typing import TYPE_CHECKING
 
 from utilities.constants import SYSTEM, USER
-from utilities.core import to_logger
+from utilities.core import substitute, to_logger
 from utilities.subprocess import chmod, chown, tee
 
 from actions.setup_cronjob.constants import (
@@ -12,13 +11,14 @@ from actions.setup_cronjob.constants import (
     LOGS_KEEP,
     PATH_CONFIGS,
     SCHEDULE,
+    SUDO,
     TIMEOUT,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from utilities.types import PathLike
+    from utilities.types import PathLike, StrStrMapping
 
 
 _LOGGER = to_logger(__name__)
@@ -30,11 +30,12 @@ def setup_cronjob(
     /,
     *args: str,
     prepend_path: Sequence[PathLike] | None = None,
+    env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
     timeout: int = TIMEOUT,
     kill_after: int = KILL_AFTER,
-    sudo: bool = False,
+    sudo: bool = SUDO,
     logs_keep: int = LOGS_KEEP,
 ) -> None:
     """Set up a cronjob & logrotate."""
@@ -47,10 +48,12 @@ def setup_cronjob(
         command,
         *args,
         prepend_path=prepend_path,
+        env_vars=env_vars,
         schedule=schedule,
         user=user,
         timeout=timeout,
         kill_after=kill_after,
+        sudo=sudo,
     )
     _tee_and_perms(f"/etc/cron.d/{name}", text, sudo=sudo)
     _tee_and_perms(
@@ -65,30 +68,37 @@ def _get_crontab(
     /,
     *args: str,
     prepend_path: Sequence[PathLike] | None = None,
+    env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
     timeout: int = TIMEOUT,
     kill_after: int = KILL_AFTER,
+    sudo: bool = SUDO,
 ) -> str:
-    return Template((PATH_CONFIGS / "cron.tmpl").read_text()).substitute(
+    return substitute(
+        (PATH_CONFIGS / "cron.tmpl"),
         PREPEND_PATH=""
         if prepend_path is None
         else "".join(f"{p}:" for p in prepend_path),
+        PATH_ENV_VARS_NEW_LINE="" if env_vars is None else "\n",
+        ENV_VARS=""
+        if env_vars is None
+        else "\n".join(f"{k}={v}" for k, v in env_vars.items()),
         SCHEDULE=schedule,
         USER=user,
         NAME=name,
         TIMEOUT=timeout,
         KILL_AFTER=kill_after,
         COMMAND=command,
-        SPACE=" " if (args is not None) and (len(args) >= 1) else "",
+        COMMAND_ARGS_SPACE=" " if (args is not None) and (len(args) >= 1) else "",
+        SUDO="sudo" if sudo else "",
+        SUDO_TEE_SPACE=" " if sudo else "",
         ARGS="" if args is None else " ".join(args),
     )
 
 
 def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
-    return Template((PATH_CONFIGS / "logrotate.tmpl").read_text()).substitute(
-        NAME=name, ROTATE=logs_keep
-    )
+    return substitute(PATH_CONFIGS / "logrotate.tmpl", NAME=name, ROTATE=logs_keep)
 
 
 def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
