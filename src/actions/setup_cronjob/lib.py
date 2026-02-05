@@ -6,12 +6,12 @@ from utilities.constants import SYSTEM, USER
 from utilities.core import substitute, to_logger
 from utilities.subprocess import chmod, chown, tee
 
+from actions.constants import SUDO
 from actions.setup_cronjob.constants import (
     KILL_AFTER,
     LOGS_KEEP,
     PATH_CONFIGS,
     SCHEDULE,
-    SUDO,
     TIMEOUT,
 )
 

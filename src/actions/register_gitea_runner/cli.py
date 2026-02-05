@@ -7,6 +7,7 @@ from click import option
 from utilities.click import ListStrs, Str
 from utilities.core import is_pytest, set_up_logging
 
+from actions.constants import sudo_option
 from actions.register_gitea_runner.constants import (
     GITEA_CONTAINER_NAME,
     GITEA_CONTAINER_USER,
@@ -57,6 +58,7 @@ if TYPE_CHECKING:
 )
 @option("--gitea-host", type=Str(), default=GITEA_HOST, help="Gitea host")
 @option("--gitea-port", type=int, default=GITEA_PORT, help="Gitea port")
+@sudo_option
 @option(
     "--runner-instance-name",
     type=Str(),
@@ -76,6 +78,7 @@ def register_gitea_runner_sub_cmd(
     runner_container_name: str,
     gitea_host: str,
     gitea_port: int,
+    sudo: bool,
     runner_instance_name: str,
 ) -> None:
     if is_pytest():
@@ -93,6 +96,7 @@ def register_gitea_runner_sub_cmd(
         runner_container_name=runner_container_name,
         gitea_host=gitea_host,
         gitea_port=gitea_port,
+        sudo=sudo,
         runner_instance_name=runner_instance_name,
     )
 

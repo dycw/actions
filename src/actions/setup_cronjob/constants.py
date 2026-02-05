@@ -5,7 +5,6 @@ from actions.constants import PATH_ACTIONS
 KILL_AFTER = 10
 LOGS_KEEP = 7
 SCHEDULE = "* * * * *"
-SUDO = False
 TIMEOUT = 60
 
 
@@ -23,6 +22,5 @@ __all__ = [
     "SCHEDULE",
     "SETUP_CRONJOB_DOCSTRING",
     "SETUP_CRONJOB_SUB_CMD",
-    "SUDO",
     "TIMEOUT",
 ]
