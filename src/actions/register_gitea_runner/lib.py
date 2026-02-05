@@ -12,9 +12,9 @@ from utilities.core import (
     write_bytes,
     write_text,
 )
-from utilities.subprocess import rm_cmd, ssh, sudo_cmd
+from utilities.subprocess import maybe_sudo_cmd, rm_cmd, ssh
 
-from actions.constants import YAML_INSTANCE
+from actions.constants import SUDO, YAML_INSTANCE
 from actions.register_gitea_runner.constants import (
     GITEA_CONTAINER_NAME,
     GITEA_CONTAINER_USER,
@@ -54,6 +54,7 @@ def register_gitea_runner(
     runner_container_name: str = RUNNER_CONTAINER_NAME,
     gitea_host: str = GITEA_HOST,
     gitea_port: int = GITEA_PORT,
+    sudo: bool = SUDO,
     runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     """Register against a remote instance of Gitea."""
@@ -78,6 +79,7 @@ def register_gitea_runner(
         runner_container_name=runner_container_name,
         gitea_host=gitea_host,
         gitea_port=gitea_port,
+        sudo=sudo,
         runner_instance_name=runner_instance_name,
     )
     _LOGGER.info("Finished registering Gitea runner")
@@ -235,6 +237,7 @@ def _start_runner(
     runner_container_name: str = RUNNER_CONTAINER_NAME,
     gitea_host: str = GITEA_HOST,
     gitea_port: int = GITEA_PORT,
+    sudo: bool = SUDO,
     runner_instance_name: str = RUNNER_INSTANCE_NAME,
 ) -> None:
     _check_certificate(certificate=runner_certificate)
@@ -248,7 +251,7 @@ def _start_runner(
     _write_entrypoint(host=gitea_host, port=gitea_port)
     _write_wait_for_it()
     logged_run(*_docker_stop_runner_args(name=runner_container_name))
-    logged_run(*sudo_cmd(*rm_cmd("data")))
+    logged_run(*maybe_sudo_cmd(*rm_cmd("data"), sudo=sudo))
     logged_run(
         *_docker_run_act_runner_args(
             token,
