@@ -7,7 +7,7 @@ from utilities.core import duration_to_seconds, substitute, to_logger
 from utilities.subprocess import chmod, chown, tee
 
 from actions.constants import SUDO
-from actions.setup_cronjob.constants import (
+from actions.set_up_cronjob.constants import (
     KILL_AFTER,
     LOGS_KEEP,
     PATH_CONFIGS,
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 _LOGGER = to_logger(__name__)
 
 
-def setup_cronjob(
+def set_up_cronjob(
     name: str,
     command: str,
     /,
@@ -107,4 +107,4 @@ def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
     chmod(path, "u=rw,g=r,o=r", sudo=sudo)
 
 
-__all__ = ["setup_cronjob"]
+__all__ = ["set_up_cronjob"]

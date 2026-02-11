@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from click import argument
-from utilities.click import ListStrs, Str, TimeDelta, option
+from utilities.click import ListStrs, Str, TimeDelta, argument, option
 from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 
 from actions.constants import sudo_option
-from actions.setup_cronjob.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
-from actions.setup_cronjob.lib import setup_cronjob
+from actions.set_up_cronjob.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
+from actions.set_up_cronjob.lib import set_up_cronjob
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -17,9 +16,9 @@ if TYPE_CHECKING:
     from utilities.types import Duration, PathLike
 
 
-@argument("name", type=str)
-@argument("command", type=str)
-@argument("args", nargs=-1, type=str)
+@argument("name", type=Str())
+@argument("command", type=Str())
+@argument("args", nargs=-1, type=Str())
 @option("--prepend-path", type=ListStrs(), default=None, help="Paths to preprend")
 @option("--schedule", type=ListStrs(), default=None, help="Cron job schedule")
 @option("--user", type=Str(), default=USER, help="Cron job user")
@@ -53,7 +52,7 @@ def setup_cronjob_sub_cmd(
     if is_pytest():
         return
     set_up_logging(__name__, root=True)
-    setup_cronjob(
+    set_up_cronjob(
         name,
         command,
         *args,
