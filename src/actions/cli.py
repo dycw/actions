@@ -20,10 +20,10 @@ from actions.register_gitea_runner.constants import (
     REGISTER_GITEA_RUNNER_DOCSTRING,
     REGISTER_GITEA_RUNNER_SUB_CMD,
 )
-from actions.setup_cronjob.cli import setup_cronjob_sub_cmd
-from actions.setup_cronjob.constants import (
-    SETUP_CRONJOB_DOCSTRING,
-    SETUP_CRONJOB_SUB_CMD,
+from actions.set_up_cronjob.cli import setup_cronjob_sub_cmd
+from actions.set_up_cronjob.constants import (
+    SET_UP_CRONJOB_DOCSTRING,
+    SET_UP_CRONJOB_SUB_CMD,
 )
 from actions.tag_commit.cli import tag_commit_sub_cmd
 from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CMD
@@ -52,7 +52,7 @@ _ = cli.command(
     **CONTEXT_SETTINGS,
 )(register_gitea_runner_sub_cmd)
 _ = cli.command(
-    name=SETUP_CRONJOB_SUB_CMD, help=SETUP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
+    name=SET_UP_CRONJOB_SUB_CMD, help=SET_UP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
 )(setup_cronjob_sub_cmd)
 _ = cli.command(name=TAG_COMMIT_SUB_CMD, help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS)(
     tag_commit_sub_cmd
