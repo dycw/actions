@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from utilities.constants import MINUTE
+
 from actions.constants import PATH_ACTIONS
 
 KILL_AFTER = 10
 LOGS_KEEP = 7
 SCHEDULE = "* * * * *"
-TIMEOUT = 60
+TIMEOUT = MINUTE
 
 
 PATH_CONFIGS = PATH_ACTIONS / "setup_cronjob/configs"

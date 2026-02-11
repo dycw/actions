@@ -18,7 +18,7 @@ from actions.setup_cronjob.constants import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from utilities.types import PathLike, StrStrMapping
+    from utilities.types import Duration, PathLike, StrStrMapping
 
 
 _LOGGER = to_logger(__name__)
@@ -33,7 +33,7 @@ def setup_cronjob(
     env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
-    timeout: int = TIMEOUT,
+    timeout: Duration = TIMEOUT,
     kill_after: int = KILL_AFTER,
     sudo: bool = SUDO,
     logs_keep: int = LOGS_KEEP,
