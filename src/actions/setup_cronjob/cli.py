@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from click import argument
-from utilities.click import ListStrs, Str, option
+from utilities.click import ListStrs, Str, TimeDelta, option
 from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 
@@ -14,7 +14,7 @@ from actions.setup_cronjob.lib import setup_cronjob
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from utilities.types import PathLike
+    from utilities.types import Duration, PathLike
 
 
 @argument("name", type=str)
@@ -24,13 +24,16 @@ if TYPE_CHECKING:
 @option("--schedule", type=ListStrs(), default=None, help="Cron job schedule")
 @option("--user", type=Str(), default=USER, help="Cron job user")
 @option(
-    "--timeout", type=int, default=TIMEOUT, help="Seconds until timing-out the cron job"
+    "--timeout",
+    type=TimeDelta(),
+    default=TIMEOUT,
+    help="Duration until timing-out the cron job",
 )
 @option(
     "--kill-after",
-    type=int,
+    type=TimeDelta(),
     default=KILL_AFTER,
-    help="Seconds until killing the cron job (after timeout)",
+    help="Duration until killing the cron job (after timeout)",
 )
 @sudo_option
 @option("--logs-keep", type=int, default=LOGS_KEEP, help="Number of logs to keep")
@@ -42,8 +45,8 @@ def setup_cronjob_sub_cmd(
     prepend_path: Sequence[PathLike] | None,
     schedule: str,
     user: str,
-    timeout: int,
-    kill_after: int,
+    timeout: Duration,
+    kill_after: Duration,
     sudo: bool,
     logs_keep: int,
 ) -> None:
