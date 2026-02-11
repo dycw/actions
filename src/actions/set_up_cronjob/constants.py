@@ -17,11 +17,11 @@ SCHEDULE: str = "* * * * *"
 TIMEOUT: Duration = MINUTE
 
 
-PATH_CONFIGS: Path = PATH_ACTIONS / "setup_cronjob/configs"
+PATH_CONFIGS: Path = PATH_ACTIONS / "set_up_cronjob/configs"
 
 
-SETUP_CRONJOB_SUB_CMD: str = "setup-cronjob"
-SETUP_CRONJOB_DOCSTRING: str = "Setup a cronjob"
+SET_UP_CRONJOB_SUB_CMD: str = "set-up-cronjob"
+SET_UP_CRONJOB_DOCSTRING: str = "Set up a cronjob"
 
 
 __all__ = [
@@ -29,7 +29,7 @@ __all__ = [
     "LOGS_KEEP",
     "PATH_CONFIGS",
     "SCHEDULE",
-    "SETUP_CRONJOB_DOCSTRING",
-    "SETUP_CRONJOB_SUB_CMD",
+    "SET_UP_CRONJOB_DOCSTRING",
+    "SET_UP_CRONJOB_SUB_CMD",
     "TIMEOUT",
 ]
