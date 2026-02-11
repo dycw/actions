@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from utilities.constants import USER
 
-from actions.setup_cronjob.lib import _get_crontab
+from actions.set_up_cronjob.lib import _get_crontab
 
 
 class TestGetCronTab:
