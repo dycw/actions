@@ -1,18 +1,27 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+from utilities.constants import MINUTE, SECOND
+
 from actions.constants import PATH_ACTIONS
 
-KILL_AFTER = 10
-LOGS_KEEP = 7
-SCHEDULE = "* * * * *"
-TIMEOUT = 60
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from utilities.types import Duration
+
+KILL_AFTER: Duration = 10 * SECOND
+LOGS_KEEP: int = 7
+SCHEDULE: str = "* * * * *"
+TIMEOUT: Duration = MINUTE
 
 
-PATH_CONFIGS = PATH_ACTIONS / "setup_cronjob/configs"
+PATH_CONFIGS: Path = PATH_ACTIONS / "setup_cronjob/configs"
 
 
-SETUP_CRONJOB_SUB_CMD = "setup-cronjob"
-SETUP_CRONJOB_DOCSTRING = "Setup a cronjob"
+SETUP_CRONJOB_SUB_CMD: str = "setup-cronjob"
+SETUP_CRONJOB_DOCSTRING: str = "Setup a cronjob"
 
 
 __all__ = [

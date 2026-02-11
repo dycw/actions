@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from utilities.constants import SYSTEM, USER
-from utilities.core import substitute, to_logger
+from utilities.core import duration_to_seconds, substitute, to_logger
 from utilities.subprocess import chmod, chown, tee
 
 from actions.constants import SUDO
@@ -18,7 +18,7 @@ from actions.setup_cronjob.constants import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from utilities.types import PathLike, StrStrMapping
+    from utilities.types import Duration, PathLike, StrStrMapping
 
 
 _LOGGER = to_logger(__name__)
@@ -33,8 +33,8 @@ def setup_cronjob(
     env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
-    timeout: int = TIMEOUT,
-    kill_after: int = KILL_AFTER,
+    timeout: Duration = TIMEOUT,
+    kill_after: Duration = KILL_AFTER,
     sudo: bool = SUDO,
     logs_keep: int = LOGS_KEEP,
 ) -> None:
@@ -71,8 +71,8 @@ def _get_crontab(
     env_vars: StrStrMapping | None = None,
     schedule: str = SCHEDULE,
     user: str = USER,
-    timeout: int = TIMEOUT,
-    kill_after: int = KILL_AFTER,
+    timeout: Duration = TIMEOUT,
+    kill_after: Duration = KILL_AFTER,
     sudo: bool = SUDO,
 ) -> str:
     return substitute(
@@ -87,8 +87,8 @@ def _get_crontab(
         SCHEDULE=schedule,
         USER=user,
         NAME=name,
-        TIMEOUT=timeout,
-        KILL_AFTER=kill_after,
+        TIMEOUT=round(duration_to_seconds(timeout)),
+        KILL_AFTER=round(duration_to_seconds(kill_after)),
         COMMAND=command,
         COMMAND_ARGS_SPACE=" " if (args is not None) and (len(args) >= 1) else "",
         SUDO="sudo" if sudo else "",
