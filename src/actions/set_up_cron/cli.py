@@ -73,7 +73,7 @@ def make_set_up_cron_cmd(
             logs_keep=logs_keep,
         )
 
-    return cli(name=name, help="Set up a cronjob", **CONTEXT_SETTINGS)(func)
+    return cli(name=name, help="Set up 'cron'", **CONTEXT_SETTINGS)(func)
 
 
 cli = make_set_up_cron_cmd()
