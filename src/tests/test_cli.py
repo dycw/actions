@@ -94,7 +94,19 @@ class TestCLI:
         result = runner.invoke(command, [*args, "--runner-certificate", str(path)])
         assert result.exit_code == 0, result.stderr
 
-    @mark.parametrize("command", [param("cli")])
+    @mark.parametrize(
+        "command",
+        [
+            param("clean-dir"),
+            param("cli"),
+            param("publish-package"),
+            param("random-sleep"),
+            param("re-encrypt"),
+            param("register-gitea-runner"),
+            param("set-up-cron"),
+            param("tag-commit"),
+        ],
+    )
     @throttle_test(duration=MINUTE)
     def test_entrypoints(self, *, command: str) -> None:
         run(command, "--help")
