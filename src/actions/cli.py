@@ -4,13 +4,11 @@ from click import group, version_option
 from utilities.click import CONTEXT_SETTINGS
 
 from actions import __version__
+from actions.clean_dir.cli import clean_dir_sub_cmd
+from actions.clean_dir.constants import CLEAN_DIR_DOCSTRING, CLEAN_DIR_SUB_CMD
 from actions.publish_package.cli import (
-    make_publish_package_cmd,
-    publish_package_sub_cmd,
-)
-from actions.publish_package.constants import (
-    PUBLISH_PACKAGE_DOCSTRING,
     PUBLISH_PACKAGE_SUB_CMD,
+    make_publish_package_cmd,
 )
 from actions.random_sleep.cli import random_sleep_sub_cmd
 from actions.random_sleep.constants import RANDOM_SLEEP_DOCSTRING, RANDOM_SLEEP_SUB_CMD
@@ -35,10 +33,10 @@ from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, TAG_COMMIT_SUB_CM
 def cli() -> None: ...
 
 
-_ = make_publish_package_cmd(cli=cli.command)
-_ = cli.command(
-    name=PUBLISH_PACKAGE_SUB_CMD, help=PUBLISH_PACKAGE_DOCSTRING, **CONTEXT_SETTINGS
-)(publish_package_sub_cmd)
+_ = cli.command(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
+    clean_dir_sub_cmd
+)
+_ = make_publish_package_cmd(cli=cli.command, name=PUBLISH_PACKAGE_SUB_CMD)
 _ = cli.command(
     name=RANDOM_SLEEP_SUB_CMD, help=RANDOM_SLEEP_DOCSTRING, **CONTEXT_SETTINGS
 )(random_sleep_sub_cmd)

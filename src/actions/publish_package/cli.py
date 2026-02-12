@@ -6,7 +6,6 @@ from click import Command, command, option
 from utilities.click import CONTEXT_SETTINGS, SecretStr, Str
 from utilities.core import is_pytest, set_up_logging
 
-from actions.clean_dir.constants import CLEAN_DIR_DOCSTRING, CLEAN_DIR_SUB_CMD
 from actions.publish_package.lib import publish_package
 
 if TYPE_CHECKING:
@@ -15,7 +14,12 @@ if TYPE_CHECKING:
     from utilities.types import SecretLike
 
 
-def make_publish_package_cmd(*, cli: Callable[..., Command] = command) -> Command:
+PUBLISH_PACKAGE_SUB_CMD = "publish-package"
+
+
+def make_publish_package_cmd(
+    *, cli: Callable[..., Command] = command, name: str | None = None
+) -> Command:
     @option("--username", type=Str(), default=None, help="The username of the upload")
     @option(
         "--password", type=SecretStr(), default=None, help="The password for the upload"
@@ -54,7 +58,7 @@ def make_publish_package_cmd(*, cli: Callable[..., Command] = command) -> Comman
             native_tls=native_tls,
         )
 
-    return cli(name=CLEAN_DIR_SUB_CMD, help=CLEAN_DIR_DOCSTRING, **CONTEXT_SETTINGS)(
+    return cli(name=name, help="Build and publish the package", **CONTEXT_SETTINGS)(
         func
     )
 
@@ -62,4 +66,4 @@ def make_publish_package_cmd(*, cli: Callable[..., Command] = command) -> Comman
 cli = make_publish_package_cmd()
 
 
-__all__ = ["cli", "make_publish_package_cmd"]
+__all__ = ["PUBLISH_PACKAGE_SUB_CMD", "cli", "make_publish_package_cmd"]
