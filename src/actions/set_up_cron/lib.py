@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, assert_never
 
 from utilities.constants import SYSTEM, USER, Sentinel, sentinel
 from utilities.core import (
@@ -35,25 +35,37 @@ def set_up_cron(
     job: Job,
     /,
     *jobs: Job,
-    log_name: str | None = None,
+    cron_name: str | None = None,
     prepend_path: Sequence[PathLike] | None = None,
     env_vars: StrStrMapping | None = None,
     sudo: bool = False,
     logs_keep: int = LOGS_KEEP,
 ) -> None:
     """Set up a cronjob & logrotate."""
-    _LOGGER.info("Setting up cronjob...")
+    _LOGGER.info("Setting up 'cron' job(s)...")
     if SYSTEM != "linux":
         msg = f"System must be 'linux'; got {SYSTEM!r}"
         raise TypeError(msg)
+    match cron_name, len(jobs):
+        case None, 0:
+            cron_name_use = job.name
+        case None, _:
+            msg = "'cron_name' must be given if there are multiple jobs"
+            raise ValueError(msg)
+        case str() as cron_name_use, _:
+            ...
+        case never:
+            assert_never(never)
     text = _get_crontab(
-        job, *jobs, log_name=log_name, prepend_path=prepend_path, env_vars=env_vars
+        job, *jobs, log_name=cron_name_use, prepend_path=prepend_path, env_vars=env_vars
     )
-    _tee_and_perms(f"/etc/cron.d/{name}", text, sudo=sudo)
+    _tee_and_perms(f"/etc/cron.d/{cron_name_use}", text, sudo=sudo)
     _tee_and_perms(
-        f"/etc/logrotate.d/{name}", _get_logrotate(name, logs_keep=logs_keep), sudo=sudo
+        f"/etc/logrotate.d/{cron_name}",
+        _get_logrotate(cron_name_use, logs_keep=logs_keep),
+        sudo=sudo,
     )
-    _LOGGER.info("Finished setting up cronjob")
+    _LOGGER.info("Finished setting up 'cron' job(s)")
 
 
 def _get_crontab(
