@@ -20,8 +20,8 @@ from actions.register_gitea_runner.constants import (
     REGISTER_GITEA_RUNNER_DOCSTRING,
     REGISTER_GITEA_RUNNER_SUB_CMD,
 )
-from actions.set_up_cronjob.cli import setup_cronjob_sub_cmd
-from actions.set_up_cronjob.constants import (
+from actions.set_up_cron.cli import setup_cronjob_sub_cmd
+from actions.set_up_cron.constants import (
     SET_UP_CRONJOB_DOCSTRING,
     SET_UP_CRONJOB_SUB_CMD,
 )

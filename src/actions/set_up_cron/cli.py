@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from click import command
 from utilities.click import ListStrs, Str, TimeDelta, argument, option
 from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 
 from actions.constants import sudo_option
-from actions.set_up_cronjob.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
-from actions.set_up_cronjob.lib import set_up_cronjob
+from actions.set_up_cron.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
+from actions.set_up_cron.lib import set_up_cronjob
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -66,4 +67,7 @@ def setup_cronjob_sub_cmd(
     )
 
 
-__all__ = ["setup_cronjob_sub_cmd"]
+cli = command(setup_cronjob_sub_cmd)
+
+
+__all__ = ["cli", "setup_cronjob_sub_cmd"]
