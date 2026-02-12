@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from click import Command, command, option
+from click import Command, command
 from utilities.click import CONTEXT_SETTINGS, ListStrs, Str, TimeDelta, argument, option
 from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from click import Command, command, option
-from utilities.click import CONTEXT_SETTINGS
+from click import Command, command
+from utilities.click import CONTEXT_SETTINGS, option
 from utilities.core import is_pytest, set_up_logging
 
 from actions.random_sleep.constants import LOG_FREQ, MAX, MIN, STEP

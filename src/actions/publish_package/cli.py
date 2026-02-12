@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from click import Command, command, option
-from utilities.click import CONTEXT_SETTINGS, SecretStr, Str
+from click import Command, command
+from utilities.click import CONTEXT_SETTINGS, SecretStr, Str, option
 from utilities.core import is_pytest, set_up_logging
 
 from actions.publish_package.lib import publish_package

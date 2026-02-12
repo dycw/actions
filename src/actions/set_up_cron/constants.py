@@ -18,7 +18,7 @@ SCHEDULE: str = "* * * * *"
 TIMEOUT: Duration = MINUTE
 
 
-PATH_CONFIGS: Path = PATH_ACTIONS / "set_up_cronjob/configs"
+PATH_CONFIGS: Path = PATH_ACTIONS / "set_up_cron/configs"
 
 
 __all__ = ["KILL_AFTER", "LOGS_KEEP", "PATH_CONFIGS", "SCHEDULE", "TIMEOUT"]
