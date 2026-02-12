@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from click import option
+from click import command, option
 from utilities.click import SecretStr, Str
 from utilities.core import is_pytest, set_up_logging
 
@@ -51,4 +51,7 @@ def publish_package_sub_cmd(
     )
 
 
-__all__ = ["publish_package_sub_cmd"]
+cli = command(publish_package_sub_cmd)
+
+
+__all__ = ["cli", "publish_package_sub_cmd"]

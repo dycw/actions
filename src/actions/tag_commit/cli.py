@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from click import option
-from utilities.click import Str
+from click import command, option
+from utilities.click import CONTEXT_SETTINGS, Str
 from utilities.core import is_pytest, set_up_logging
 
-from actions.tag_commit.constants import USER_EMAIL, USER_NAME
+from actions.tag_commit.constants import TAG_COMMIT_DOCSTRING, USER_EMAIL, USER_NAME
 from actions.tag_commit.lib import tag_commit
 
 
@@ -28,4 +28,7 @@ def tag_commit_sub_cmd(
     )
 
 
-__all__ = ["tag_commit_sub_cmd"]
+cli = command(help=TAG_COMMIT_DOCSTRING, **CONTEXT_SETTINGS)(tag_commit_sub_cmd)
+
+
+__all__ = ["cli", "tag_commit_sub_cmd"]

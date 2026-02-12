@@ -33,8 +33,14 @@
     ]
 
   [project.scripts]
+    clean-dir = "actions.clean_dir.cli:cli"
     cli = "actions.cli:cli"
+    publish-package = "actions.publish_package.cli:cli"
+    random-sleep = "actions.random_sleep.cli:cli"
+    re-encrypt = "actions.re_encrypt.cli:cli"
+    register-gitea-runner = "actions.register_gitea_runner.cli:cli"
     set-up-cron = "actions.set_up_cron.cli:cli"
+    tag-commit = "actions.tag_commit.cli:cli"
 
 
 [tool]

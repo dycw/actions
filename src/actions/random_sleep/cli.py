@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from click import option
+from click import command, option
 from utilities.core import is_pytest, set_up_logging
 
 from actions.random_sleep.constants import LOG_FREQ, MAX, MIN, STEP
@@ -18,4 +18,7 @@ def random_sleep_sub_cmd(*, min_: int, max_: int, step: int, log_freq: int) -> N
     random_sleep(min=min_, max=max_, step=step, log_freq=log_freq)
 
 
-__all__ = ["random_sleep_sub_cmd"]
+cli = command(random_sleep_sub_cmd)
+
+
+__all__ = ["cli", "random_sleep_sub_cmd"]

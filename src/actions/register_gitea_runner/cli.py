@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import utilities.click
-from click import option
+from click import command, option
 from utilities.click import ListStrs, Str
 from utilities.core import is_pytest, set_up_logging
 
@@ -101,4 +101,7 @@ def register_gitea_runner_sub_cmd(
     )
 
 
-__all__ = ["register_gitea_runner_sub_cmd"]
+cli = command(register_gitea_runner_sub_cmd)
+
+
+__all__ = ["cli", "register_gitea_runner_sub_cmd"]

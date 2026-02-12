@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import utilities.click
-from click import option
+from click import command, option
 from utilities.constants import PWD
 from utilities.core import is_pytest, set_up_logging
 
@@ -26,4 +26,7 @@ def clean_dir_sub_cmd(*, path: PathLike) -> None:
     clean_dir(path=path)
 
 
-__all__ = ["clean_dir_sub_cmd"]
+cli = command(clean_dir_sub_cmd)
+
+
+__all__ = ["clean_dir_sub_cmd", "cli"]

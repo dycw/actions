@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import utilities.click
-from click import argument, option
+from click import argument, command, option
 from utilities.click import Str
 from utilities.core import is_pytest, set_up_logging
 
@@ -46,4 +46,7 @@ def re_encrypt_sub_cmd(
     )
 
 
-__all__ = ["re_encrypt_sub_cmd"]
+cli = command(re_encrypt_sub_cmd)
+
+
+__all__ = ["cli", "re_encrypt_sub_cmd"]
