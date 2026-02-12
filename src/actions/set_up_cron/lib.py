@@ -7,7 +7,7 @@ from utilities.core import duration_to_seconds, substitute, to_logger
 from utilities.subprocess import chmod, chown, tee
 
 from actions.constants import SUDO
-from actions.set_up_cronjob.constants import (
+from actions.set_up_cron.constants import (
     KILL_AFTER,
     LOGS_KEEP,
     PATH_CONFIGS,

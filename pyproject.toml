@@ -2,13 +2,15 @@
   build-backend = "uv_build"
   requires = ["uv_build"]
 
+
 [dependency-groups]
-  dev = ["dycw-utilities[test]>=0.188.30", "orjson>=3.11.7", "pyright>=1.1.408"]
+  dev = ["dycw-utilities[test]>=0.189.1", "orjson>=3.11.7", "pyright>=1.1.408"]
+
 
 [project]
   dependencies = [
     "click>=8.3.1",
-    "dycw-utilities>=0.188.30",
+    "dycw-utilities>=0.189.1",
     "pydantic>=2.12.5",
     "requests>=2.32.5",
     "ruamel-yaml>=0.19.1",
@@ -18,12 +20,12 @@
   name = "dycw-actions"
   readme = "README.md"
   requires-python = ">= 3.12"
-  version = "0.17.0"
+  version = "0.18.0"
 
   [project.optional-dependencies]
     cli = [
       "click==8.3.1",
-      "dycw-utilities==0.188.30",
+      "dycw-utilities==0.189.1",
       "pydantic==2.12.5",
       "requests==2.32.5",
       "ruamel-yaml==0.19.1",
@@ -31,7 +33,15 @@
     ]
 
   [project.scripts]
+    clean-dir = "actions.clean_dir.cli:cli"
     cli = "actions.cli:cli"
+    publish-package = "actions.publish_package.cli:cli"
+    random-sleep = "actions.random_sleep.cli:cli"
+    re-encrypt = "actions.re_encrypt.cli:cli"
+    register-gitea-runner = "actions.register_gitea_runner.cli:cli"
+    set-up-cron = "actions.set_up_cron.cli:cli"
+    tag-commit = "actions.tag_commit.cli:cli"
+
 
 [tool]
   [tool.uv]
