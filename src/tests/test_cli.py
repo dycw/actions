@@ -20,26 +20,27 @@ from actions.tag_commit.constants import TAG_COMMIT_SUB_CMD
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from click import Command
     from utilities.types import SequenceStr
 
 
 class TestCLI:
     @mark.parametrize(
-        "commands",
+        ("command", "args"),
         [
-            param([CLEAN_DIR_SUB_CMD]),
-            param([CLEAN_DIR_SUB_CMD, "--path", str(TEMP_DIR)]),
-            param([PUBLISH_PACKAGE_SUB_CMD]),
-            param([PUBLISH_PACKAGE_SUB_CMD, "--username", "username"]),
-            param([RANDOM_SLEEP_SUB_CMD]),
-            param([SET_UP_CRONJOB_SUB_CMD, "name", "command"]),
-            param([TAG_COMMIT_SUB_CMD]),
+            param(cli, [CLEAN_DIR_SUB_CMD]),
+            param(cli, [CLEAN_DIR_SUB_CMD, "--path", str(TEMP_DIR)]),
+            param(cli, [PUBLISH_PACKAGE_SUB_CMD]),
+            param(cli, [PUBLISH_PACKAGE_SUB_CMD, "--username", "username"]),
+            param(cli, [RANDOM_SLEEP_SUB_CMD]),
+            param(cli, [SET_UP_CRONJOB_SUB_CMD, "name", "command"]),
+            param(cli, [TAG_COMMIT_SUB_CMD]),
         ],
     )
     @throttle_test(duration=MINUTE)
-    def test_commands(self, *, commands: SequenceStr) -> None:
+    def test_commands(self, *, command: Command, args: SequenceStr) -> None:
         runner = CliRunner()
-        result = runner.invoke(cli, commands)
+        result = runner.invoke(command, args)
         assert result.exit_code == 0, result.stderr
 
     @throttle_test(duration=MINUTE)
