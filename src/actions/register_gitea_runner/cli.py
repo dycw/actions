@@ -113,7 +113,7 @@ def make_register_gitea_runner_cmd(
     return cli(name=name, help="Register a Gitea runner", **CONTEXT_SETTINGS)(func)
 
 
-cli = make_clean_dir_cmd()
+cli = make_register_gitea_runner_cmd()
 
 
 __all__ = ["cli", "make_clean_dir_cmd"]
