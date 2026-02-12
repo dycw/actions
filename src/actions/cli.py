@@ -11,11 +11,8 @@ from actions.publish_package.cli import (
 )
 from actions.random_sleep.cli import RANDOM_SLEEP_SUB_CMD, make_random_sleep_cmd
 from actions.re_encrypt.cli import RE_ENCRYPT_SUB_CMD, make_re_encrypt_cmd
-from actions.register_gitea_runner.cli import register_gitea_runner_sub_cmd
-from actions.register_gitea_runner.constants import (
-    REGISTER_GITEA_RUNNER_DOCSTRING,
-    REGISTER_GITEA_RUNNER_SUB_CMD,
-)
+from actions.register_gitea_runner.cli import make_register_gitea_runner_cmd
+from actions.register_gitea_runner.constants import REGISTER_GITEA_RUNNER_SUB_CMD
 from actions.set_up_cron.cli import setup_cronjob_sub_cmd
 from actions.set_up_cron.constants import (
     SET_UP_CRONJOB_DOCSTRING,
@@ -34,11 +31,7 @@ _ = make_clean_dir_cmd(cli=cli.command, name=CLEAN_DIR_SUB_CMD)
 _ = make_publish_package_cmd(cli=cli.command, name=PUBLISH_PACKAGE_SUB_CMD)
 _ = make_random_sleep_cmd(cli=cli.command, name=RANDOM_SLEEP_SUB_CMD)
 _ = make_re_encrypt_cmd(cli=cli.command, name=RE_ENCRYPT_SUB_CMD)
-_ = cli.command(
-    name=REGISTER_GITEA_RUNNER_SUB_CMD,
-    help=REGISTER_GITEA_RUNNER_DOCSTRING,
-    **CONTEXT_SETTINGS,
-)(register_gitea_runner_sub_cmd)
+_ = make_register_gitea_runner_cmd(cli=cli.command, name=REGISTER_GITEA_RUNNER_SUB_CMD)
 _ = cli.command(
     name=SET_UP_CRONJOB_SUB_CMD, help=SET_UP_CRONJOB_DOCSTRING, **CONTEXT_SETTINGS
 )(setup_cronjob_sub_cmd)
