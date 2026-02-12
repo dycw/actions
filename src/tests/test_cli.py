@@ -94,6 +94,7 @@ class TestCLI:
         result = runner.invoke(command, [*args, "--runner-certificate", str(path)])
         assert result.exit_code == 0, result.stderr
 
+    @mark.parametrize("head", [param([]), param(["just"], marks=skipif_ci)])
     @mark.parametrize(
         "command",
         [
@@ -108,10 +109,5 @@ class TestCLI:
         ],
     )
     @throttle_test(duration=MINUTE)
-    def test_entrypoints(self, *, command: str) -> None:
-        run(command, "--help")
-
-    @skipif_ci
-    @throttle_test(duration=MINUTE)
-    def test_justfile(self) -> None:
-        run("just", "cli", "--help")
+    def test_entrypoints_and_justfile(self, *, head: SequenceStr, command: str) -> None:
+        run(*head, command, "--help")
