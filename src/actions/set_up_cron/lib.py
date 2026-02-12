@@ -48,21 +48,21 @@ def set_up_cron(
         raise TypeError(msg)
     match cron_name, len(jobs):
         case None, 0:
-            cron_name_use = job.name
+            name_use = job.name
         case None, _:
             msg = "'cron_name' must be given if there are multiple jobs"
             raise ValueError(msg)
-        case str() as cron_name_use, _:
+        case str() as name_use, _:
             ...
         case never:
             assert_never(never)
     text = _get_crontab(
-        job, *jobs, log_name=cron_name_use, prepend_path=prepend_path, env_vars=env_vars
+        job, *jobs, log_name=name_use, prepend_path=prepend_path, env_vars=env_vars
     )
-    _tee_and_perms(f"/etc/cron.d/{cron_name_use}", text, sudo=sudo)
+    _tee_and_perms(f"/etc/cron.d/{name_use}", text, sudo=sudo)
     _tee_and_perms(
         f"/etc/logrotate.d/{cron_name}",
-        _get_logrotate(cron_name_use, logs_keep=logs_keep),
+        _get_logrotate(name_use, logs_keep=logs_keep),
         sudo=sudo,
     )
     _LOGGER.info("Finished setting up 'cron' job(s)")
@@ -108,37 +108,41 @@ def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
 
 @dataclass(order=True, unsafe_hash=True, slots=True)
 class Job:
+    name: str
+    command: str
     schedule: str = field(default=SCHEDULE, kw_only=True)
     user: str = field(default=USER, kw_only=True)
-    name: str
     timeout: Duration = field(default=TIMEOUT, kw_only=True)
     kill_after: Duration = field(default=KILL_AFTER, kw_only=True)
-    command: str
     sudo: bool = field(default=SUDO, kw_only=True)
     args: list[str] | None = field(default=None, kw_only=True)
     log: str | None = field(default=None, kw_only=True)
 
+    @property
+    def log_use(self) -> str:
+        return self.name if self.log is None else self.log
+
     def replace(
         self,
         *,
+        name: str | Sentinel = sentinel,
+        command: str | Sentinel = sentinel,
         schedule: str | Sentinel = sentinel,
         user: str | Sentinel = sentinel,
-        name: str | Sentinel = sentinel,
         timeout: Duration | Sentinel = sentinel,
         kill_after: Duration | Sentinel = sentinel,
-        command: str | Sentinel = sentinel,
         sudo: bool | Sentinel = sentinel,
         args: list[str] | None | Sentinel = sentinel,
         log: str | None | Sentinel = sentinel,
     ) -> Self:
         return replace_non_sentinel(
             self,
+            name=name,
+            command=command,
             schedule=schedule,
             user=user,
-            name=name,
             timeout=timeout,
             kill_after=kill_after,
-            command=command,
             sudo=sudo,
             args=args,
             log=log,
@@ -160,7 +164,7 @@ class Job:
             SUDO="sudo" if self.sudo else "",
             SUDO_TEE_SPACE=" " if self.sudo else "",
             ARGS="" if self.args is None else " ".join(self.args),
-            LOG=self.name if self.log is None else self.log,
+            LOG=self.log_use,
         )
 
 
