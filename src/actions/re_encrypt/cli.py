@@ -63,4 +63,4 @@ def make_re_encrypt_cmd(
 cli = make_re_encrypt_cmd()
 
 
-__all__ = ["RE_ENCRYPT_SUB_CMD", "cli", "re_encrypt_sub_cmd"]
+__all__ = ["RE_ENCRYPT_SUB_CMD", "cli", "make_re_encrypt_cmd"]

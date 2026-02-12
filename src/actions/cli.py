@@ -10,8 +10,7 @@ from actions.publish_package.cli import (
     make_publish_package_cmd,
 )
 from actions.random_sleep.cli import RANDOM_SLEEP_SUB_CMD, make_random_sleep_cmd
-from actions.re_encrypt.cli import re_encrypt_sub_cmd
-from actions.re_encrypt.constants import RE_ENCRYPT_DOCSTRING, RE_ENCRYPT_SUB_CMD
+from actions.re_encrypt.cli import RE_ENCRYPT_SUB_CMD, make_re_encrypt_cmd
 from actions.register_gitea_runner.cli import register_gitea_runner_sub_cmd
 from actions.register_gitea_runner.constants import (
     REGISTER_GITEA_RUNNER_DOCSTRING,
@@ -34,9 +33,7 @@ def cli() -> None: ...
 _ = make_clean_dir_cmd(cli=cli.command, name=CLEAN_DIR_SUB_CMD)
 _ = make_publish_package_cmd(cli=cli.command, name=PUBLISH_PACKAGE_SUB_CMD)
 _ = make_random_sleep_cmd(cli=cli.command, name=RANDOM_SLEEP_SUB_CMD)
-_ = cli.command(name=RE_ENCRYPT_SUB_CMD, help=RE_ENCRYPT_DOCSTRING, **CONTEXT_SETTINGS)(
-    re_encrypt_sub_cmd
-)
+_ = make_re_encrypt_cmd(cli=cli.command, name=RE_ENCRYPT_SUB_CMD)
 _ = cli.command(
     name=REGISTER_GITEA_RUNNER_SUB_CMD,
     help=REGISTER_GITEA_RUNNER_DOCSTRING,
