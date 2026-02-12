@@ -10,7 +10,7 @@ from utilities.types import PathLike
 
 from actions.constants import sudo_option
 from actions.set_up_cron.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
-from actions.set_up_cron.lib import set_up_cronjob
+from actions.set_up_cron.lib import set_up_cron
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -60,7 +60,7 @@ def make_set_up_cron_cmd(
         if is_pytest():
             return
         set_up_logging(__name__, root=True)
-        set_up_cronjob(
+        set_up_cron(
             name,
             command,
             *args,

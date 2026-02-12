@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 _LOGGER = to_logger(__name__)
 
 
-def set_up_cronjob(
+def set_up_cron(
     name: str,
     command: str,
     /,
@@ -107,4 +107,4 @@ def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
     chmod(path, "u=rw,g=r,o=r", sudo=sudo)
 
 
-__all__ = ["set_up_cronjob"]
+__all__ = ["set_up_cron"]
