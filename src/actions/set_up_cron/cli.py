@@ -16,7 +16,7 @@ from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 from utilities.types import PathLike
 
-from actions.set_up_cron.constants import KILL_AFTER, LOGS_KEEP, TIMEOUT
+from actions.set_up_cron.constants import KILL_AFTER, LOGS_KEEP, SCHEDULE, TIMEOUT
 from actions.set_up_cron.lib import Job, set_up_cron
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ def make_set_up_cron_cmd(
     @argument("name", type=Str())
     @argument("command", type=Str())
     @argument("args", nargs=-1, type=Str())
-    @option("--schedule", type=Str(), default=None, help="Cron job schedule")
+    @option("--schedule", type=Str(), default=SCHEDULE, help="Cron job schedule")
     @option("--user", type=Str(), default=USER, help="Cron job user")
     @option(
         "--timeout",
