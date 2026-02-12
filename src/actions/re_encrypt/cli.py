@@ -8,6 +8,7 @@ from utilities.click import CONTEXT_SETTINGS, Str
 from utilities.core import is_pytest, set_up_logging
 from utilities.types import PathLike
 
+from actions import __version__
 from actions.re_encrypt.lib import re_encrypt
 
 if TYPE_CHECKING:
@@ -52,7 +53,7 @@ def make_re_encrypt_cmd(
     ) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         re_encrypt(
             path, key_file=key_file, key=key, new_key_file=new_key_file, new_key=new_key
         )

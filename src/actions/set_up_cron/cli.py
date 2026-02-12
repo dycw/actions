@@ -16,6 +16,7 @@ from utilities.constants import USER
 from utilities.core import is_pytest, set_up_logging
 from utilities.types import PathLike
 
+from actions import __version__
 from actions.set_up_cron.constants import KILL_AFTER, LOGS_KEEP, SCHEDULE, TIMEOUT
 from actions.set_up_cron.lib import Job, set_up_cron
 
@@ -68,7 +69,7 @@ def make_set_up_cron_cmd(
     ) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         job = Job(
             name,
             command,
