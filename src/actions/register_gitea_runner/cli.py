@@ -7,6 +7,7 @@ from click import Command, command
 from utilities.click import CONTEXT_SETTINGS, ListStrs, Str, option
 from utilities.core import is_pytest, set_up_logging
 
+from actions import __version__
 from actions.clean_dir.cli import make_clean_dir_cmd
 from actions.constants import sudo_option
 from actions.register_gitea_runner.constants import (
@@ -93,7 +94,7 @@ def make_register_gitea_runner_cmd(
     ) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         register_gitea_runner(
             runner_token=runner_token,
             ssh_user=ssh_user,

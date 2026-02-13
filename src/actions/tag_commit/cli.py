@@ -6,6 +6,7 @@ from click import Command, command
 from utilities.click import CONTEXT_SETTINGS, Str, option
 from utilities.core import is_pytest, set_up_logging
 
+from actions import __version__
 from actions.tag_commit.constants import USER_EMAIL, USER_NAME
 from actions.tag_commit.lib import tag_commit
 
@@ -31,7 +32,7 @@ def make_tag_commit_cmd(
     ) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         tag_commit(
             user_name=user_name,
             user_email=user_email,

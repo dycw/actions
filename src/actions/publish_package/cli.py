@@ -6,6 +6,7 @@ from click import Command, command
 from utilities.click import CONTEXT_SETTINGS, SecretStr, Str, option
 from utilities.core import is_pytest, set_up_logging
 
+from actions import __version__
 from actions.publish_package.lib import publish_package
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ def make_publish_package_cmd(
     ) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         publish_package(
             username=username,
             password=password,

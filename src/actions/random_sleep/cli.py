@@ -6,6 +6,7 @@ from click import Command, command
 from utilities.click import CONTEXT_SETTINGS, option
 from utilities.core import is_pytest, set_up_logging
 
+from actions import __version__
 from actions.random_sleep.constants import LOG_FREQ, MAX, MIN, STEP
 from actions.random_sleep.lib import random_sleep
 
@@ -25,7 +26,7 @@ def make_random_sleep_cmd(
     def func(*, min_: int, max_: int, step: int, log_freq: int) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         random_sleep(min=min_, max=max_, step=step, log_freq=log_freq)
 
     return cli(name=name, help="Random sleep with logging", **CONTEXT_SETTINGS)(func)

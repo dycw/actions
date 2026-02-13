@@ -7,6 +7,7 @@ from utilities.click import CONTEXT_SETTINGS, Path, option
 from utilities.constants import PWD
 from utilities.core import is_pytest, set_up_logging
 
+from actions import __version__
 from actions.clean_dir.lib import clean_dir
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ def make_clean_dir_cmd(
     def func(*, path: PathLike) -> None:
         if is_pytest():
             return
-        set_up_logging(__name__, root=True)
+        set_up_logging(__name__, root=True, log_version=__version__)
         clean_dir(path=path)
 
     return cli(name=name, help="Clean a directory", **CONTEXT_SETTINGS)(func)
