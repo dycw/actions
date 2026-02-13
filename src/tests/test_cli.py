@@ -28,7 +28,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from click import Command
-    from utilities.types import SequenceStr
 
 
 class TestCLI:
@@ -55,7 +54,7 @@ class TestCLI:
         ],
     )
     @throttle_test(duration=MINUTE)
-    def test_commands(self, *, command: Command, args: SequenceStr) -> None:
+    def test_commands(self, *, command: Command, args: list[str]) -> None:
         runner = CliRunner()
         result = runner.invoke(command, args)
         assert result.exit_code == 0, result.stderr
@@ -69,7 +68,7 @@ class TestCLI:
     )
     @throttle_test(duration=MINUTE)
     def test_re_encrypt(
-        self, *, command: Command, args: SequenceStr, tmp_path: Path
+        self, *, command: Command, args: list[str], tmp_path: Path
     ) -> None:
         path = tmp_path / "secrets.json"
         path.touch()
@@ -86,7 +85,7 @@ class TestCLI:
     )
     @throttle_test(duration=MINUTE)
     def test_register_gitea_runner(
-        self, *, command: Command, args: SequenceStr, tmp_path: Path
+        self, *, command: Command, args: list[str], tmp_path: Path
     ) -> None:
         path = tmp_path / "secrets.json"
         path.touch()
@@ -109,5 +108,5 @@ class TestCLI:
         ],
     )
     @throttle_test(duration=MINUTE)
-    def test_entrypoints_and_justfile(self, *, head: SequenceStr, command: str) -> None:
+    def test_entrypoints_and_justfile(self, *, head: list[str], command: str) -> None:
         run(*head, command, "--help")
