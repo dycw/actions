@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING, Self, assert_never
 
 from utilities.constants import SYSTEM, USER, Sentinel, sentinel
@@ -59,9 +60,9 @@ def set_up_cron(
     text = _get_crontab(
         job, *jobs, log_name=name_use, prepend_path=prepend_path, env_vars=env_vars
     )
-    _tee_and_perms(f"/etc/cron.d/{name_use}", text, sudo=sudo)
+    _tee_and_perms(Path("/etc/cron.d", name_use), text, sudo=sudo)
     _tee_and_perms(
-        f"/etc/logrotate.d/{cron_name}",
+        Path("/etc/logrotate.d", name_use),
         _get_logrotate(name_use, logs_keep=logs_keep),
         sudo=sudo,
     )
@@ -80,7 +81,7 @@ def _get_crontab(
     if log_name is not None:
         all_jobs = [j.replace(log=log_name) for j in all_jobs]
     text = substitute(
-        (PATH_CONFIGS / "cron.tmpl"),
+        PATH_CONFIGS / "cron.tmpl",
         PREPEND_PATH=""
         if prepend_path is None
         else "".join(f"{p}:" for p in prepend_path),
@@ -99,7 +100,7 @@ def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
 
 def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
     tee(path, text, sudo=sudo)
-    chown(path, sudo=sudo, user="root", group="root")
+    chown(path, sudo=sudo, owner="root", group="root")
     chmod(path, "u=rw,g=r,o=r", sudo=sudo)
 
 
@@ -151,7 +152,7 @@ class Job:
     @property
     def text(self) -> str:
         return substitute(
-            (PATH_CONFIGS / "job.tmpl"),
+            PATH_CONFIGS / "job.tmpl",
             SCHEDULE=self.schedule,
             USER=self.user,
             NAME=self.name,
