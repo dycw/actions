@@ -100,7 +100,7 @@ def _get_logrotate(name: str, /, *, logs_keep: int = LOGS_KEEP) -> str:
 
 def _tee_and_perms(path: PathLike, text: str, /, *, sudo: bool = False) -> None:
     tee(path, text, sudo=sudo)
-    chown(path, sudo=sudo, user="root", group="root")
+    chown(path, sudo=sudo, owner="root", group="root")
     chmod(path, "u=rw,g=r,o=r", sudo=sudo)
 
 
