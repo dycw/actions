@@ -58,7 +58,7 @@ def set_up_cron(
         case never:
             assert_never(never)
     text = _get_crontab(
-        job, *jobs, log_name=name_use, prepend_path=prepend_path, env_vars=env_vars
+        job, *jobs, family=name_use, prepend_path=prepend_path, env_vars=env_vars
     )
     _tee_and_perms(Path("/etc/cron.d", name_use), text, sudo=sudo)
     _tee_and_perms(
@@ -73,13 +73,13 @@ def _get_crontab(
     job: Job,
     /,
     *jobs: Job,
-    log_name: str | None = None,
+    family: str | None = None,
     prepend_path: Sequence[PathLike] | None = None,
     env_vars: StrStrMapping | None = None,
 ) -> str:
     all_jobs = [job, *jobs]
-    if log_name is not None:
-        all_jobs = [j.replace(log=log_name) for j in all_jobs]
+    if family is not None:
+        all_jobs = [j.replace(family=family) for j in all_jobs]
     text = substitute(
         PATH_CONFIGS / "cron.tmpl",
         PREPEND_PATH=""
@@ -117,11 +117,11 @@ class Job:
     kill_after: Duration = field(default=KILL_AFTER, kw_only=True)
     sudo: bool = field(default=SUDO, kw_only=True)
     args: list[str] | None = field(default=None, kw_only=True)
-    log: str | None = field(default=None, kw_only=True)
+    family: str | None = field(default=None, kw_only=True)
 
     @property
-    def log_use(self) -> str:
-        return self.name if self.log is None else self.log
+    def family_use(self) -> str:
+        return self.name if self.family is None else self.family
 
     def replace(
         self,
@@ -134,7 +134,7 @@ class Job:
         kill_after: Duration | Sentinel = sentinel,
         sudo: bool | Sentinel = sentinel,
         args: list[str] | None | Sentinel = sentinel,
-        log: str | None | Sentinel = sentinel,
+        family: str | None | Sentinel = sentinel,
     ) -> Self:
         return replace_non_sentinel(
             self,
@@ -146,7 +146,7 @@ class Job:
             kill_after=kill_after,
             sudo=sudo,
             args=args,
-            log=log,
+            family=family,
         )
 
     @property
@@ -157,6 +157,7 @@ class Job:
             USER=self.user,
             NAME=self.name,
             TIMEOUT=round(duration_to_seconds(self.timeout)),
+            FAMILY=self.family_use,
             KILL_AFTER=round(duration_to_seconds(self.kill_after)),
             COMMAND=self.command,
             COMMAND_ARGS_SPACE=" "
@@ -165,7 +166,6 @@ class Job:
             SUDO="sudo" if self.sudo else "",
             SUDO_TEE_SPACE=" " if self.sudo else "",
             ARGS="" if self.args is None else " ".join(self.args),
-            LOG=self.log_use,
         )
 
 
