@@ -26,24 +26,24 @@ PATH=/usr/local/bin:/usr/bin:/bin
 """
         assert result == expected
 
-    def test_log_name(self) -> None:
-        result = _get_crontab(Job("name", "command"), log_name="other")
+    def test_family(self) -> None:
+        result = _get_crontab(Job("name", "command"), family="family")
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/other.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-family.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/family.log
 """
         assert result == expected
 
-    def test_multiple_and_log_name(self) -> None:
+    def test_multiple_and_family(self) -> None:
         result = _get_crontab(
-            Job("name1", "command1"), Job("name2", "command2"), log_name="other"
+            Job("name1", "command1"), Job("name2", "command2"), family="family"
         )
         expected = f"""\
 PATH=/usr/local/bin:/usr/bin:/bin
 
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name1'..."; flock --nonblock --verbose /tmp/cron-name1.lock timeout --kill-after=10s --verbose 60s command1; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name1' with exit code $?") 2>&1 | tee -a /var/log/other.log
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name2'..."; flock --nonblock --verbose /tmp/cron-name2.lock timeout --kill-after=10s --verbose 60s command2; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name2' with exit code $?") 2>&1 | tee -a /var/log/other.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name1'..."; flock --nonblock --verbose /tmp/cron-family.lock timeout --kill-after=10s --verbose 60s command1; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name1' with exit code $?") 2>&1 | tee -a /var/log/family.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name2'..."; flock --nonblock --verbose /tmp/cron-family.lock timeout --kill-after=10s --verbose 60s command2; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name2' with exit code $?") 2>&1 | tee -a /var/log/family.log
 """
         assert result == expected
 
@@ -130,9 +130,9 @@ class TestJob:
 """)
         assert result == expected
 
-    def test_log(self) -> None:
-        result = Job("name", "command", log="other").text
+    def test_family(self) -> None:
+        result = Job("name", "command", family="family").text
         expected = normalize_multi_line_str(f"""
-* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-name.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/other.log
+* * * * * {USER} (echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Starting 'name'..."; flock --nonblock --verbose /tmp/cron-family.lock timeout --kill-after=10s --verbose 60s command; echo "[$(date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S') | $$] Finished 'name' with exit code $?") 2>&1 | tee -a /var/log/family.log
 """)
         assert result == expected
